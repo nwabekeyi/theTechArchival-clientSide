@@ -1,14 +1,11 @@
 import { useState, useEffect } from 'react';
-import { updateCourseCurriculum } from "../../../../../firebase/utils";
 import useApi from '../../../../../hooks/useApi';
-import useWebSocket from '../../../../../hooks/useWebocket';
 import { useDispatch, useSelector } from 'react-redux';
 import {setAllCourses} from '../../../../../reduxStore/slices/adminDataSlice'
 import { endpoints } from '../../../../../utils/constants';
 
 
 const useCourses = () => {
-  const actionToSend = { action: 'watch courses' };
 
   // Use the centralized useWebSocket hook, passing both URL and actionToSend
 
@@ -130,7 +127,6 @@ const useCourses = () => {
   // Update course curriculum
   const handleUpdateCurriculum = async () => {
     try {
-      await updateCourseCurriculum(currentCourseId, formValues.curriculum);
 
       const updatedCourses = courses.map(course =>
         course.id === currentCourseId ? { ...course, curriculum: formValues.curriculum } : course

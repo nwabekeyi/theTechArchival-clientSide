@@ -1,6 +1,5 @@
 import { useState, useEffect } from 'react';
 import DeleteIcon from '@mui/icons-material/Delete';
-import { getStorage, ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import { useSelector } from 'react-redux';
 import EditIcon from '@mui/icons-material/Edit';
 import {IconButton,Typography} from "@mui/material";
@@ -53,15 +52,15 @@ const useUserManagement = () => {
   const handleImageUpload = async (file) => {
     if (!file) return;
 
-    try {
-      const storage = getStorage();
-      const storageRef = ref(storage, `profile_pictures/${file.name}`);
-      await uploadBytes(storageRef, file);
-      const downloadURL = await getDownloadURL(storageRef);
-      return downloadURL;
-    } catch (error) {
-      console.error("Error uploading profile image:", error);
-    }
+    // try {
+    //   const storage = getStorage();
+    //   const storageRef = ref(storage, `profile_pictures/${file.name}`);
+    //   await uploadBytes(storageRef, file);
+    //   const downloadURL = await getDownloadURL(storageRef);
+    //   return downloadURL;
+    // } catch (error) {
+    //   console.error("Error uploading profile image:", error);
+    // }
   };
 
 
@@ -219,7 +218,6 @@ const useUserManagement = () => {
     },
   ];
   
-  console.log(selectedUser)
 
 
 

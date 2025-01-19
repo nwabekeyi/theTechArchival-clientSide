@@ -24,7 +24,6 @@ import LibraryBooksIcon from '@mui/icons-material/LibraryBooks';
 import SettingsOutlinedIcon from "@mui/icons-material/SettingsOutlined";
 import profileImg from "../../../../images/profile-placeholder.png";
 import EmailIcon from '@mui/icons-material/Email';
-import { logout } from "../../../../firebase/utils";
 import { useNavigate } from "react-router-dom";
 import { useSelector } from 'react-redux';
 import useAuth from "../../../../hooks/useAuth";
