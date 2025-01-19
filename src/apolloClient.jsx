@@ -3,7 +3,7 @@ import { ApolloClient, InMemoryCache, createHttpLink } from '@apollo/client';
 // Create HTTP link for standard queries and mutations
 const url = import.meta.env.VITE_MESSAGING_ENDPOINT
 const httpLink = createHttpLink({
-  uri: url,  // Your HTTP endpoint
+  uri: `${url}/graphql`,  // Your HTTP endpoint
 });
 
 // Initialize the Apollo Client

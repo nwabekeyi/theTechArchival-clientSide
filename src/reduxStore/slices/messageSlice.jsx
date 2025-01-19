@@ -77,7 +77,8 @@ const initialState = {
   chatroomMessages: {}, // This will store chatroom messages
   messageLoading: false,
   error: null,
-  chatrooms : []
+  chatrooms : [],
+  unreadChatroomMessages : []
 };
 
 const messageSlice = createSlice({
@@ -140,6 +141,11 @@ const messageSlice = createSlice({
       state.chatrooms = action.payload; // Set chatrooms from an external source
     },
 
+    // New reducer to set unread chatroom messages
+    setUnreadChatroomMessages: (state, action) => {
+       state.unreadChatroomMessages = action.payload;
+        },
+
     addChatroom: (state, action) => {
       state.chatrooms.push(action.payload); // Add a new chatroom to the list
     }
@@ -174,7 +180,16 @@ const messageSlice = createSlice({
 });
 
 // Export the actions
-export const { addPrivateMessage, addChatroomMessages, addChatroomMessage, setMessageLoading, updateDeliveredTo, addChatroom, setAdminChatrooms} = messageSlice.actions;
+export const { 
+  addPrivateMessage,
+  addChatroomMessages, 
+  addChatroomMessage, 
+  setMessageLoading, 
+  updateDeliveredTo, 
+  addChatroom, 
+  setAdminChatrooms,
+  setUnreadChatroomMessages
+} = messageSlice.actions;
 
 // Export the reducer
 export default messageSlice.reducer;

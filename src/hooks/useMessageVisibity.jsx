@@ -1,9 +1,11 @@
 import { useState, useEffect, useRef } from 'react';
-import { useSelector } from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux';
+import { setUnreadChatroomMessages } from '../reduxStore/slices/messageSlice';
 
 export const useMessageVisibility = (messageRefs, messages, chatroomName) => {
   const [visibleMessages, setVisibleMessages] = useState([]);
   const userId = useSelector((state) => state.users.user.userId);
+  const dispatch = useDispatch();
 
   const observer = useRef(null);
 
@@ -55,5 +57,11 @@ export const useMessageVisibility = (messageRefs, messages, chatroomName) => {
     };
   }, [messages, messageRefs, userId]);
 
+// Dispatch the updated unread messages whenever visibleMessages changes
+useEffect(() => {
+  if (visibleMessages.length > 0) {
+    dispatch(setUnreadChatroomMessages(visibleMessages));
+  }
+}, [visibleMessages, dispatch]);
   return visibleMessages;
 };

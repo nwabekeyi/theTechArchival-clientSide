@@ -10,22 +10,27 @@ const useWebSocket = (listeners = [], actionToSend = null) => {
   const { userId, role, profilePictureUrl, lastName, firstName } = useSelector((state) => state.users.user) || {};
   const dispatch = useDispatch();
   const chatroomNames = useSelector((state) => state.message.chatrooms);
+  const unreadMessages = useSelector((state) => state.message.unreadChatroomMessages);
   const recipientDetails = {
     userId: userId,
     firstName: firstName,
     lastName: lastName,
     profilePictureUrl: profilePictureUrl
   };
-
   useEffect(() => {
     if (!socket.current) {
-      socket.current = io('http://localhost:4000', {
+      socket.current = io(import.meta.env.VITE_MESSAGING_ENDPOINT, {
         transports: ['websocket', 'polling'],
         reconnectionAttempts: 5,
         reconnectionDelay: 1000,
       });
 
-      
+    // Log unread messages length when it's available
+    console.log('Initial unreadMessages length:', unreadMessages.length);
+
+    if (unreadMessages.length) {
+      console.log('Unread messages length in if block:', unreadMessages.length);
+    }
 
       // Handle 'chatroom message' event
       socket.current.on('chatroom message', ({ chatroomName, message }) => {
