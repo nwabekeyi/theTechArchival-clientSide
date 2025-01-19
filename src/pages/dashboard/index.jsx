@@ -18,7 +18,6 @@ const Dashboard = lazy(() => import("./scenes/dashboard"));
 const Team = lazy(() => import("./scenes/team"));
 const FinancialManagement = lazy(() => import("./scenes/financialManagement"));
 const Contacts = lazy(() => import("./scenes/contacts"));
-const Bar = lazy(() => import("./scenes/bar"));
 const Form = lazy(() => import("./scenes/form"));
 const Line = lazy(() => import("./scenes/line"));
 const Pie = lazy(() => import("./scenes/pie"));
@@ -53,12 +52,6 @@ function DashboardHome() {
   const { emit, isConnected, listen} = useWebSocket();
 
 
-  
-  
-
-  const handleMessage = () => {
-    navigate("/messenger");
-  };
 
   const renderRoutesBasedOnRole = (role) => {
     switch (role) {
