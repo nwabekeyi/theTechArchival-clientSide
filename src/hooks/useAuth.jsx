@@ -1,6 +1,7 @@
 import { useDispatch, useSelector } from 'react-redux';
 import { setLoading, setError } from '../reduxStore/slices/uiSlice';
 import { setUser, resetUser} from '../reduxStore/slices/usersSlice';
+import { endpoints } from '../utils/constants';
 import { useEffect } from 'react';
 const useAuth = () => {
   const dispatch = useDispatch();
@@ -13,10 +14,9 @@ const useAuth = () => {
   const login = async (email, password) => {
     dispatch(setLoading(true)); // Start loading
     dispatch(setError(null)); // Clear any previous errors
-
     try {
       // Make the login API call to your backend
-      const res = await fetch('http://localhost:3500/api/v1/login', {
+      const res = await fetch(endpoints.LOGIN, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
