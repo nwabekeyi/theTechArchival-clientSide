@@ -63,7 +63,6 @@ function DashboardHome() {
             <Route path="/contacts" element={<Contacts />} />
             <Route path="/financialManagement" element={<FinancialManagement />} />
             <Route path="/form" element={<Form />} />
-            <Route path="/bar" element={<Bar />} />
             <Route path="/pie" element={<Pie />} />
             <Route path="/line" element={<Line />} />
             <Route path="/enquiries" element={<Enquiries />} />

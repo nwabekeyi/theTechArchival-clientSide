@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import styled from 'styled-components';
 import ChatbotBtn from '../chatbotBtn';
 import BtnWrapperStyle from '../btnWrapperstyle';
-import { submitEnquiry } from '../../../firebase/utils'; 
 import useApi from '../../../hooks/useApi';
 
 const ContactForm = () => {
@@ -15,9 +14,10 @@ const ContactForm = () => {
   };
 
   const handleSubmit = async (e) => {
+    const baseUrl = import.meta.env.VITE_API_BASE_URL
     e.preventDefault();
     try {
-      const result = await callApi('http://localhost:3500/api/v1/enquiries', 'POST', formData);
+      const result = await callApi(`${baseUrl}/api/v1/enquiries`, 'POST', formData);
       console.log('Enquiry submitted successfully:', result);
       setFormData({ name: '', message: '', phoneNumber: '' }); 
     } catch (err) {
