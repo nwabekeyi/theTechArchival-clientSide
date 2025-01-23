@@ -13,26 +13,38 @@ export const useMessageVisibility = (messageRefs, messages, chatroomName) => {
     // Create an IntersectionObserver
     observer.current = new IntersectionObserver(
       (entries) => {
-        const visibleMessagesArray = [];
+        const currentlyVisibleMessages = new Set(visibleMessages.map(msg => msg.messageId));
 
         entries.forEach((entry) => {
           const messageId = entry.target.firstElementChild.getAttribute('data-message-id');
           const message = messages.find((msg) => msg._id === messageId);
 
-          if (entry.isIntersecting && message && !message.readBy.includes(userId)) {
-            visibleMessagesArray.push({
-              messageId: message._id,
-              chatroomName,
-              userId,
-            });
+          if (entry.isIntersecting && message) {
+            // Check if the userId is not in the readBy array
+            const isReadByUser = message.readBy.some((readUser) => readUser.userId === userId);
+            console.log(isReadByUser)
+            if (!isReadByUser && !currentlyVisibleMessages.has(messageId)) {
+              // Add message to the list only if it's not already there
+              setVisibleMessages((prevMessages) => [
+                ...prevMessages,
+                {
+                  messageId: message._id,
+                  chatroomName,
+                  senderId: message.sender.id
+                }
+              ]);
+            }
+          } else if (!entry.isIntersecting && messageId && currentlyVisibleMessages.has(messageId)) {
+            // Remove messages that are no longer visible
+            setVisibleMessages((prevMessages) =>
+              prevMessages.filter((msg) => msg.messageId !== messageId)
+            );
           }
         });
-
-        setVisibleMessages(visibleMessagesArray);
       },
       {
         rootMargin: '0px',
-        threshold: 0.1, // Trigger when 50% of the message is visible
+        threshold: 0.1, // Trigger when 10% of the message is visible
       }
     );
 
@@ -55,13 +67,14 @@ export const useMessageVisibility = (messageRefs, messages, chatroomName) => {
         });
       }
     };
-  }, [messages, messageRefs, userId]);
+  }, [messages, messageRefs, userId, visibleMessages]);
 
-// Dispatch the updated unread messages whenever visibleMessages changes
-useEffect(() => {
-  if (visibleMessages.length > 0) {
-    dispatch(setUnreadChatroomMessages(visibleMessages));
-  }
-}, [visibleMessages, dispatch]);
+  // Dispatch the updated unread messages whenever visibleMessages changes
+  useEffect(() => {
+    if (visibleMessages.length > 0) {
+      dispatch(setUnreadChatroomMessages(visibleMessages));
+    }
+  }, [visibleMessages, dispatch]);
+
   return visibleMessages;
 };

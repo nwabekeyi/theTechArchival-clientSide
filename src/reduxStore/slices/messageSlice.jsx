@@ -1,5 +1,13 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
-import { saveMessage, isDBFull, removeOldestMessage, getMessagesFromIndexedDB, updateDeliveredToIndexedDB } from '../../utils/indexedDBService';
+import { 
+  saveMessage, 
+  isDBFull, 
+  removeOldestMessage, 
+  getMessagesFromIndexedDB, 
+  updateDeliveredToIndexedDB,
+  updateChatroomDeliveredTo,
+  updateChatroomReadby
+} from '../../utils/indexedDBService';
 
 // Thunk for loading messages from IndexedDB
 export const loadMessagesFromIndexedDB = createAsyncThunk(
@@ -14,6 +22,35 @@ export const loadMessagesFromIndexedDB = createAsyncThunk(
     }
   }
 );
+
+// Thunk to update the readBy array in IndexedDB
+export const updateChatroomReadbyThunk = createAsyncThunk(
+  'chatroom/updateChatroomReadby',
+  async ({ chatroomName, messageId, recipientDetails}, { rejectWithValue }) => {
+    try {
+      // Call the function to update the readBy array
+      await updateChatroomReadby(chatroomName, messageId, recipientDetails);
+    } catch (error) {
+      // Reject the thunk in case of an error
+      return rejectWithValue(error.message);
+    }
+  }
+);
+
+// Thunk to update the deliveredTo array in IndexedDB
+export const updateChatroomDeliveredToThunk = createAsyncThunk(
+  'chatroom/updateChatroomDeliveredTo',
+  async ({ chatroomName, messageId, recipientDetails }, { rejectWithValue }) => {
+    try {
+      // Call the function to update the deliveredTo array
+      await updateChatroomDeliveredTo(chatroomName, messageId, recipientDetails);
+    } catch (error) {
+      // Reject the thunk in case of an error
+      return rejectWithValue(error.message);
+    }
+  }
+);
+
 export const updateDeliveredToDB = createAsyncThunk(
   'message/updateDeliveredTo',
   async ({ chatroomName, messageId, recipientDetails }, { rejectWithValue }) => {
@@ -21,7 +58,7 @@ export const updateDeliveredToDB = createAsyncThunk(
       console.log('called update thunk');
       // Ensure that you await the promise resolution from `updateDeliveredToIndexedDB`
       const updatedDeliveredTo = await updateDeliveredToIndexedDB(chatroomName, messageId, recipientDetails);
-      
+
       // Return the resolved value, not the Promise
       return { chatroomName, messageId, updatedDeliveredTo };
     } catch (error) {
@@ -120,7 +157,7 @@ const messageSlice = createSlice({
       const { chatroomName, messageId, recipientDetails } = action.payload;
       console.log(recipientDetails);
 
-      const data = { chatroomName, messageId, recipientDetails } 
+      const data = { chatroomName, messageId, recipientDetails }
 
       // Find the message by messageId (_id) in the given chatroom
       const messages = state.chatroomMessages[chatroomName];
@@ -129,6 +166,24 @@ const messageSlice = createSlice({
         if (messageIndex !== -1) {
           // Push recipientDetails into the deliveredTo array for the found message
           state.chatroomMessages[chatroomName][messageIndex].deliveredTo.push(recipientDetails);
+        }
+      }
+    },
+
+    // New reducer to push recipientDetails into the readBy array
+    updateReadby: (state, action) => {
+      const { chatroomName, messageId, recipientDetails} = action.payload;
+      console.log(recipientDetails);
+
+      const data = { chatroomName, messageId, recipientDetails}
+
+      // Find the message by messageId (_id) in the given chatroom
+      const messages = state.chatroomMessages[chatroomName];
+      if (messages) {
+        const messageIndex = messages.findIndex(msg => msg._id === messageId);
+        if (messageIndex !== -1) {
+          // Push recipientDetails into the deliveredTo array for the found message
+          state.chatroomMessages[chatroomName][messageIndex].readBy.push(recipientDetails);
         }
       }
     },
@@ -180,15 +235,16 @@ const messageSlice = createSlice({
 });
 
 // Export the actions
-export const { 
+export const {
   addPrivateMessage,
-  addChatroomMessages, 
-  addChatroomMessage, 
-  setMessageLoading, 
-  updateDeliveredTo, 
-  addChatroom, 
+  addChatroomMessages,
+  addChatroomMessage,
+  setMessageLoading,
+  updateDeliveredTo,
+  addChatroom,
   setAdminChatrooms,
-  setUnreadChatroomMessages
+  setUnreadChatroomMessages,
+  updateReadby
 } = messageSlice.actions;
 
 // Export the reducer

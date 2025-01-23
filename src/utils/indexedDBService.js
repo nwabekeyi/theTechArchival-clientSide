@@ -319,4 +319,142 @@ const updateDeliveredToIndexedDB = async (chatroomName, messageId, recipientDeta
 };
 
 
-export { saveMessage, isDBFull, removeOldestMessage, openIndexedDB, updateDeliveredToIndexedDB };
+// Function to update the readBy array for a specific message in IndexedDB
+const updateChatroomReadby = async (chatroomName, messageId, readBy) => {
+  const dbName = 'Messages'; // Database name
+  const storeName = 'ChatroomMessages';
+
+  try {
+    // Open the IndexedDB database
+    const db = await openIndexedDB(dbName);
+    const transaction = db.transaction([storeName], 'readwrite');
+    const store = transaction.objectStore(storeName);
+
+    // Retrieve the chatroom by chatroomName
+    const request = store.get(chatroomName);
+
+    request.onsuccess = () => {
+      const chatroom = request.result;
+
+      if (!chatroom || !chatroom.messages) {
+        console.error(`Chatroom ${chatroomName} not found or has no messages.`);
+        return;
+      }
+
+      // Find the message by messageId and senderId
+      const message = chatroom.messages.find(msg => msg._id === messageId);
+
+      if (!message) {
+        console.error(`Message with ID ${messageId} and senderId ${senderId} not found in chatroom ${chatroomName}.`);
+        return;
+      }
+
+      // Check if readBy is already in the array
+      if (!message.readBy.includes(readBy)) {
+        // Add readBy to the message's readBy array
+        message.readBy.push(readBy);
+
+        // Update the chatroom with the modified message
+        const updateRequest = store.put(chatroom);
+        updateRequest.onsuccess = () => {
+          console.log(`Message readBy updated successfully in chatroom ${chatroomName}`);
+        };
+        updateRequest.onerror = (event) => {
+          console.error('Error updating readBy array:', event.target.error);
+        };
+      } else {
+        console.log('User already exists in the readBy array.');
+      }
+    };
+
+    request.onerror = (event) => {
+      console.error('Error retrieving chatroom from store:', event.target.error);
+    };
+
+    transaction.oncomplete = () => {
+      console.log('Transaction complete for updating readBy array.');
+    };
+
+    transaction.onerror = (event) => {
+      console.error('Transaction failed while updating readBy array:', event.target.error);
+    };
+  } catch (error) {
+    console.error('Failed to update readBy in IndexedDB:', error);
+  }
+};
+
+// Function to update the deliveredTo array in a message
+const updateChatroomDeliveredTo = async (chatroomName, messageId, recipientDetails) => {
+  const dbName = 'Messages'; // Database name
+  const storeName = 'ChatroomMessages';
+
+  try {
+    // Open the IndexedDB database
+    const db = await openIndexedDB(dbName);
+    const transaction = db.transaction([storeName], 'readwrite');
+    const store = transaction.objectStore(storeName);
+
+    // Retrieve the conversation by chatroomName
+    const request = store.get(chatroomName);
+
+    request.onsuccess = () => {
+      const conversation = request.result;
+
+      if (!conversation || !conversation.messages) {
+        console.error(`Chatroom ${chatroomName} not found or has no messages.`);
+        return;
+      }
+
+      // Find the message by messageId
+      const message = conversation.messages.find(msg => msg._id === messageId);
+
+      if (!message) {
+        console.error(`Message with ID ${messageId} not found in chatroom ${chatroomName}.`);
+        return;
+      }
+
+      // Add recipientDetails to the deliveredTo array if it doesn't already exist
+      const isRecipientAlreadyAdded = message.deliveredTo.some(recipient => recipient.id === recipientDetails.id);
+
+      if (!isRecipientAlreadyAdded) {
+        message.deliveredTo.push(recipientDetails);
+
+        // Update the conversation back in the store
+        const putRequest = store.put(conversation);
+        putRequest.onsuccess = () => {
+          console.log(`Recipient details added to message ID ${messageId} in chatroom ${chatroomName}.`);
+        };
+        putRequest.onerror = (event) => {
+          console.error('Error updating conversation:', event.target.error);
+        };
+      } else {
+        console.log(`Recipient with ID ${recipientDetails.id} is already in the deliveredTo array for message ID ${messageId}.`);
+      }
+    };
+
+    request.onerror = (event) => {
+      console.error('Error retrieving conversation from store:', event.target.error);
+    };
+
+    transaction.oncomplete = () => {
+      console.log('Transaction complete for updating deliveredTo array.');
+    };
+
+    transaction.onerror = (event) => {
+      console.error('Transaction failed while updating deliveredTo array:', event.target.error);
+    };
+  } catch (err) {
+    console.error('Failed to update deliveredTo array in IndexedDB:', err);
+  }
+};
+
+
+export {
+  saveMessage,
+  isDBFull,
+  removeOldestMessage,
+  openIndexedDB,
+  updateDeliveredToIndexedDB,
+  updateChatroomReadby,
+  updateChatroomDeliveredTo
+};
