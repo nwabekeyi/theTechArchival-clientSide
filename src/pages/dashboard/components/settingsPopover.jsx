@@ -64,7 +64,7 @@ const SettingsPopover = ({ anchorEl, handleClose, userDetails }) => {
         horizontal: 'right',
       }}
       PaperProps={{
-        style: { width: '30vw', padding: '16px' },
+        style: { width: '20vw', padding: '16px' },
       }}
     >
       <Box display="flex" alignItems="center" mb={2}>
