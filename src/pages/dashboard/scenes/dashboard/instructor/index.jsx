@@ -70,7 +70,7 @@ const Instructor = () => {
 
 
   return (
-    <Box m="20px">
+    <Box>
       {/* ROW 1 */}
       <Box display="grid" gridTemplateColumns="repeat(12, 1fr)" gap="20px">
         {/* Course Progress */}

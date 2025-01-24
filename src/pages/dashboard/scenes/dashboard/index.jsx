@@ -6,7 +6,7 @@ import Admin from './admin';
 import Student from './student'
 import Instructor from './instructor';
 import { useSelector} from 'react-redux'; // Import Redux hooks
-
+import withDashboardWrapper from '../../../../components/dasboardPagesContainer';
 
 const Dashboard = () => {
   const theme = useTheme();
@@ -15,7 +15,7 @@ const user = useSelector((state) => state.users.user)
 
 
   return (
-    <Box mx="20px">
+    <Box>
       {/* HEADER */}
       <Box display="flex" justifyContent="space-between" alignItems="center" mx='20px'>
         <Header title={user.firstName} subtitle="Welcome to your Babtech virtual learning dashboard" />
@@ -68,4 +68,4 @@ const user = useSelector((state) => state.users.user)
   );
 };
 
-export default Dashboard;
+export default withDashboardWrapper(Dashboard);

@@ -60,7 +60,7 @@ const Student = ({ user }) => {
   const conBg = `${theme.palette.mode === "light" ? colors.blueAccent[800] : colors.greenAccent[600]} !important`
 
   return (
-    <Box m="20px">
+    <Box>
       <Box display="grid" gridTemplateColumns="repeat(12, 1fr)" gap="20px">
         {/* FIRST ROW */}
         <Box gridColumn="span 12" display="grid" gridTemplateColumns="repeat(4, 1fr)" gap="20px">

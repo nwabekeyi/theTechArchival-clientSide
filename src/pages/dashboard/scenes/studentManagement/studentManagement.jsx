@@ -21,6 +21,7 @@ import useApi from '../../../../hooks/useApi';
 import { useSelector } from 'react-redux';
 import VisibilityIcon from '@mui/icons-material/Visibility'; // Import the eye icon
 import { tokens } from '../../theme';
+import withDashboardWrapper from '../../../../components/dasboardPagesContainer';
 
 const StudentManagement = () => {
   const theme = useTheme();
@@ -78,7 +79,7 @@ const StudentManagement = () => {
   };
 
   return (
-    <Box m='20px' >
+    <Box>
       <Grid item xs={12}>
         <Header
           title='Student Management'
@@ -145,4 +146,4 @@ const StudentManagement = () => {
   );
 };
 
-export default StudentManagement;
+export default withDashboardWrapper(StudentManagement);
