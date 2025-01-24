@@ -2,8 +2,8 @@ import { useEffect, useRef, useState, useMemo, useCallback } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { addChatroomMessage, updateDeliveredTo } from '../reduxStore/slices/messageSlice';
 import io from 'socket.io-client';
-import { 
-  checkDBFullnessAndSave, 
+import {
+  checkDBFullnessAndSave,
   updateDeliveredToDB,
   updateReadby,
   updateChatroomReadbyThunk
@@ -88,6 +88,7 @@ const useWebSocket = (actionToSend = null) => {
         setIsConnected(false);
       });
 
+      
 
       return () => {
         if (socket.current) {
@@ -99,6 +100,13 @@ const useWebSocket = (actionToSend = null) => {
       };
     }
   }, [userId, role, actionToSend, dispatch, recipientDetails]);
+
+  //request for offline readby and deliveredTo array
+  // useEffect(() => {
+  //   chatroomNames.forEach((chatroomName) => {
+
+  //   })
+  // }, [])
 
   // Handle message read logic
   useEffect(() => {

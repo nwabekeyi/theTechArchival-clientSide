@@ -9,26 +9,25 @@ import PeopleOutlinedIcon from "@mui/icons-material/PeopleOutlined";
 import ContactsOutlinedIcon from "@mui/icons-material/ContactsOutlined";
 import ReceiptOutlinedIcon from "@mui/icons-material/ReceiptOutlined";
 import PersonOutlinedIcon from "@mui/icons-material/PersonOutlined";
-import SupportAgentIcon from '@mui/icons-material/SupportAgent';
-import FeedbackIcon from '@mui/icons-material/Feedback';
+import SupportAgentIcon from "@mui/icons-material/SupportAgent";
+import FeedbackIcon from "@mui/icons-material/Feedback";
 import TimelineOutlinedIcon from "@mui/icons-material/TimelineOutlined";
 import MenuOutlinedIcon from "@mui/icons-material/MenuOutlined";
 import MapOutlinedIcon from "@mui/icons-material/MapOutlined";
-import LogoutIcon from '@mui/icons-material/Logout';
-import AssignmentIcon from '@mui/icons-material/Assignment';
+import AssignmentIcon from "@mui/icons-material/Assignment";
 import CalendarTodayIcon from "@mui/icons-material/CalendarToday";
-import SchoolIcon from '@mui/icons-material/School';
-import GradeIcon from '@mui/icons-material/Grade';
-import FolderIcon from '@mui/icons-material/Folder';
-import LibraryBooksIcon from '@mui/icons-material/LibraryBooks';
+import SchoolIcon from "@mui/icons-material/School";
+import GradeIcon from "@mui/icons-material/Grade";
+import FolderIcon from "@mui/icons-material/Folder";
+import LibraryBooksIcon from "@mui/icons-material/LibraryBooks";
 import SettingsOutlinedIcon from "@mui/icons-material/SettingsOutlined";
 import profileImg from "../../../../images/profile-placeholder.png";
-import EmailIcon from '@mui/icons-material/Email';
+import EmailIcon from "@mui/icons-material/Email";
 import { useNavigate } from "react-router-dom";
-import { useSelector } from 'react-redux';
+import { useSelector } from "react-redux";
 import useAuth from "../../../../hooks/useAuth";
 
-const Item = ({ title, to, icon, selected, setSelected }) => {
+const Item = ({ title, to, icon, selected, setSelected, isCollapsed }) => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
 
@@ -40,8 +39,9 @@ const Item = ({ title, to, icon, selected, setSelected }) => {
       }}
       onClick={() => setSelected(title)}
       icon={icon}
+      title={title} // Tooltip for icon when sidebar is collapsed
     >
-      <Typography>{title}</Typography>
+      {!isCollapsed && <Typography>{title}</Typography>}
       <Link to={to} />
     </MenuItem>
   );
@@ -50,16 +50,10 @@ const Item = ({ title, to, icon, selected, setSelected }) => {
 const Sidebar = () => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
-  const [isCollapsed, setIsCollapsed] = useState(false);
+  const [isCollapsed, setIsCollapsed] = useState(true); // Default state is now collapsed
   const [selected, setSelected] = useState("Dashboard");
   const navigate = useNavigate();
   const user = useSelector((state) => state.users.user);
-  const { logout } = useAuth();
-
-  const handleLogout = () => {
-    logout();
-    navigate("/");
-  };
 
   if (!user) {
     return null; // or a loading spinner, or some fallback UI
@@ -72,15 +66,15 @@ const Sidebar = () => {
     { title: "User Management", to: "/dashboard/userManagement", icon: <PeopleOutlinedIcon /> },
     { title: "Course Management", to: "/dashboard/courseManagement", icon: <ReceiptOutlinedIcon /> },
     { title: "Content Management", to: "/dashboard/contentManagement", icon: <AssignmentIcon /> },
-    { title: "Financial Management", to: "/dashboard/fInancialManagement", icon: <ContactsOutlinedIcon /> },
+    { title: "Financial Management", to: "/dashboard/financialManagement", icon: <ContactsOutlinedIcon /> },
     { title: "Team", to: "/dashboard/team", icon: <PersonOutlinedIcon /> },
-    { title: "Analytics and Reporting", to: "s", icon: <MapOutlinedIcon /> },
-    { title: "Growth & Innovation", to: "", icon: <TimelineOutlinedIcon /> },
+    { title: "Analytics and Reporting", to: "/dashboard/analytics", icon: <MapOutlinedIcon /> },
+    { title: "Growth & Innovation", to: "/dashboard/growth", icon: <TimelineOutlinedIcon /> },
     { title: "Contacts", to: "/dashboard/contacts", icon: <SettingsOutlinedIcon /> },
     { title: "Support", to: "/dashboard/support", icon: <SupportAgentIcon /> },
     { title: "Feedbacks", to: "/dashboard/feedbacks", icon: <FeedbackIcon /> },
     { title: "Enquiries", to: "/dashboard/enquiries", icon: <EmailIcon /> },
-    { title: "Generated codes", to: "/dashboard/offlineStudents", icon: <PersonOutlinedIcon /> },
+    { title: "Generated Codes", to: "/dashboard/offlineStudents", icon: <PersonOutlinedIcon /> },
   ];
 
   const studentMenuItems = [
@@ -122,15 +116,15 @@ const Sidebar = () => {
       sx={{
         "& .pro-sidebar-inner": {
           background: `${theme.palette.mode === "light" ? colors.blueAccent[200] : colors.primary[400]} !important`,
-          position: 'fixed',
-          overflow: 'hidden',
+          position: "fixed",
+          overflow: "hidden",
         },
         "& .pro-icon-wrapper": {
           backgroundColor: "transparent !important",
         },
         "& .pro-inner-item": {
           padding: "5px 35px 5px 20px !important",
-          color: '#fff !important',
+          color: "#fff !important",
         },
         "& .pro-inner-item:hover": {
           color: "#868dfb !important",
@@ -146,7 +140,7 @@ const Sidebar = () => {
         },
         "&::-webkit-scrollbar-track": {
           background: "transparent",
-        }
+        },
       }}
     >
       <ProSidebar collapsed={isCollapsed}>
@@ -154,26 +148,18 @@ const Sidebar = () => {
           {/* LOGO AND MENU ICON */}
           <MenuItem
             onClick={() => setIsCollapsed(!isCollapsed)}
-            icon={isCollapsed ? <MenuOutlinedIcon /> : undefined}
+            icon={isCollapsed ? <MenuOutlinedIcon title="Menu" /> : undefined}
             style={{
               margin: "10px 0 20px 0",
-              color: '#fff',
+              color: "#fff",
             }}
           >
             {!isCollapsed && (
-              <Box
-                display="flex"
-                justifyContent="space-between"
-                alignItems="center"
-                ml="15px"
-              >
-                <Typography variant="h4" >
-                    Babtech E-learning
-                </Typography>
-                <IconButton onClick={() => setIsCollapsed(!isCollapsed)} 
-                sx={{ color: '#fff'}}>
-                          <MenuOutlinedIcon />
-                        </IconButton>
+              <Box display="flex" justifyContent="space-between" alignItems="center" ml="15px">
+                <Typography variant="h4">Babtech E-learning</Typography>
+                <IconButton onClick={() => setIsCollapsed(!isCollapsed)} sx={{ color: "#fff" }}>
+                  <MenuOutlinedIcon />
+                </IconButton>
               </Box>
             )}
           </MenuItem>
@@ -188,12 +174,7 @@ const Sidebar = () => {
                 />
               </Box>
               <Box textAlign="center">
-                <Typography
-                  variant="h2"
-                  fontWeight="bold"
-                  fontSize="medium"
-                  sx={{ p: "10px 0 0 0" }}
-                >
+                <Typography variant="h2" fontWeight="bold" fontSize="medium" sx={{ p: "10px 0 0 0" }}>
                   {`${user.firstName} ${user.lastName}`}
                 </Typography>
                 <Typography variant="h5">
@@ -212,13 +193,9 @@ const Sidebar = () => {
                 icon={item.icon}
                 selected={selected}
                 setSelected={setSelected}
+                isCollapsed={isCollapsed} // Pass isCollapsed here
               />
             ))}
-            <br />
-            <IconButton onClick={handleLogout} style={{ color: '#fff' }}>
-              <LogoutIcon />
-              <Typography>Sign out</Typography>
-            </IconButton>
           </Box>
         </Menu>
       </ProSidebar>

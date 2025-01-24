@@ -2,15 +2,12 @@ import React, { useState, useContext } from 'react';
 import { useSelector, useDispatch } from 'react-redux'; // Import Redux hooks
 import { Box, InputBase, IconButton, useTheme, Badge, Button, Avatar, Typography } from "@mui/material";
 import { ColorModeContext, tokens } from "../../theme";
-import LightModeOutlinedIcon from "@mui/icons-material/LightModeOutlined";
-import DarkModeOutlinedIcon from "@mui/icons-material/DarkModeOutlined";
 import NotificationsOutlinedIcon from "@mui/icons-material/NotificationsOutlined";
 import SettingsOutlinedIcon from "@mui/icons-material/SettingsOutlined";
-import PersonOutlinedIcon from "@mui/icons-material/PersonOutlined";
 import SearchIcon from "@mui/icons-material/Search";
 import NotificationsPopover from '../../components/notificationPopper';
 import CodeGenerator from '../../../../generateCode/codeGenerator'; 
-import Modal from '../../components/modal';
+import SettingsPopover from '../../components/settingsPopover';
 
 
 
@@ -18,45 +15,45 @@ import Modal from '../../components/modal';
 const Topbar = () => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
-  const colorMode = useContext(ColorModeContext);
-  
+
   // Access notifications and unreadCount from Redux store
   const { unreadCount } = useSelector((state) => state.notifications);
   
   const userDetails = useSelector((state) => state.users.user);
-  const [settingsOpen, setSettingsOpen] = useState(false);
-  const [profileOpen, setProfileOpen] = useState(false);
   const [notificationsAnchorEl, setNotificationsAnchorEl] = useState(null);
-
-  const handleOpenSettings = () => setSettingsOpen(true);
-  const handleCloseSettings = () => setSettingsOpen(false);
-
-  const handleOpenProfile = () => setProfileOpen(true);
-  const handleCloseProfile = () => setProfileOpen(false);
+  const [settingsAnchorEl, setSettingsAnchorEl] = useState(null);
 
   const handleOpenNotifications = (event) => {
     setNotificationsAnchorEl(event.currentTarget);
     // Do not mark all notifications as read here
     // Simply open the notification popover
   };
+  const handleOpenSettings = (event) => {
+    setSettingsAnchorEl(event.currentTarget);
+  };
 
   const handleCloseNotifications = () => {
     setNotificationsAnchorEl(null);
   };
+  const handleCloseSettings = () => {
+    setSettingsAnchorEl(null);
+  };
 
   const isNotificationsOpen = Boolean(notificationsAnchorEl);
+  const isSettingsOpen = Boolean(settingsAnchorEl);
+
   const notificationsId = isNotificationsOpen ? 'simple-popover' : undefined;
 
   return (
     <Box display="flex" justifyContent="space-between"
-     p={2} 
-     borderRadius="7px"
+     py={2} 
+     px={5} 
 
      sx={{
       position: 'sticky',
       top: 0, // Stick to the top of the page
       zIndex: 1000, // Ensure it stays above other content
-      backgroundColor: `${theme.palette.mode === "light" ? colors.blueAccent[800] : colors.primary[500]} !important`,
+      backgroundColor: `${theme.palette.mode === "light" ? colors.blueAccent[200] : colors.primary[400]} !important`,
     }}
     >
       {/* SEARCH BAR */}
@@ -85,13 +82,6 @@ const Topbar = () => {
               : colors.blueAccent[700],
         }}
       >
-        <IconButton onClick={colorMode.toggleColorMode}>
-          {theme.palette.mode === "dark" ? (
-            <DarkModeOutlinedIcon />
-          ) : (
-            <LightModeOutlinedIcon />
-          )}
-        </IconButton>
         <IconButton onClick={handleOpenNotifications}>
           <Badge badgeContent={unreadCount} color="error">
             <NotificationsOutlinedIcon />
@@ -99,9 +89,6 @@ const Topbar = () => {
         </IconButton>
         <IconButton onClick={handleOpenSettings}>
           <SettingsOutlinedIcon />
-        </IconButton>
-        <IconButton onClick={handleOpenProfile}>
-          <PersonOutlinedIcon />
         </IconButton>
       </Box>
 
@@ -113,32 +100,13 @@ const Topbar = () => {
         role={userDetails.role}      // Pass the user role from Redux state
       />
 
-      {/* Profile Modal */}
-      <Modal open={profileOpen} onClose={handleCloseProfile} title="Profile" noConfirm>
-        <Box display="flex" flexDirection="column" alignItems="center" mb={2}>
-          {/* Profile Picture */}
-          <Avatar alt="Profile Picture" src={userDetails.idCardUrl} sx={{ width: 100, height: 100, mb: 2 }} />
-          
-          {/* Display User Details */}
-          <Typography variant="h6" sx={{ marginBottom: '10px' }}>
-            <strong>First Name:</strong> {userDetails.firstName}
-          </Typography>
-          <Typography variant="h6" sx={{ marginBottom: '10px' }}>
-            <strong>Last Name:</strong> {userDetails.lastName}
-          </Typography>
-          <Typography variant="h6" sx={{ marginBottom: '10px' }}>
-            <strong>Email:</strong> {userDetails.email}
-          </Typography>
-          <Typography variant="h6" sx={{ marginBottom: '10px' }}>
-            <strong>Phone Number:</strong> {userDetails.phoneNumber}
-          </Typography>
-          
-          {/* Close Button */}
-          <Button onClick={handleCloseProfile} variant="contained" color="primary">
-            Close
-          </Button>
-        </Box>
-      </Modal>
+        {/* Setttings Popover */}
+        <SettingsPopover
+        anchorEl={settingsAnchorEl}
+        handleClose={handleCloseSettings}
+        userDetails={userDetails}      // Pass the user role from Redux state
+      />
+
     </Box>
   );
 };
