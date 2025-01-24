@@ -7,7 +7,7 @@ class MessageParser {
     const lowerCase = message.toLowerCase();
     // const courseInfo = ActionProvider.handleCourseInfo
 
-    if (lowerCase.includes('hello')) {
+    if (lowerCase.includes('hello') || lowerCase.includes('hi')) {
       this.actionProvider.handleHello();
     }
     else if (lowerCase.includes('register') &&
@@ -260,6 +260,20 @@ class MessageParser {
     ) {
       this.actionProvider.handleCareerAdvancement();
     }
+
+    else if(
+      lowerCase.includes('refund') &&
+      lowerCase.includes('policy') || lowerCase.include('policies')
+    ){
+      this.actionProvider.handleRefundPolicy();
+    }
+
+    // else if(
+    //   lowerCase.includes('courses') &&
+    //   lowerCase.includes('self-paced') || lowerCase.include('instructor-led')
+    // ){
+    //   this.actionProvider.handleStudentPace();
+    // }
 
     else {
       this.actionProvider.handleUnknownQuery();

@@ -3,6 +3,7 @@ import { Box, Typography, useTheme, LinearProgress } from "@mui/material";
 import Header from "../../components/Header";
 import { tokens } from "../../theme";
 import useStudentData from "../dashboard/student/useStudentData"; // Import your custom hook
+import withDashboardWrapper from "../../../../components/dasboardPagesContainer";
 
 const StudentProgress = () => {
   const theme = useTheme();
@@ -12,7 +13,7 @@ const StudentProgress = () => {
   const { completedCourses, remainingCourses, progressPercentage } = useStudentData();
   console.log({ completedCourses, remainingCourses, progressPercentage })
   return (
-    <Box m="20px">
+    <Box>
       <Header title="Student Progress" subtitle="Track Your Learning Progress" />
 
       <Box
@@ -77,4 +78,4 @@ const StudentProgress = () => {
   );
 };
 
-export default StudentProgress;
+export default withDashboardWrapper(StudentProgress);

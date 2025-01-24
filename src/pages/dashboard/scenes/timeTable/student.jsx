@@ -72,7 +72,7 @@ const TimeTable = () => {
   };
 
   return (
-    <Box p="20px">
+    <Box py="20px">
       <Header title="TIME TABLE" subtitle="Overview of Schedule" />
       {loading ? (
         <Loader />

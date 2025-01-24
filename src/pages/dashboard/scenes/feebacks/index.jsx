@@ -14,6 +14,8 @@ import { tokens } from '../../theme';
 import Header from '../../components/Header';
 import TableComponent from '../../../../components/table';
 import useApi from '../../../../hooks/useApi'; // Import your custom hook
+import withDashboardWrapper from '../../../../components/dasboardPagesContainer';
+
 
 const Feedbacks = () => {
   const theme = useTheme();
@@ -107,7 +109,7 @@ const Feedbacks = () => {
   };
 
   return (
-    <Box m="20px">
+    <Box>
       <Header title="Feedback" subtitle="Feedback from Students, Instructors, and Workers" />
 
       {fetchLoading && <Typography>Loading feedbacks...</Typography>}
@@ -190,4 +192,4 @@ const Feedbacks = () => {
   );
 };
 
-export default Feedbacks;
+export default withDashboardWrapper(Feedbacks);

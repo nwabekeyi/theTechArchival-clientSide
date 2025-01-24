@@ -200,7 +200,7 @@ const Assignment = () => {
   ];
 
   return (
-    <Box m="20px">
+    <Box>
       <Header
         title="ASSIGNMENTS"
         subtitle="Overview of Assignments"

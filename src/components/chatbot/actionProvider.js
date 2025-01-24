@@ -328,6 +328,24 @@ class ActionProvider {
     this.addMessageToBotState(message);
   };
 
+  handleRefundPolicy = () => {
+    const messages = this.createChatBotMessage(
+      "All deposits made by any individual can not be refunded back.",
+        );
+
+    this.addMessageToBotState(messages);
+  };
+
+  // handleStudentPace = () => {
+  //   const messages = this.createChatBotMessage(
+  //     "In any of our courses, you will be assigned to an instructor hence making the courses instuctor-led.",
+  //       );
+
+  //   this.addMessageToBotState(messages);
+  // };
+
+  
+
   addMessageToBotState = (messages, newState) => {
     if (Array.isArray(messages)) {
       this.setState((state) => ({

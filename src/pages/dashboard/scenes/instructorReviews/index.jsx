@@ -5,6 +5,7 @@ import { tokens } from '../../theme';
 import { useSelector } from 'react-redux';
 import useApi from '../../../../hooks/useApi';
 import { endpoints } from '../../../../utils/constants';
+import withDashboardWrapper from '../../../../components/dasboardPagesContainer';
 
 const InstructorReviews = () => {
   const theme = useTheme();
@@ -41,7 +42,7 @@ const InstructorReviews = () => {
   }
 
   return (
-    <Box m="20px">
+    <Box>
       <Typography variant="h4" fontWeight="600" mb="20px" color={colors.greenAccent[500]}>
         Instructor Reviews
       </Typography>
@@ -71,4 +72,4 @@ const InstructorReviews = () => {
   );
 };
 
-export default InstructorReviews;
+export default withDashboardWrapper(InstructorReviews);

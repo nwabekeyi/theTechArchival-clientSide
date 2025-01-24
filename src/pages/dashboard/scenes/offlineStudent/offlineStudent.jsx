@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import TableComponent from "../../../../components/table";
 import { Button } from "@mui/material";
+import withDashboardWrapper from "../../../../components/dasboardPagesContainer";
 
 const OfflineStudentTable = () => {
   const [codes, setCodes] = useState([]); // Local state for handling codes
@@ -86,7 +87,7 @@ const OfflineStudentTable = () => {
   const filteredCodes = codes.filter((code) => code.studentType === tab);
 
   return (
-    <div style={{ padding: "20px" }}>
+    <div>
       {/* Tab Section */}
       <div style={{ marginBottom: "20px", display: "flex", gap: "10px" }}>
         <Button
@@ -138,4 +139,4 @@ const OfflineStudentTable = () => {
   );
 };
 
-export default OfflineStudentTable;
+export default withDashboardWrapper(OfflineStudentTable);

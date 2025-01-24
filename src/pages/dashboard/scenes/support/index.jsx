@@ -10,6 +10,7 @@ import { tokens } from "../../theme";
 import Header from "../../components/Header";
 import TableComponent from "../../../../components/table"; // Ensure this path is correct
 import useApi from "../../../../hooks/useApi"; // Adjust the path to where your `useApi` hook is stored
+import withDashboardWrapper from "../../../../components/dasboardPagesContainer";
 
 const Support = () => {
   const theme = useTheme();
@@ -74,7 +75,7 @@ const Support = () => {
   };
 
   return (
-    <Box m="20px">
+    <Box>
       <Header
         title="Support and Customer Care"
         subtitle="Submit your inquiries and concerns"
@@ -163,4 +164,4 @@ const Support = () => {
   );
 };
 
-export default Support;
+export default withDashboardWrapper(Support);

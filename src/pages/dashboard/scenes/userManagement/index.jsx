@@ -8,6 +8,7 @@ import TableComponent from "../../../../components/table";
 import useUserManagement from './useUserManagement';
 import ScrollDialog from '../../components/scrollDialog'; // Importing the ScrollDialog component
 import SignUpForm from '../../../../components/signUp';
+import withDashboardWrapper from '../../../../components/dasboardPagesContainer';
 
 const UserManagement = () => {
   const theme = useTheme();
@@ -61,7 +62,7 @@ const UserManagement = () => {
   }, [selectedUser]);
 
   return (
-    <Box m="20px">
+    <Box>
       <Header title="User Management" subtitle="Manage users" />
 
       <Dropdown
@@ -213,4 +214,4 @@ const UserManagement = () => {
   );
 };
 
-export default UserManagement;
+export default withDashboardWrapper(UserManagement);
