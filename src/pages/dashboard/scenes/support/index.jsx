@@ -27,28 +27,28 @@ const Support = () => {
     loading: loadingInquiries,
     error: errorInquiries,
     callApi: fetchInquiries,
-  } = useApi(endpoints.ENQUIRIES);
+  } = useApi();
 
   const {
     callApi: submitInquiry,
     loading: loadingSubmit,
     error: errorSubmit,
-  } = useApi(endpoints.ENQUIRIES);
+  } = useApi();
 
   // Fetch inquiries on component mount
   useEffect(() => {
-    fetchInquiries("GET");
+    fetchInquiries(endpoints.ENQUIRIES, 'GET');
   }, [fetchInquiries]);
 
   // Submit a new inquiry
   const handleSubmit = async (e) => {
     e.preventDefault();
     const newInquiry = { name, email, date, message };
-    await submitInquiry("POST", newInquiry);
+    await submitInquiry(endpoints.ENQUIRIES, "POST", newInquiry);
 
     // Refresh the inquiries list after successful submission
     if (!errorSubmit) {
-      fetchInquiries("GET");
+      fetchInquiries(endpoints.ENQUIRIES, "GET");
       setName("");
       setEmail("");
       setDate("");
