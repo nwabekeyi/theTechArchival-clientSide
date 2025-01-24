@@ -10,6 +10,7 @@ import { tokens } from "../../theme";
 import Header from "../../components/Header";
 import TableComponent from "../../../../components/table"; // Ensure this path is correct
 import useApi from "../../../../hooks/useApi"; // Adjust the path to where your `useApi` hook is stored
+import { endpoints } from "../../../../utils/constants";
 
 const Support = () => {
   const theme = useTheme();
@@ -25,13 +26,13 @@ const Support = () => {
     loading: loadingInquiries,
     error: errorInquiries,
     callApi: fetchInquiries,
-  } = useApi("http://localhost:5000/api/v1/inquiries");
+  } = useApi(endpoints.ENQUIRIES);
 
   const {
     callApi: submitInquiry,
     loading: loadingSubmit,
     error: errorSubmit,
-  } = useApi("http://localhost:5000/api/v1/inquiries");
+  } = useApi(endpoints.ENQUIRIES);
 
   // Fetch inquiries on component mount
   useEffect(() => {
