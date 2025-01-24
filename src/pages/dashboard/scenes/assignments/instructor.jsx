@@ -34,13 +34,14 @@ const Assignment = () => {
   const postUrl = `${endpoints.ASSIGNMENT}/${cohortName}`;
 
   const { loading: postLoading, data: postData, error: postError, callApi: postCallApi } = useApi();
-  const { loading: getLoading, error: getError, callApi: getCallApi } = useApi();
+  const { loading: getLoading, data: getCallData, error: getError, callApi: getCallApi } = useApi();
   const { loading: putLoading, data: putData, error: putError, callApi: putCallApi } = useApi();
   const { loading: deleteLoading, data: deleteData, error: deleteError, callApi: deleteCallApi } = useApi();
 
   useEffect(() => {
     const fetchSchedules = async () => {
       if (postUrl) {
+        console.log(postUrl)
         const data = await getCallApi(postUrl, 'GET');
         setAssignments(data);
       }
