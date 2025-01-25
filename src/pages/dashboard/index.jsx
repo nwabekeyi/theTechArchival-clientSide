@@ -118,32 +118,34 @@ function DashboardHome() {
 
             {/* Content */}
             <Box
-              id="dashboard"
-              className="content"
-              sx={{
-                backgroundColor:
-                  theme.palette.mode === "light"
-                    ? colors.primary[900]
-                    : colors.primary[500],
-                height: "100vh",
-                display: "flex",
-                flexDirection: "column",
-              }}
-            >
-              <Box sx={{ height: "auto" }}>
-                <Topbar userData={userData} />
-              </Box>
+  id="dashboard"
+  className="content"
+  sx={{
+    backgroundColor:
+      theme.palette.mode === "light"
+        ? colors.primary[900]
+        : colors.primary[500],
+    height: "100vh", // Make the content area take full height
+    display: "flex",
+    flexDirection: "column",
+    overflowY: "auto", // Enable vertical scrolling
+  }}
+>
+  <Box sx={{ height: "auto" }}>
+    <Topbar userData={userData} />
+  </Box>
 
-              {/* Routes */}
-              <Box sx={{ flexGrow: 1, overflowY: "auto" }}>
-                <Suspense fallback={<div>Loading...</div>}>
-                  <Routes>
-                    <Route path="/" element={<Dashboard userData={userData} />} />
-                    {userRole && renderRoutesBasedOnRole(userRole)}
-                  </Routes>
-                </Suspense>
-              </Box>
-            </Box>
+  {/* Routes */}
+  <Box sx={{ flexGrow: 1, overflowY: "auto", height: "calc(100vh - 64px)" }}>
+    <Suspense fallback={<div>Loading...</div>}>
+      <Routes>
+        <Route path="/" element={<Dashboard userData={userData} />} />
+        {userRole && renderRoutesBasedOnRole(userRole)}
+      </Routes>
+    </Suspense>
+  </Box>
+</Box>
+
           </div>
         </ThemeProvider>
       </ColorModeContext.Provider>

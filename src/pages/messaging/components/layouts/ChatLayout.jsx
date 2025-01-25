@@ -9,7 +9,8 @@ import Welcome from "../chat/Welcome";
 import AllUsers from "../chat/AllUsers";
 import SearchUsers from "../chat/SearchUsers";
 import GroupIcon from "@mui/icons-material/Group"; // Import an icon, replace with your desired one
-import {addChatroom, } from '../../../../reduxStore/slices/messageSlice'
+import { addChatroom } from '../../../../reduxStore/slices/messageSlice';
+
 export default function ChatLayout() {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
@@ -27,7 +28,7 @@ export default function ChatLayout() {
   const user = useSelector((state) => state.users.user); // Get the current user
   const dispatch = useDispatch(); // Correctly call useDispatch as a function
 
-    // Fetch the chatroom based on the user's role (only for students and instructors)
+  // Fetch the chatroom based on the user's role (only for students and instructors)
   const { loading: loadSingleRoom, data: singleRoomData } = useQuery(GET_CHATROOM, {
     variables: { name: user.cohort },
     skip: !(user.cohort && ['student', 'instructor'].includes(user.role)), // Run only if the user is a student or instructor and has a cohort
@@ -41,8 +42,9 @@ export default function ChatLayout() {
   useEffect(() => {
     if (singleRoomData) {
       setSingleRoom(singleRoomData.getChatroom); // Set single room data
-        // Dispatch addChatroom with the room name
-      dispatch(addChatroom(singleRoomData.getChatroom.name));      }
+      // Dispatch addChatroom with the room name
+      dispatch(addChatroom(singleRoomData.getChatroom.name));      
+    }
   }, [singleRoomData]);
 
   useEffect(() => {
@@ -86,7 +88,7 @@ export default function ChatLayout() {
     if (chatRooms.length !== 0) {
       chatRooms.forEach((chatRoom) => {
         const isUserContact = chatRoom.participants.some(
-          (e) => e !== currentUser.uid && searchedUsersId.includes(e)
+          (e) => e !== user.uid && searchedUsersId.includes(e)
         );
         setIsContact(isUserContact);
 
@@ -119,7 +121,7 @@ export default function ChatLayout() {
         <Grid
           item
           xs={12}
-          lg={4}
+          lg={3} // Set left side to 25% (or lg={3} for 3/12 of the screen width)
           sx={{
             borderRight: `1px solid ${colors.grey[300]}`,
             display: "flex",
@@ -183,7 +185,7 @@ export default function ChatLayout() {
         <Grid
           item
           xs={12}
-          lg={8}
+          lg={9} // Set right side to take the remaining space (or lg={9} for 9/12 of the screen width)
           sx={{
             display: "flex",
             flexDirection: "column",

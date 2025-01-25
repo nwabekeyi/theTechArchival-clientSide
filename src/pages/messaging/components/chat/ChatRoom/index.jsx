@@ -224,7 +224,7 @@ console.log(currentChat)
   console.log(currentChat)
 
   return (
-    <Box sx={{ width: '100%', display: 'flex', flexDirection: 'column', height: '100%' }}>
+    <Box sx={{ width: '100%', display: 'flex', flexDirection: 'column', height: '100%'}}>
       <Paper sx={{ padding: 2, backgroundColor: colors.primary[800], borderBottom: 1, borderColor: 'divider', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
         <Box sx={{ display: 'flex', alignItems: 'center' }}>
           {selectedView !== 'messages' && (
@@ -233,10 +233,10 @@ console.log(currentChat)
             </IconButton>
           )}
           <Box>
-            <Typography variant="h6" component="h2">
+            <Typography variant="h3" component="h2">
               {currentChat.name}
             </Typography>
-            <Typography variant="body2" color="textSecondary">
+            <Typography variant="h6" color="textSecondary">
               {
               currentChat.participants[0] !== null ? 
               currentChat.participants.map(participant => `${participant.firstName} ${participant.lastName}`).join(', ')
