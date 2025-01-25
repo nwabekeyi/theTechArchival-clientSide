@@ -10,6 +10,8 @@ import { tokens } from "../../theme";
 import Header from "../../components/Header";
 import TableComponent from "../../../../components/table"; // Ensure this path is correct
 import useApi from "../../../../hooks/useApi"; // Adjust the path to where your `useApi` hook is stored
+import { endpoints } from "../../../../utils/constants";
+import withDashboardWrapper from "../../../../components/dasboardPagesContainer";
 
 const Support = () => {
   const theme = useTheme();
@@ -25,28 +27,28 @@ const Support = () => {
     loading: loadingInquiries,
     error: errorInquiries,
     callApi: fetchInquiries,
-  } = useApi("http://localhost:5000/api/v1/inquiries");
+  } = useApi();
 
   const {
     callApi: submitInquiry,
     loading: loadingSubmit,
     error: errorSubmit,
-  } = useApi("http://localhost:5000/api/v1/inquiries");
+  } = useApi();
 
   // Fetch inquiries on component mount
   useEffect(() => {
-    fetchInquiries("GET");
+    fetchInquiries(endpoints.ENQUIRIES, 'GET');
   }, [fetchInquiries]);
 
   // Submit a new inquiry
   const handleSubmit = async (e) => {
     e.preventDefault();
     const newInquiry = { name, email, date, message };
-    await submitInquiry("POST", newInquiry);
+    await submitInquiry(endpoints.ENQUIRIES, "POST", newInquiry);
 
     // Refresh the inquiries list after successful submission
     if (!errorSubmit) {
-      fetchInquiries("GET");
+      fetchInquiries(endpoints.ENQUIRIES, "GET");
       setName("");
       setEmail("");
       setDate("");
@@ -74,7 +76,7 @@ const Support = () => {
   };
 
   return (
-    <Box m="20px">
+    <Box>
       <Header
         title="Support and Customer Care"
         subtitle="Submit your inquiries and concerns"
@@ -163,4 +165,4 @@ const Support = () => {
   );
 };
 
-export default Support;
+export default withDashboardWrapper(Support);

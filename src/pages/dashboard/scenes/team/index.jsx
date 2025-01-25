@@ -6,6 +6,7 @@ import SecurityOutlinedIcon from "@mui/icons-material/SecurityOutlined";
 import Header from "../../components/Header";
 import { tokens } from "../../theme";
 import TableComponent from "../../../../components/table"; // Make sure this path is correct
+import withDashboardWrapper from '../../../../components/dasboardPagesContainer';
 
 const Team = () => {
   const theme = useTheme();
@@ -96,7 +97,7 @@ const Team = () => {
   };
 
   return (
-    <Box m="20px">
+    <Box>
       <Header title="TEAM" subtitle="Managing the Team Members" />
       <Box m="40px 0 0 0" height="75vh">
         <TableComponent {...tableProps} />
@@ -105,4 +106,4 @@ const Team = () => {
   );
 };
 
-export default Team;
+export default withDashboardWrapper(Team);

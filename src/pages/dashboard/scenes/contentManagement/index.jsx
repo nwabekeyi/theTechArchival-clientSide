@@ -14,6 +14,7 @@ import {
 } from '@mui/material';
 import { Add as AddIcon, Edit as EditIcon, Delete as DeleteIcon } from '@mui/icons-material';
 import Header from "../../components/Header";
+import withDashboardWrapper from '../../../../components/dasboardPagesContainer';
 
 const ContentManagement = () => {
   const [content, setContent] = useState([]);
@@ -96,7 +97,7 @@ const ContentManagement = () => {
           value={currentContent.description}
           onChange={handleInputChange}
         />
-        <Box mt={2}>
+        <Box >
           {isEditing ? (
             <Button variant="contained" color="primary" onClick={handleUpdateContent}>
               Update Content
@@ -142,4 +143,4 @@ const ContentManagement = () => {
   );
 };
 
-export default ContentManagement;
+export default withDashboardWrapper(ContentManagement) ;

@@ -11,6 +11,7 @@ import Receipt from '../../components/Receipt';
 import Header from "../../components/Header";
 import { tokens } from "../../theme";
 import useStudentData from "../dashboard/student/useStudentData";
+import withDashboardWrapper from '../../../../components/dasboardPagesContainer';
 
 const PaymentHistory = () => {
   const user = useSelector((state) => state.users.user);
@@ -132,7 +133,7 @@ const PaymentHistory = () => {
   ];
 
   return (
-    <Box m="20px">
+    <Box>
          <Header title="Payment History" subtitle="Overview of Payments Made" />
 
          <Box backgroundColor={colors.primary[400]} p="20px" borderRadius="4px">
@@ -227,4 +228,4 @@ const PaymentHistory = () => {
   );
 };
 
-export default PaymentHistory;
+export default withDashboardWrapper(PaymentHistory);

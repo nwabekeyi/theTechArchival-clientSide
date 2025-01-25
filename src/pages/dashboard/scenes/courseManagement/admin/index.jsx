@@ -162,7 +162,7 @@ const Admin = () => {
 
 
   return (
-    <Grid container spacing={3} px={3}>
+    <Grid container>
       <Grid item xs={12}>
         <Header
           title='Course Management'

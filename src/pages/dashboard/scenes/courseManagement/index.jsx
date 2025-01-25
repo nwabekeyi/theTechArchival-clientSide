@@ -1,6 +1,7 @@
 import Instructors from './instructor';
 import Admin from './admin';
 import { useSelector } from 'react-redux';
+import withDashboardWrapper from '../../../../components/dasboardPagesContainer';
 
 
 const TimeTable = () => {
@@ -16,4 +17,4 @@ console.log(userRole);
   );
 };
 
-export default TimeTable;
+export default withDashboardWrapper(TimeTable) ;

@@ -3,12 +3,12 @@ import { useDispatch } from 'react-redux';
 import { Box, Typography, Popover, IconButton, Avatar, Button, useTheme, Divider, TextField } from '@mui/material';
 import { ColorModeContext, tokens } from '../theme';
 import useAuth from '../../../hooks/useAuth';
-import PersonOutlinedIcon from "@mui/icons-material/PersonOutlined";
 import DarkModeOutlinedIcon from "@mui/icons-material/DarkModeOutlined";
 import LightModeOutlinedIcon from "@mui/icons-material/LightModeOutlined";
 import LogoutIcon from '@mui/icons-material/Logout';
 import LockOutlinedIcon from '@mui/icons-material/LockOutlined'; // Import for change password icon
 import Modal from './modal';
+import {useNavigate} from 'react-router-dom'
 
 const SettingsPopover = ({ anchorEl, handleClose, userDetails }) => {
   const [profileOpen, setProfileOpen] = useState(false);
@@ -19,6 +19,7 @@ const SettingsPopover = ({ anchorEl, handleClose, userDetails }) => {
     confirmPassword: ''
   });
 
+  const navigate = useNavigate()
   const dispatch = useDispatch();
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
@@ -64,7 +65,7 @@ const SettingsPopover = ({ anchorEl, handleClose, userDetails }) => {
         horizontal: 'right',
       }}
       PaperProps={{
-        style: { width: '30vw', padding: '16px' },
+        style: { width: '20vw', padding: '16px' },
       }}
     >
       <Box display="flex" alignItems="center" mb={2}>

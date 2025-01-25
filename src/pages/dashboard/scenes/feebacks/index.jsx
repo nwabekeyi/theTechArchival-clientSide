@@ -14,6 +14,9 @@ import { tokens } from '../../theme';
 import Header from '../../components/Header';
 import TableComponent from '../../../../components/table';
 import useApi from '../../../../hooks/useApi'; // Import your custom hook
+import withDashboardWrapper from '../../../../components/dasboardPagesContainer';
+import { endpoints } from "../../../../utils/constants";
+
 
 const Feedbacks = () => {
   const theme = useTheme();
@@ -31,17 +34,17 @@ const Feedbacks = () => {
     data: fetchData,
     error: fetchError,
     callApi: fetchFeedbacks,
-  } = useApi('http://localhost:3500/api/v1/feedbacks');
+  } = useApi();
 
   const {
     loading: submitLoading,
     error: submitError,
     callApi: submitFeedback,
-  } = useApi('http://localhost:3500/api/v1/feedbacks');
+  } = useApi();
 
   // Fetch feedbacks when the component mounts
   useEffect(() => {
-    fetchFeedbacks('GET');
+    fetchFeedbacks(endpoints.FEEDBACKS, 'GET');
   }, [fetchFeedbacks]);
 
   // Update feedbacks state when data is fetched
@@ -56,7 +59,7 @@ const Feedbacks = () => {
     e.preventDefault();
     const newFeedback = { name, role, date, comments };
 
-    await submitFeedback('POST', newFeedback);
+    await submitFeedback(endpoints.FEEDBACKS, 'POST', newFeedback);
 
     if (!submitError) {
       // Update feedback list with the newly added feedback
@@ -107,7 +110,7 @@ const Feedbacks = () => {
   };
 
   return (
-    <Box m="20px">
+    <Box>
       <Header title="Feedback" subtitle="Feedback from Students, Instructors, and Workers" />
 
       {fetchLoading && <Typography>Loading feedbacks...</Typography>}
@@ -190,4 +193,4 @@ const Feedbacks = () => {
   );
 };
 
-export default Feedbacks;
+export default withDashboardWrapper(Feedbacks);

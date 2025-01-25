@@ -6,6 +6,7 @@ import TableComponent from "../../../../components/table";
 import Modal from "../../components/modal";
 import ContactForm from "../contactForm";
 import useApi from "../../../../hooks/useApi";
+import withDashboardWrapper from "../../../../components/dasboardPagesContainer";
 
 const Contacts = () => {
   const theme = useTheme();
@@ -67,7 +68,7 @@ const Contacts = () => {
   };
 
   return (
-    <Box m="20px">
+    <Box>
       {/* Header Section */}
       <Header title="CONTACTS" subtitle="List of Contacts for Future Reference" />
 
@@ -117,4 +118,4 @@ const Contacts = () => {
   );
 };
 
-export default Contacts;
+export default withDashboardWrapper(Contacts);

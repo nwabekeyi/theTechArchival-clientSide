@@ -1,5 +1,5 @@
 import Instructors from "../courseManagement/instructor";
-
+import withDashboardWrapper from "../../../../components/dasboardPagesContainer";
 
 const Curriculum = () => {
 
@@ -11,4 +11,4 @@ const Curriculum = () => {
   );
 };
 
-export default Curriculum;
+export default withDashboardWrapper(Curriculum);

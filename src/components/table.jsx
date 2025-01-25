@@ -38,11 +38,14 @@ const TableComponent = ({
   const colors = tokens(theme.palette.mode);
 
   useEffect(() => {
-    setFilteredData(data.filter(row => 
-      columns.some(column => 
-        String(row[column.id]).toLowerCase().includes(searchQuery.toLowerCase())
-      )
-    ));
+    if(data){
+      setFilteredData(data.filter(row => 
+        columns.some(column => 
+          String(row[column.id]).toLowerCase().includes(searchQuery.toLowerCase())
+        )
+      ));
+    }
+   
   }, [searchQuery, data, columns]);
 
   const sortedData = [...filteredData].sort((a, b) => {
@@ -54,79 +57,90 @@ const TableComponent = ({
   const paginatedData = sortedData.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage);
 
   return (
-    <TableContainer component={Paper} sx={{ 
-      maxHeight: '75vh', 
-      overflow: 'auto', 
-      backgroundColor : colors.primary[400],
-    }} style={{marginTop: "10px"}}>
-      <Box display="flex" justifyContent="space-between" alignItems="center" p={2}>
-        <Typography variant="h2">{tableHeader}</Typography>
-        <TextField
-          variant="outlined"
-          placeholder="Search..."
-          value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)}
-        />
-      </Box>
-      <Divider />
-      <Table stickyHeader>
-        <TableHead>
-          <TableRow>
-            {columns.map(column => (
-              <TableCell key={column.id} 
-                sx={{
-                  fontWeight: "900",
-                  fontSize: "small",
-                  backgroundColor : colors.primary[400],
-                }}
-              >
-                <TableSortLabel
-                  active={sortBy === column.id}
-                  direction={sortBy === column.id ? sortDirection : 'asc'}
-                  onClick={() => onSortChange(column.id)}
-                  IconComponent={sortDirection === 'asc' ? ArrowUpward : ArrowDownward}
+
+    <div>
+      {
+        data ? 
+        <TableContainer component={Paper} sx={{ 
+          maxHeight: '75vh', 
+          overflow: 'auto', 
+          backgroundColor : colors.primary[400],
+        }} style={{marginTop: "10px"}}>
+          <Box display="flex" justifyContent="space-between" alignItems="center" p={2}>
+            <Typography variant="h2">{tableHeader}</Typography>
+            <TextField
+              variant="outlined"
+              placeholder="Search..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+            />
+          </Box>
+          <Divider />
+          <Table stickyHeader>
+            <TableHead>
+              <TableRow>
+                {columns.map(column => (
+                  <TableCell key={column.id} 
+                    sx={{
+                      fontWeight: "900",
+                      fontSize: "small",
+                      backgroundColor : colors.primary[400],
+                    }}
+                  >
+                    <TableSortLabel
+                      active={sortBy === column.id}
+                      direction={sortBy === column.id ? sortDirection : 'asc'}
+                      onClick={() => onSortChange(column.id)}
+                      IconComponent={sortDirection === 'asc' ? ArrowUpward : ArrowDownward}
+                    >
+                      {column.label}
+                    </TableSortLabel>
+                  </TableCell>
+                ))}
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              {paginatedData.map(row => (
+                <TableRow
+                  key={row.id}
+                  onClick={() => onRowClick()}
+                  style={{ cursor: 'pointer', transition: 'background-color 0.3s' }}
+                  sx={{
+                    '&:hover': {
+                      backgroundColor: colors.blueAccent[200],
+                      // Apply text color change to all TableCells inside the hovered row
+                      '& td': {
+                        color: '#fff',
+                      },
+                    },
+                  }}
                 >
-                  {column.label}
-                </TableSortLabel>
-              </TableCell>
-            ))}
-          </TableRow>
-        </TableHead>
-        <TableBody>
-          {paginatedData.map(row => (
-            <TableRow
-              key={row.id}
-              onClick={() => onRowClick()}
-              style={{ cursor: 'pointer', transition: 'background-color 0.3s' }}
-              sx={{
-                '&:hover': {
-                  backgroundColor: colors.blueAccent[200],
-                  // Apply text color change to all TableCells inside the hovered row
-                  '& td': {
-                    color: '#fff',
-                  },
-                },
-              }}
-            >
-              {columns.map(column => (
-                <TableCell key={column.id}>
-                  {column.renderCell ? column.renderCell(row) : formatCellData(row[column.id])}
-                </TableCell>
+                  {columns.map(column => (
+                    <TableCell key={column.id}>
+                      {column.renderCell ? column.renderCell(row) : formatCellData(row[column.id])}
+                    </TableCell>
+                  ))}
+                </TableRow>
               ))}
-            </TableRow>
-          ))}
-        </TableBody>
-      </Table>
-      <TablePagination
-        component="div"
-        count={filteredData.length}
-        page={page}
-        rowsPerPage={rowsPerPage}
-        rowsPerPageOptions={[5, 10, 25, 50, 100]}
-        onPageChange={onPageChange}
-        onRowsPerPageChange={onRowsPerPageChange}
-      />
-    </TableContainer>
+            </TableBody>
+          </Table>
+          <TablePagination
+            component="div"
+            count={filteredData.length}
+            page={page}
+            rowsPerPage={rowsPerPage}
+            rowsPerPageOptions={[5, 10, 25, 50, 100]}
+            onPageChange={onPageChange}
+            onRowsPerPageChange={onRowsPerPageChange}
+          />
+        </TableContainer>
+        :
+        <Typography>
+          Data unavailable
+        </Typography>
+      }
+    </div>
+   
   );
 };
 

@@ -3,6 +3,8 @@ import { Box, Typography, useTheme, Tab, Tabs } from "@mui/material";
 import { tokens } from "../../theme";
 import Header from "../../components/Header";
 import TableComponent from "../../../../components/table"; // Make sure this path is correct
+import withDashboardWrapper from '../../../../components/dasboardPagesContainer';
+
 
 // Dummy data for additional sections
 const mockDataInvoices = [
@@ -89,7 +91,7 @@ const FinancialManagement = () => {
   };
 
   return (
-    <Box m="20px">
+    <Box>
       <Header title="FINANCIAL MANAGEMENT" subtitle="Manage your financial data" />
 
       <Tabs value={tabValue} onChange={handleTabChange} aria-label="financial management tabs">
@@ -110,4 +112,4 @@ const FinancialManagement = () => {
   );
 };
 
-export default FinancialManagement;
+export default withDashboardWrapper(FinancialManagement);
