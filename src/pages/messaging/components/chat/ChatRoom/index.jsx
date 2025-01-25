@@ -274,6 +274,7 @@ console.log(currentChat)
                       onCloseReply={handleCloseReply}
                       isReplyingTo={replyToMessage}
                       setIsReplyingTo={setReplyToMessage}
+                      chatroomName = {currentChat.name}
                     />
                   </Box>
                 ))}

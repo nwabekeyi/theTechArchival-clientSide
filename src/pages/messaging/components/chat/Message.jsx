@@ -11,6 +11,7 @@ export default function Message({
   message,
   self,
   onReply,
+  chatroomName,
   isReplyingTo,
   setIsReplyingTo,
   mention,
@@ -20,7 +21,6 @@ export default function Message({
   const [menuOpen, setMenuOpen] = useState(false); // State to control Menu visibility
   const [infoOpen, setInfoOpen] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
-  const [longPress, setLongPress] = useState(false); // For detecting long press
   const menuRef = useRef(null); // Reference for the Box wrapping the Menu
   const menuItemsRef = useRef([]); // Reference for all MenuItems
   const touchStart = useRef(0); // Store touch start time
@@ -30,22 +30,31 @@ export default function Message({
 console.log("Redux State:", state);
 const chatroomMessages = useSelector((state) => state.message?.chatroomMessages);
 console.log("Chatroom Messages:", chatroomMessages);
-console.log('bbbvv')
-const deliveredToArray = useSelector((state) => {
-  const chatroomMessages = state.message?.chatroomMessages?.["code wizards"];
-  return chatroomMessages?.map((message) => message?.deliveredTo) || [];
-});
 
+const deliveredToArray = useSelector((state) => {
+  const chatroomMessages = state.message?.chatroomMessages?.[chatroomName];
+  return chatroomMessages
+    ?.map((message) => message?.deliveredTo)
+    .filter((deliveredTo) => deliveredTo !== undefined) || [];
+});
+console.log(chatroomName)
 console.log("Delivered To Array:", deliveredToArray);
+// console.log('grauuupParticipants:', participant);
+
 
 const readByArray = useSelector((state) => {
-  const chatroomMessages = state.message?.chatroomMessages?.["code wizards"];
-  return chatroomMessages?.map((message) => message?.readBy) || [];
+  const chatroomMessages = state.message?.chatroomMessages?.[chatroomName];
+  return chatroomMessages
+    ?.map((message) => message?.readBy)
+    .filter((readBy) => readBy != null) || []; // null and undefined are excluded
 });
 
-console.log("Read By Array:", readByArray);
 
+console.log(self);
 
+// Access `unreadChatroomMessages` from Redux
+const unreadChatroomMessages = useSelector((state) => state.message?.unreadChatroomMessages);
+console.log("Unread Chatroom Messages:", unreadChatroomMessages?.length || 0);
 
 
 
@@ -67,6 +76,9 @@ console.log("Read By Array:", readByArray);
     }
   };
 
+ 
+
+
   // Handle the menu close if clicked outside the menu
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -83,7 +95,7 @@ console.log("Read By Array:", readByArray);
 
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
-  console.log('Delivered To Users:', deliveredToUsers);
+  
   return (
    
     <Box
@@ -215,7 +227,7 @@ console.log("Read By Array:", readByArray);
               >
                 <ReplyIcon sx={{ marginRight: 1 }} /> Reply
               </MenuItem>
-              <MenuItem
+             {self === message.sender.id && <MenuItem
                 ref={(el) => (menuItemsRef.current[1] = el)}
                 onClick={(event) => {
                   event.stopPropagation();
@@ -224,7 +236,8 @@ console.log("Read By Array:", readByArray);
                 }}
               >
                 <InfoIcon sx={{ marginRight: 1 }} /> Info
-              </MenuItem>
+              </MenuItem> 
+              }
             </Menu>
           )}
         </Box>
@@ -252,8 +265,31 @@ console.log("Read By Array:", readByArray);
         <GroupParticipants 
         title = '' 
         participants={readByArray.flat() || []} />
+
+             {/* Unread messages count display */}
+      
       </DialogContent>
     </Dialog>
+    
+    its still not showing even with this 
+<Box
+        sx={{
+          position: 'fixed',
+          bottom: '160px',
+          right: '50px',
+          backgroundColor: 'red',
+          color: '#fff',
+          padding: '10px 20px',
+          borderRadius: '10px',
+          zIndex: 9999,
+        }}
+      >
+       <Typography variant="body2">
+          Unread Messages: {unreadChatroomMessages?.length}
+        </Typography>
+      </Box>
+
+
 
       
       </Box>

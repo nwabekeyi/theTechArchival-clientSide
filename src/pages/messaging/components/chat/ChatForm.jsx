@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { Box, IconButton, TextField, Paper, useTheme } from "@mui/material";
 import SendIcon from "@mui/icons-material/Send";
 import EmojiEmotionsIcon from "@mui/icons-material/EmojiEmotions";
@@ -8,31 +8,35 @@ import { tokens } from "../../../dashboard/theme"; // Assuming your token functi
 export default function ChatForm(props) {
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
   const [chosenEmoji, setChosenEmoji] = useState(null);
+  const inputRef = useRef(""); // Ref for the input value
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
 
   useEffect(() => {
     return () => {
-      // Cleanup on unmount (if there are any async tasks or timeouts)
+      // Cleanup on unmount
       setShowEmojiPicker(false);
       setChosenEmoji(null);
     };
   }, []);
 
   const handleEmojiClick = (event, emojiObject) => {
-    const emoji = event.emoji; // Extract the emoji from the object
-
+    const emoji = event.emoji; // Extract the emoji
     if (emoji) {
-      props.onChange({ target: { value: props.message + emoji } }); // Append emoji to message
+      inputRef.current += emoji; // Append emoji to the current input
+      props.onChange({ target: { value: inputRef.current } }); // Inform parent of the new value
     }
-    setShowEmojiPicker(false); // Close the emoji picker after selecting an emoji
+    setShowEmojiPicker(false); // Close emoji picker
+  };
+
+  const handleInputChange = (e) => {
+    inputRef.current = e.target.value; // Update the ref without causing re-renders
+    props.onChange(e); // Pass the event to the parent for controlled state
   };
 
   const handleFormSubmit = (e) => {
     e.preventDefault();
-
-    const newMessage = props.message; // Use message passed from parent
-    props.onSubmit(newMessage); // Submit the message
+    props.onSubmit(inputRef.current); // Use the value from the ref
   };
 
   return (
@@ -64,24 +68,23 @@ export default function ChatForm(props) {
 
           {/* Message Input */}
           <TextField
-              variant="outlined"
-              placeholder="Write a message"
-              fullWidth
-              value={props.message} // Controlled by parent
-              onChange={props.onChange} // Passed from parent
-              multiline // Allow multiple lines of text
-              minRows={2} // Start with 3 rows (increased height)
-              sx={{
-                borderRadius: 2,
-                "& .MuiInputBase-root": {
-                },
-                "& .MuiOutlinedInput-notchedOutline": {
-                  borderColor: "transparent",
-                },
-                height: "auto", // Let the height adjust based on content
-                minHeight: "80px", // Optional: Minimum height for the input field
-              }}
-            />
+            variant="outlined"
+            placeholder="Write a message"
+            fullWidth
+            defaultValue={props.message} // Use defaultValue instead of value for better performance
+            onChange={handleInputChange}
+            multiline
+            minRows={2}
+            sx={{
+              borderRadius: 2,
+              "& .MuiInputBase-root": {},
+              "& .MuiOutlinedInput-notchedOutline": {
+                borderColor: "transparent",
+              },
+              height: "auto",
+              minHeight: "80px",
+            }}
+          />
 
           {/* Send Button */}
           <IconButton
