@@ -93,6 +93,7 @@ export default function AllUsers({
         }}
       >
         <Avatar
+        
           src={chatRoom.avatarUrl || ""}
           alt={chatRoom.name || "Chat Room"}
           sx={{ width: 50, height: 50, mr: 2 }}

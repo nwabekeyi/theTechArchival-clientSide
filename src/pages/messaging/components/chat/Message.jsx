@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Box, Typography, useTheme, Menu, MenuItem, Avatar, Dialog, DialogContent } from '@mui/material';
+import { Box, Typography, Menu, MenuItem, Avatar, Dialog, DialogContent, useTheme } from '@mui/material';
 import ReplyIcon from '@mui/icons-material/Reply';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import { tokens } from "../../../dashboard/theme";
@@ -28,53 +28,57 @@ const Message = React.forwardRef(({
   setIsReplyingTo,
   mention,
   currentChat
-}, ref) => { // Accept ref here
+}, ref) => {
   const [menuOpen, setMenuOpen] = useState(false);
   const [infoOpen, setInfoOpen] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
   const menuRef = useRef(null);
-  const menuItemsRef = useRef([]);
-  const touchStart = useRef(0);
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
 
   const deliveredToArray = useSelector((state) => getDeliveredToArray(state, currentChat));
   const readByArray = useSelector((state) => getReadByArray(state, currentChat));
 
-  // Use refs to store the arrays without triggering rerenders
-  const deliveredToRef = useRef(deliveredToArray);
-  const readByRef = useRef(readByArray);
+  const deliveredToRef = useRef([]);
+  const readByRef = useRef([]);
+
+  // Function to remove duplicates based on userId
+  const removeDuplicates = (array) => {
+    const uniqueUsers = {};
+    array.forEach((user) => {
+      uniqueUsers[user.userId] = user; // Use userId as the key to ensure uniqueness
+    });
+    return Object.values(uniqueUsers); // Return the array of unique users
+  };
 
   useEffect(() => {
-    deliveredToRef.current = deliveredToArray;
+    // Remove duplicates from deliveredToArray based on userId
+    const uniqueDeliveredTo = removeDuplicates(deliveredToArray.flat());
+    deliveredToRef.current = uniqueDeliveredTo;
   }, [deliveredToArray]);
 
   useEffect(() => {
-    readByRef.current = readByArray;
+    // Remove duplicates from readByArray based on userId
+    const uniqueReadBy = removeDuplicates(readByArray.flat());
+    readByRef.current = uniqueReadBy;
   }, [readByArray]);
 
-  const handleRightClick = (event) => {
-    event.preventDefault();
-    setMenuOpen(true);
-  };
+  const handleReply = (event) => {
+    event.stopPropagation(); // Prevents the event from propagating to the handleClickOutside
+    console.log('Reply button clicked'); // Check if the click is triggering correctly
+    setIsReplyingTo(message); // Set the message to be replied to
 
-  const handleTouchStart = (event) => {
-    touchStart.current = Date.now();
-  };
-
-  const handleTouchEnd = (event) => {
-    const touchDuration = Date.now() - touchStart.current;
-    if (touchDuration >= 3000) {
-      setMenuOpen(true);
-    }
+    // Ensure the menu stays open or close it manually
+    setMenuOpen(true); // If you want to keep the menu open after clicking Reply
   };
 
   useEffect(() => {
     const handleClickOutside = (event) => {
+      // Allow clicking inside the menu and on the reply button
       if (
         menuRef.current &&
         !menuRef.current.contains(event.target) &&
-        !menuItemsRef.current.some((itemRef) => itemRef && itemRef.contains(event.target))
+        !event.target.closest('button')
       ) {
         setMenuOpen(false);
       }
@@ -87,7 +91,7 @@ const Message = React.forwardRef(({
 
   return (
     <Box
-      ref={ref} // Use the ref here
+      ref={ref}
       sx={{
         width: 'auto',
         display: 'flex',
@@ -97,9 +101,6 @@ const Message = React.forwardRef(({
         position: 'relative',
         flexWrap: 'wrap',
       }}
-      onContextMenu={handleRightClick}
-      onTouchStart={handleTouchStart}
-      onTouchEnd={handleTouchEnd}
       data-message-id={message._id}
     >
       <Box
@@ -119,7 +120,6 @@ const Message = React.forwardRef(({
           overflowWrap: 'break-word',
           overflow: 'hidden',
           position: 'relative',
-          wordBreak: 'break-word',
         }}
         onMouseEnter={() => setIsHovered(true)}
         onMouseLeave={() => setIsHovered(false)}
@@ -146,7 +146,7 @@ const Message = React.forwardRef(({
           }}
         >
           <Typography
-            variant="body1" // Corrected here
+            variant="body1"
             sx={{
               wordWrap: 'break-word',
               overflowWrap: 'break-word',
@@ -159,7 +159,7 @@ const Message = React.forwardRef(({
           </Typography>
 
           {isHovered && (
-            <KeyboardArrowDownIcon
+            <Box
               sx={{
                 position: 'absolute',
                 right: '5px',
@@ -167,11 +167,15 @@ const Message = React.forwardRef(({
                 marginLeft: '8%',
                 transform: 'translateY(-50%)',
                 cursor: 'pointer',
-                paddingLeft: self !== message.sender.id ? 'none' : '10px',
-                fontSize: self === message.sender.id ? '2rem' : '1.5rem',
               }}
-              onClick={() => setMenuOpen(true)} 
-            />
+              onClick={() => setMenuOpen(true)} // Open the menu on click
+            >
+              <KeyboardArrowDownIcon
+                sx={{
+                  fontSize: self === message.sender.id ? '2rem' : '1.5rem',
+                }}
+              />
+            </Box>
           )}
         </Box>
 
@@ -202,34 +206,33 @@ const Message = React.forwardRef(({
           </Box>
         )}
 
-        <Box ref={menuRef}>
-          {menuOpen && (
+          <Box ref={menuRef}>
             <Menu
               anchorEl={menuRef.current}
               open={menuOpen}
               onClose={() => setMenuOpen(false)}
             >
-              <MenuItem onClick={() => onReply(message)}>
+              <MenuItem onClick={handleReply}>
                 <ReplyIcon sx={{ marginRight: 1 }} /> Reply
               </MenuItem>
               <MenuItem onClick={() => setInfoOpen(true)}>
                 <InfoIcon sx={{ marginRight: 1 }} /> Info
               </MenuItem>
             </Menu>
-          )}
-        </Box>
+          </Box>
+
 
         <Dialog open={infoOpen} onClose={() => setInfoOpen(false)} fullWidth maxWidth="sm">
           <DialogContent>
             <Typography variant="h6" sx={{ marginBottom: 2 }}>
               Delivered To
             </Typography>
-            <GroupParticipants title="" participants={deliveredToRef.current?.flat() || []} />
+            <GroupParticipants title="" participants={deliveredToRef.current || []} />
 
             <Typography variant="h6" sx={{ marginTop: 4, marginBottom: 2 }}>
               Read By
             </Typography>
-            <GroupParticipants title="" participants={readByRef.current?.flat() || []} />
+            <GroupParticipants title="" participants={readByRef.current || []} />
           </DialogContent>
         </Dialog>
       </Box>

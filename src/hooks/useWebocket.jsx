@@ -22,6 +22,7 @@ const useWebSocket = (actionToSend = null) => {
   const dispatch = useDispatch();
   const chatroomNames = useSelector((state) => state.message.chatrooms);
   const unreadMessages = useSelector(selectUnreadMessages);
+  console.log(unreadMessages.length)
 
   // Memoize recipientDetails to prevent unnecessary re-renders
   const recipientDetails = useMemo(() => ({

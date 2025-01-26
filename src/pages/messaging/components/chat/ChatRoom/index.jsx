@@ -31,7 +31,7 @@ export default function ChatRoom({ currentChat, currentUser }) {
   const messageRefs = useRef({});
   const [replyToMessage, setReplyToMessage] = useState(null);
   const [mention, setMention] = useState('');
-  const message = useRef('');
+  const [message, setMessage] = useState('');
   const chatroomMessages = useSelector((state) => state.message.chatroomMessages[currentChat.name]);
   const loading = useSelector((state) => state.message.chatroomMessages.messageLoading);
   const chatroomName = useChatroomVisibility(scrollRef, currentChat);
@@ -124,27 +124,26 @@ export default function ChatRoom({ currentChat, currentUser }) {
         setMessages((prevMessages) => [...prevMessages, data.sendMessage]);
         setReplyToMessage(null);
         setMention('');
-        message.current = ''; // Clear input field after sending the message
+        setMessage('');
         emit('chatroom message', {
           ...messageBody,
           _id: data.sendMessage._id
         });
-        dispatch(addChatroomMessage({chatroomName: currentChat.name, message: data.sendMessage}));
-
-
-        //dispatch to redux
+        dispatch(addChatroomMessage({ chatroomName: currentChat.name, message: data.sendMessage }));
         dispatch(checkDBFullnessAndSave({
-          storeName: 'ChatroomMessages',  // Specify the object store name
-          chatroomName: currentChat.name,     // Pass the chatroom name
-          message: data.sendMessage,                       // Pass each message for saving and fullness check
+          storeName: 'ChatroomMessages',
+          chatroomName: currentChat.name,
+          message: data.sendMessage,
         }));
-       }
+      }
     } catch (err) {
       console.error('Error sending message:', err);
     }
   };
 
   const handleReply = (message) => {
+    console.log(message)
+
     setReplyToMessage(message);
     setMention('');
   };
@@ -166,8 +165,6 @@ export default function ChatRoom({ currentChat, currentUser }) {
     handleMenuClose();
   };
 
-
-
   const handleMessageClick = (message) => {
     if (message.replyTo && message.replyTo.id) {
       const replyMessage = messages.find((msg) => msg._id === message.replyTo.id);
@@ -179,7 +176,7 @@ export default function ChatRoom({ currentChat, currentUser }) {
       }
     }
   };
-console.log('hey')
+
 
   return (
     <Box sx={{ width: '100%', display: 'flex', flexDirection: 'column', height: '100%'}}>
@@ -222,20 +219,20 @@ console.log('hey')
               <Loader />
             ) : (
               <Box component="ul" sx={{ listStyleType: 'none', padding: 0 }}>
-                {messages.map((message, index) => (
-                  <Box key={index} ref={(el) => { messageRefs.current[message._id] = el; }} onClick={() => handleMessageClick(message)}>
-                    <Message
-                     ref={(el) => (messageRefs.current[message._id] = el)} // Store the reference of each message
-                      message={message}
-                      self={currentUser.userId}
-                      onReply={handleReply}
-                      onCloseReply={handleCloseReply}
-                      isReplyingTo={replyToMessage}
-                      setIsReplyingTo={setReplyToMessage}
-                      currentChat = {currentChat}
-                    />
-                  </Box>
-                ))}
+          {messages.map((message, index) => (
+                <Box key={index} ref={(el) => { messageRefs.current[message._id] = el; }} onClick={() => handleMessageClick(message)}>
+                  <Message
+                    ref={(el) => (messageRefs.current[message._id] = el)}
+                    message={message}
+                    self={currentUser.userId}
+                    onReply={handleReply}
+                    onCloseReply={handleCloseReply}
+                    isReplyingTo={replyToMessage}
+                    setIsReplyingTo={setReplyToMessage}
+                    currentChat={currentChat}
+                  />
+                </Box>
+              ))}
               </Box>
             )}
           </Box>
@@ -257,7 +254,7 @@ console.log('hey')
           )}
 
           <ChatForm
-            message={message.current}
+            message={message}
             onSubmit={handleFormSubmit}
             // onChange={handleChange}
             currentChat= {currentChat}
