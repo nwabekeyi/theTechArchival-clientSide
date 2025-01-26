@@ -1,43 +1,72 @@
-import React, { useState, useEffect, useRef } from "react";
-import { Box, IconButton, TextField, Paper, useTheme } from "@mui/material";
+import React, { useState, useEffect, useCallback } from "react";
+import { Box, IconButton, TextField, Paper, useTheme, List, ListItem, ListItemText, Avatar } from "@mui/material";
 import SendIcon from "@mui/icons-material/Send";
 import EmojiEmotionsIcon from "@mui/icons-material/EmojiEmotions";
 import Picker from "emoji-picker-react";
 import { tokens } from "../../../dashboard/theme"; // Assuming your token function for colors
 
-export default function ChatForm(props) {
+const ChatForm = ({ message, currentChat, onSubmit }) => {
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
   const [chosenEmoji, setChosenEmoji] = useState(null);
-  const inputRef = useRef(""); // Ref for the input value
+  const [mentionPosition, setMentionPosition] = useState({});
+  const [filteredParticipants, setFilteredParticipants] = useState([]);
+  const [mentionQuery, setMentionQuery] = useState('');
+  const [messageState, setMessageState] = useState(message); // Using state for the message
+
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
 
+  // Handle mention selection
+  const onChange = useCallback((e) => {
+    const value = e.target.value;
+    setMessageState(value); // Update the state with the new message
+
+    if (value.includes('@')) {
+      const query = value.split('@').pop().trim();
+      setMentionQuery(query);
+      setFilteredParticipants(
+        currentChat.participants.filter((participant) =>
+          `${participant.firstName} ${participant.lastName}`.toLowerCase().includes(query.toLowerCase())
+        )
+      );
+
+      const inputElement = e.target;
+      const cursorPos = inputElement.selectionStart;
+      const rect = inputElement.getBoundingClientRect();
+      const charWidth = 8; // Approximate width of each character
+      const left = rect.left + charWidth * (cursorPos - value.lastIndexOf('@') - 1);
+      const top = rect.top - 250;
+
+      setMentionPosition({ left, top });
+    } else {
+      setMentionQuery('');
+      setFilteredParticipants([]);
+    }
+  }, [currentChat.participants]);
+
   useEffect(() => {
     return () => {
-      // Cleanup on unmount
+      // Cleanup on unmount (if there are any async tasks or timeouts)
       setShowEmojiPicker(false);
       setChosenEmoji(null);
     };
   }, []);
 
   const handleEmojiClick = (event, emojiObject) => {
-    const emoji = event.emoji; // Extract the emoji
-    if (emoji) {
-      inputRef.current += emoji; // Append emoji to the current input
-      props.onChange({ target: { value: inputRef.current } }); // Inform parent of the new value
-    }
-    setShowEmojiPicker(false); // Close emoji picker
-  };
+    const emoji = event.emoji; // Extract the emoji from the object
 
-  const handleInputChange = (e) => {
-    inputRef.current = e.target.value; // Update the ref without causing re-renders
-    props.onChange(e); // Pass the event to the parent for controlled state
+    if (emoji) {
+      setMessageState(prevState => prevState + emoji); // Append emoji to the message
+    }
+    setShowEmojiPicker(false); // Close the emoji picker after selecting an emoji
   };
 
   const handleFormSubmit = (e) => {
     e.preventDefault();
-    props.onSubmit(inputRef.current); // Use the value from the ref
+    onSubmit(messageState); // Submit the message
+    setMessageState('');
   };
+
 
   return (
     <Box>
@@ -71,15 +100,15 @@ export default function ChatForm(props) {
             variant="outlined"
             placeholder="Write a message"
             fullWidth
-            defaultValue={props.message} // Use defaultValue instead of value for better performance
-            onChange={handleInputChange}
+            value={messageState} // Controlled by state
+            onChange={onChange} // Update state value on change
             multiline
             minRows={2}
             sx={{
               borderRadius: 2,
               "& .MuiInputBase-root": {},
               "& .MuiOutlinedInput-notchedOutline": {
-                borderColor: "transparent",
+                borderColor: colors.grey[100],
               },
               height: "auto",
               minHeight: "80px",
@@ -114,6 +143,36 @@ export default function ChatForm(props) {
           />
         </Box>
       )}
+
+      {/* Mention Suggestions */}
+      {filteredParticipants.length > 0 && (
+        <Box sx={{ position: 'absolute', top: mentionPosition.top, left: mentionPosition.left, backgroundColor: 'background.paper', boxShadow: 2, zIndex: 2, borderRadius: 1 }}>
+          <List>
+            {filteredParticipants.map((participant) => (
+              <ListItem
+                key={participant.userId}
+                onClick={() => {
+                  setMessageState(`${messageState.substring(0, messageState.lastIndexOf('@'))}@${participant.firstName} ${participant.lastName} `);
+                  setMentionQuery('');
+                  setFilteredParticipants([]);
+                }}
+                sx={{
+                  cursor: 'pointer',
+                  '&:hover': {
+                    backgroundColor: colors.grey[900],
+                    transition: 'background-color 0.3s',
+                  },
+                }}
+              >
+                <Avatar src={participant.profilePictureUrl} sx={{ marginRight: 2 }} />
+                <ListItemText primary={`${participant.firstName} ${participant.lastName}`} />
+              </ListItem>
+            ))}
+          </List>
+        </Box>
+      )}
     </Box>
   );
-}
+};
+
+export default React.memo(ChatForm);

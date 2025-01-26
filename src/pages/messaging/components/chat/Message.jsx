@@ -1,85 +1,74 @@
-import { useState, useEffect, useRef } from 'react';
-import { Box, Typography, useTheme, Menu, MenuItem, Avatar, Dialog, DialogTitle, DialogContent } from '@mui/material';
+import React, { useState, useEffect, useRef } from 'react';
+import { Box, Typography, useTheme, Menu, MenuItem, Avatar, Dialog, DialogContent } from '@mui/material';
 import ReplyIcon from '@mui/icons-material/Reply';
-import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown'; // Change the icon
+import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import { tokens } from "../../../dashboard/theme";
 import GroupParticipants from "../chat/ChatRoom/GroupParticipants";
 import InfoIcon from '@mui/icons-material/Info';
 import { useSelector } from 'react-redux';
+import { createSelector } from 'reselect';
 
-export default function Message({
+// Memoized selector for deliveredTo array
+const getDeliveredToArray = createSelector(
+  (state, currentChat) => state.message?.chatroomMessages?.[currentChat.name],
+  (chatroomMessages) => chatroomMessages?.map((message) => message?.deliveredTo) || []
+);
+
+// Memoized selector for readBy array
+const getReadByArray = createSelector(
+  (state, currentChat) => state.message?.chatroomMessages?.[currentChat.name],
+  (chatroomMessages) => chatroomMessages?.map((message) => message?.readBy) || []
+);
+
+const Message = React.forwardRef(({
   message,
   self,
   onReply,
-  chatroomName,
   isReplyingTo,
   setIsReplyingTo,
   mention,
-  readByUsers,
-  deliveredToUsers
-}) {
-  const [menuOpen, setMenuOpen] = useState(false); // State to control Menu visibility
+  currentChat
+}, ref) => { // Accept ref here
+  const [menuOpen, setMenuOpen] = useState(false);
   const [infoOpen, setInfoOpen] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
-  const menuRef = useRef(null); // Reference for the Box wrapping the Menu
-  const menuItemsRef = useRef([]); // Reference for all MenuItems
-  const touchStart = useRef(0); // Store touch start time
+  const menuRef = useRef(null);
+  const menuItemsRef = useRef([]);
+  const touchStart = useRef(0);
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
-  const state = useSelector((state) => state);
-console.log("Redux State:", state);
-const chatroomMessages = useSelector((state) => state.message?.chatroomMessages);
-console.log("Chatroom Messages:", chatroomMessages);
 
-const deliveredToArray = useSelector((state) => {
-  const chatroomMessages = state.message?.chatroomMessages?.[chatroomName];
-  return chatroomMessages
-    ?.map((message) => message?.deliveredTo)
-    .filter((deliveredTo) => deliveredTo !== undefined) || [];
-});
-console.log(chatroomName)
-console.log("Delivered To Array:", deliveredToArray);
-// console.log('grauuupParticipants:', participant);
+  const deliveredToArray = useSelector((state) => getDeliveredToArray(state, currentChat));
+  const readByArray = useSelector((state) => getReadByArray(state, currentChat));
 
+  // Use refs to store the arrays without triggering rerenders
+  const deliveredToRef = useRef(deliveredToArray);
+  const readByRef = useRef(readByArray);
 
-const readByArray = useSelector((state) => {
-  const chatroomMessages = state.message?.chatroomMessages?.[chatroomName];
-  return chatroomMessages
-    ?.map((message) => message?.readBy)
-    .filter((readBy) => readBy != null) || []; // null and undefined are excluded
-});
+  useEffect(() => {
+    deliveredToRef.current = deliveredToArray;
+  }, [deliveredToArray]);
 
+  useEffect(() => {
+    readByRef.current = readByArray;
+  }, [readByArray]);
 
-console.log(self);
-
-// Access `unreadChatroomMessages` from Redux
-const unreadChatroomMessages = useSelector((state) => state.message?.unreadChatroomMessages);
-console.log("Unread Chatroom Messages:", unreadChatroomMessages?.length || 0);
-
-
-
-  // Handle right-click to show the reply menu
   const handleRightClick = (event) => {
-    event.preventDefault(); // Prevent the default right-click menu
-    setMenuOpen(true); // Show the menu
+    event.preventDefault();
+    setMenuOpen(true);
   };
 
-  // Handle long press for mobile/tablet
   const handleTouchStart = (event) => {
     touchStart.current = Date.now();
   };
 
   const handleTouchEnd = (event) => {
     const touchDuration = Date.now() - touchStart.current;
-    if (touchDuration >= 3000) { // 3 seconds for long press
-      setMenuOpen(true); // Show the menu after 3 seconds
+    if (touchDuration >= 3000) {
+      setMenuOpen(true);
     }
   };
 
- 
-
-
-  // Handle the menu close if clicked outside the menu
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (
@@ -95,21 +84,22 @@ console.log("Unread Chatroom Messages:", unreadChatroomMessages?.length || 0);
 
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
-  
+
   return (
-   
     <Box
+      ref={ref} // Use the ref here
       sx={{
         width: 'auto',
         display: 'flex',
         flexDirection: 'column',
         borderRadius: 2,
         padding: 1,
-        position: 'relative', // Required for absolute positioning
+        position: 'relative',
+        flexWrap: 'wrap',
       }}
-      onContextMenu={handleRightClick} // Handle right-click for desktop
-      onTouchStart={handleTouchStart} // Handle touch start for mobile/tablet
-      onTouchEnd={handleTouchEnd} // Handle touch end for mobile/tablet
+      onContextMenu={handleRightClick}
+      onTouchStart={handleTouchStart}
+      onTouchEnd={handleTouchEnd}
       data-message-id={message._id}
     >
       <Box
@@ -120,7 +110,8 @@ console.log("Unread Chatroom Messages:", unreadChatroomMessages?.length || 0);
           padding: 1,
           backgroundColor: self === message.sender.id ? colors.primary[500] : colors.primary[600],
           borderRadius: 2,
-          maxWidth: '80%',
+          maxWidth: '50%',
+          width: 'auto',
           marginLeft: self === message.sender?.id ? 'auto' : '0',
           cursor: 'pointer',
           '&:hover': { backgroundColor: colors.grey[700] },
@@ -128,11 +119,12 @@ console.log("Unread Chatroom Messages:", unreadChatroomMessages?.length || 0);
           overflowWrap: 'break-word',
           overflow: 'hidden',
           position: 'relative',
+          wordBreak: 'break-word',
         }}
         onMouseEnter={() => setIsHovered(true)}
         onMouseLeave={() => setIsHovered(false)}
       >
-        {message.replyTo && Object.keys(message.replyTo).length !== 0 ? (
+        {message.replyTo && Object.keys(message.replyTo).length !== 0 && (
           <Typography
             variant="caption"
             color="textSecondary"
@@ -140,7 +132,7 @@ console.log("Unread Chatroom Messages:", unreadChatroomMessages?.length || 0);
           >
             {message.replyTo.message}
           </Typography>
-        ) : null}
+        )}
 
         <Box
           sx={{
@@ -154,42 +146,42 @@ console.log("Unread Chatroom Messages:", unreadChatroomMessages?.length || 0);
           }}
         >
           <Typography
-            variant="body2"
+            variant="body1" // Corrected here
             sx={{
               wordWrap: 'break-word',
               overflowWrap: 'break-word',
               width: '100%',
               color: '#fff',
+              marginRight: '20px'
             }}
           >
             {message.message}
           </Typography>
 
-          {/* Arrow icon visible on hover and clickable to open reply menu */}
           {isHovered && (
             <KeyboardArrowDownIcon
               sx={{
                 position: 'absolute',
                 right: '5px',
                 top: '50%',
-                marginLeft: '5%',
+                marginLeft: '8%',
                 transform: 'translateY(-50%)',
                 cursor: 'pointer',
                 paddingLeft: self !== message.sender.id ? 'none' : '10px',
+                fontSize: self === message.sender.id ? '2rem' : '1.5rem',
               }}
-              onClick={() => setMenuOpen(true)} // Open the reply menu on click
+              onClick={() => setMenuOpen(true)} 
             />
           )}
         </Box>
 
-        {/* Sender info below the message */}
         {self !== message.sender.id && (
           <Box
             sx={{
               display: 'flex',
-              alignItems: 'center',
+              alignItems: 'end',
               marginTop: 1,
-              marginRight: "2%"
+              marginRight: '2%',
             }}
           >
             <Avatar
@@ -217,82 +209,32 @@ console.log("Unread Chatroom Messages:", unreadChatroomMessages?.length || 0);
               open={menuOpen}
               onClose={() => setMenuOpen(false)}
             >
-              <MenuItem
-                ref={(el) => (menuItemsRef.current[0] = el)}
-                onClick={(event) => {
-                  event.stopPropagation();
-                  onReply(message);
-                  setMenuOpen(false);
-                }}
-              >
+              <MenuItem onClick={() => onReply(message)}>
                 <ReplyIcon sx={{ marginRight: 1 }} /> Reply
               </MenuItem>
-             {self === message.sender.id && <MenuItem
-                ref={(el) => (menuItemsRef.current[1] = el)}
-                onClick={(event) => {
-                  event.stopPropagation();
-                  setInfoOpen(true); // Open the Info dialog
-                  setMenuOpen(false);
-                }}
-              >
+              <MenuItem onClick={() => setInfoOpen(true)}>
                 <InfoIcon sx={{ marginRight: 1 }} /> Info
-              </MenuItem> 
-              }
+              </MenuItem>
             </Menu>
           )}
         </Box>
-    
-    {/* Info Dialog */}
-    <Dialog
-      open={infoOpen}
-      onClose={() => setInfoOpen(false)}
-      fullWidth
-      maxWidth="sm"
-    >
-      <DialogContent>
-        {/* Delivered To Section */}
-        <Typography variant="h6" sx={{ marginBottom: 2 }}>
-          Delivered To
-        </Typography>
-        <GroupParticipants 
-        title = ''
-        participants={deliveredToArray.flat() || []} />
 
-        {/* Read By Section */}
-        <Typography variant="h6" sx={{ marginTop: 4, marginBottom: 2 }}>
-          Read By
-        </Typography>
-        <GroupParticipants 
-        title = '' 
-        participants={readByArray.flat() || []} />
+        <Dialog open={infoOpen} onClose={() => setInfoOpen(false)} fullWidth maxWidth="sm">
+          <DialogContent>
+            <Typography variant="h6" sx={{ marginBottom: 2 }}>
+              Delivered To
+            </Typography>
+            <GroupParticipants title="" participants={deliveredToRef.current?.flat() || []} />
 
-             {/* Unread messages count display */}
-      
-      </DialogContent>
-    </Dialog>
-    
-    its still not showing even with this 
-<Box
-        sx={{
-          position: 'fixed',
-          bottom: '160px',
-          right: '50px',
-          backgroundColor: 'red',
-          color: '#fff',
-          padding: '10px 20px',
-          borderRadius: '10px',
-          zIndex: 9999,
-        }}
-      >
-       <Typography variant="body2">
-          Unread Messages: {unreadChatroomMessages?.length}
-        </Typography>
-      </Box>
-
-
-
-      
+            <Typography variant="h6" sx={{ marginTop: 4, marginBottom: 2 }}>
+              Read By
+            </Typography>
+            <GroupParticipants title="" participants={readByRef.current?.flat() || []} />
+          </DialogContent>
+        </Dialog>
       </Box>
     </Box>
   );
-}
+});
+
+export default Message;

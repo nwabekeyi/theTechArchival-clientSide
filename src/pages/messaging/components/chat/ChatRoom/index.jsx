@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { Box, Paper, Typography, IconButton, Menu, MenuItem, Avatar, List, ListItem, ListItemText, colors, useTheme } from '@mui/material';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
@@ -31,18 +31,13 @@ export default function ChatRoom({ currentChat, currentUser }) {
   const messageRefs = useRef({});
   const [replyToMessage, setReplyToMessage] = useState(null);
   const [mention, setMention] = useState('');
-  const [filteredParticipants, setFilteredParticipants] = useState([]);
-  const [mentionQuery, setMentionQuery] = useState('');
-  const [mentionPosition, setMentionPosition] = useState({});
-  const [message, setMessage] = useState('');
+  const message = useRef('');
   const chatroomMessages = useSelector((state) => state.message.chatroomMessages[currentChat.name]);
   const loading = useSelector((state) => state.message.chatroomMessages.messageLoading);
   const chatroomName = useChatroomVisibility(scrollRef, currentChat);
   const visibleMessages = useMessageVisibility(messageRefs, messages, currentChat.name);
   const dispatch = useDispatch();
-  const [db, setDb] = useState(null);
 
-console.log(currentChat)
   useEffect(() => {
     let mounted = true; // Track if the component is mounted
   
@@ -129,7 +124,7 @@ console.log(currentChat)
         setMessages((prevMessages) => [...prevMessages, data.sendMessage]);
         setReplyToMessage(null);
         setMention('');
-        setMessage(''); // Clear input field after sending the message
+        message.current = ''; // Clear input field after sending the message
         emit('chatroom message', {
           ...messageBody,
           _id: data.sendMessage._id
@@ -171,43 +166,7 @@ console.log(currentChat)
     handleMenuClose();
   };
 
-  // Handle mention selection
-  const handleMentionSelect = (participant) => {
-    const mention = `${participant.firstName} ${participant.lastName}`;
-    const cursorPosition = message.lastIndexOf(mentionQuery);
-    const updatedMessage = message.slice(0, cursorPosition) + mention + message.slice(cursorPosition + mentionQuery.length);
-    setMessage(updatedMessage);
-    setMentionQuery('');
-    setFilteredParticipants([]);
-  };
 
-  // Handle changes to the input message
-  const handleChange = (e) => {
-    const value = e.target.value;
-    setMessage(value);
-
-    if (value.includes('@')) {
-      const query = value.split('@').pop().trim();
-      setMentionQuery(query);
-      setFilteredParticipants(
-        currentChat.participants.filter((participant) =>
-          `${participant.firstName} ${participant.lastName}`.toLowerCase().includes(query.toLowerCase())
-        )
-      );
-
-      const inputElement = e.target;
-      const cursorPos = inputElement.selectionStart;
-      const rect = inputElement.getBoundingClientRect();
-      const charWidth = 8; // Approximate width of each character
-      const left = rect.left + charWidth * (cursorPos - value.lastIndexOf('@') - 1);
-      const top = rect.top - 250; 
-
-      setMentionPosition({ left, top });
-    } else {
-      setMentionQuery('');
-      setFilteredParticipants([]);
-    }
-  };
 
   const handleMessageClick = (message) => {
     if (message.replyTo && message.replyTo.id) {
@@ -220,8 +179,7 @@ console.log(currentChat)
       }
     }
   };
-
-  console.log(currentChat)
+console.log('hey')
 
   return (
     <Box sx={{ width: '100%', display: 'flex', flexDirection: 'column', height: '100%'}}>
@@ -274,7 +232,7 @@ console.log(currentChat)
                       onCloseReply={handleCloseReply}
                       isReplyingTo={replyToMessage}
                       setIsReplyingTo={setReplyToMessage}
-                      chatroomName = {currentChat.name}
+                      currentChat = {currentChat}
                     />
                   </Box>
                 ))}
@@ -299,35 +257,15 @@ console.log(currentChat)
           )}
 
           <ChatForm
-            message={message}
+            message={message.current}
             onSubmit={handleFormSubmit}
-            onChange={handleChange}
+            // onChange={handleChange}
+            currentChat= {currentChat}
           />
         </>
       )}
 
-      {filteredParticipants.length > 0 && (
-        <Box sx={{ position: 'absolute', top: mentionPosition.top, left: mentionPosition.left, backgroundColor: 'background.paper', boxShadow: 2, zIndex: 2, borderRadius: 1 }}>
-          <List>
-            {filteredParticipants.map((participant) => (
-              <ListItem 
-                key={participant.id} 
-                onClick={() => handleMentionSelect(participant)} 
-                sx={{
-                  cursor: 'pointer', 
-                  '&:hover': {
-                    backgroundColor: colors.grey[900], 
-                    transition: 'background-color 0.3s', 
-                  }
-                }}
-              >
-                <Avatar src={participant.profilePictureUrl} sx={{ marginRight: 2 }}/>
-                <ListItemText primary={`${participant.firstName} ${participant.lastName}`} />
-              </ListItem>
-            ))}
-          </List>
-        </Box>
-      )}
+    
 
       {selectedView === 'groupInfo' && <GroupInfo currentChat={currentChat} />}
       {selectedView === 'search' && <SearchMessages currentChat={currentChat} />}

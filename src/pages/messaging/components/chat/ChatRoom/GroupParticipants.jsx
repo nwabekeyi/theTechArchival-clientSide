@@ -7,27 +7,13 @@ export default function GroupParticipants({
   sx = {}, // Default to an empty object for custom styles
   titleSx = {}, // Custom styles for the title
 }) {
-  // Filter out duplicate participants by id
-  const uniqueParticipants = participants.filter(
-    (participant, index, self) => {
-     if(participant.userId){
-      participant.userId && // Check that userId exists
-      index === self.findIndex((p) => p.userId === participant.userId)
-     }
-    }
-  );
-  
-  console.log('Unique Participants:', uniqueParticipants);
-  console.log('First userId:', uniqueParticipants[0]?.userId);  
-  
-
   return (
     <Box sx={{ padding: 2, ...sx }}>
       <Typography variant="h6" gutterBottom sx={{ ...titleSx }}>
         {title}
       </Typography>
-      {uniqueParticipants.length > 0 ? (
-        uniqueParticipants.map((participant, index) => (
+      {participants.length > 0 ? (
+        participants.map((participant, index) => (
           <Box
             key={index}
             sx={{
@@ -57,7 +43,7 @@ export default function GroupParticipants({
         ))
       ) : (
         // Replace the text with three circles
-        <Box sx={{ display: 'flex', gap: '4px', alignItems: 'start' }}>
+        <Box sx={{ display: 'flex',  gap: '4px', alignItems: 'start' }}>
           <Box
             sx={{
               width: '8px',

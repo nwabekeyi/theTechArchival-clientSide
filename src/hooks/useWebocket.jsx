@@ -8,6 +8,12 @@ import {
   updateReadby,
   updateChatroomReadbyThunk
 } from '../reduxStore/slices/messageSlice';
+import { createSelector } from 'reselect';
+
+const selectUnreadMessages = createSelector(
+  (state) => state.message.unreadChatroomMessages,
+  (unreadChatroomMessages) => unreadChatroomMessages
+);
 
 const useWebSocket = (actionToSend = null) => {
   const socket = useRef(null);
@@ -15,8 +21,8 @@ const useWebSocket = (actionToSend = null) => {
   const { userId, role, profilePictureUrl, lastName, firstName } = useSelector((state) => state.users.user) || {};
   const dispatch = useDispatch();
   const chatroomNames = useSelector((state) => state.message.chatrooms);
-  const unreadMessages = useSelector((state) => state.message.unreadChatroomMessages);
-  console.log(unreadMessages)
+  const unreadMessages = useSelector(selectUnreadMessages);
+
   // Memoize recipientDetails to prevent unnecessary re-renders
   const recipientDetails = useMemo(() => ({
     userId: userId,
@@ -111,7 +117,7 @@ const useWebSocket = (actionToSend = null) => {
   // Handle message read logic
   useEffect(() => {
     const handleMessageRead = ({ chatroomName, messageId, recipientDetails }) => {
-
+        console.log('message readd by ' + recipientDetails )
       dispatch(updateReadby({ chatroomName, messageId, recipientDetails }));
       dispatch(updateChatroomReadbyThunk({ chatroomName, messageId, recipientDetails }));
     };
@@ -131,20 +137,20 @@ const useWebSocket = (actionToSend = null) => {
     }
   }, [chatroomNames, recipientDetails, isConnected]);
 
-  // Emit 'chatroomMessage readBy' for unread messages
-  useEffect(() => {
-    if (unreadMessages.length && isConnected) {
-      unreadMessages.forEach((message) => {
-        console.log(message);
-        socket.current.emit('chatroomMessage readBy', {
-          chatroomName: message.chatroomName,
-          messageId: message.messageId,
-          recipientDetails: recipientDetails,
-          senderId: message.senderId,
-        });
-      });
-    }
-  }, [unreadMessages, isConnected, recipientDetails]);
+
+  // // Emit 'chatroomMessage readBy' for unread messages
+  // useEffect(() => {
+  //   if (unreadMessages.length && isConnected) {
+  //     unreadMessages.forEach((message) => {
+  //       socket.current.emit('chatroomMessage readBy', {
+  //         chatroomName: message.chatroomName,
+  //         messageId: message.messageId,
+  //         recipientDetails: recipientDetails,
+  //         senderId: message.senderId,
+  //       });
+  //     });
+  //   }
+  // }, [unreadMessages, isConnected, recipientDetails]);
 
   // Emit function for socket events
   const emit = (event, messageBody) => {

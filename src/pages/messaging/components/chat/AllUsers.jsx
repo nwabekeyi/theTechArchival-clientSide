@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { createChatRoom } from "../../services/ChatService";
-import { Avatar, List, ListItem, ListItemText, Typography, Box } from "@mui/material";
+import { Avatar, List, ListItem, ListItemText, Typography, Box, useTheme } from "@mui/material";
+import { tokens } from "../../../dashboard/theme"; // Your token function
 
 export default function AllUsers({
   chatRooms, // Default to empty array
@@ -10,6 +11,8 @@ export default function AllUsers({
   role = '' // Default to empty string
 }) {
   const [selectedChat, setSelectedChat] = useState(null);
+  const theme = useTheme();
+  const colors = tokens(theme.palette.mode);
 
   useEffect(() => {
     if (!role) {
@@ -43,7 +46,7 @@ export default function AllUsers({
         selected={selectedChat === chatRoom}
         onClick={() => changeCurrentChat(chatRoom)}
         sx={{
-          backgroundColor: selectedChat === chatRoom ? 'action.selected' : 'background.paper',
+          backgroundColor: selectedChat === chatRoom ? colors.greenAccent[700] : colors.greenAccent[900],
           '&:hover': {
             backgroundColor: 'action.hover',
           },
@@ -92,16 +95,21 @@ export default function AllUsers({
         <Avatar
           src={chatRoom.avatarUrl || ""}
           alt={chatRoom.name || "Chat Room"}
-          sx={{ width: 32, height: 32, mr: 2 }}
+          sx={{ width: 50, height: 50, mr: 2 }}
         >
           {!chatRoom.avatarUrl && getInitials(chatRoom.name)}
         </Avatar>
         
         {/* Render chat room name */}
         <ListItemText
-          primary={chatRoom.name}
-          secondary={`Participants: ${chatRoom.participants ? chatRoom.participants.length : 0}`}
-        />
+            primary={
+              <Typography variant="h1" sx={{ fontWeight: 'bold' }}>
+                {chatRoom.name}
+              </Typography>
+            }
+            secondary={`Participants: ${chatRoom.participants ? chatRoom.participants.length : 0}`}
+          />
+
       </ListItem>
     ));
   };
