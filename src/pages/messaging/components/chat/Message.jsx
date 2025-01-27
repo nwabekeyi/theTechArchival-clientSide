@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React,{ useState, useEffect, useRef } from 'react';
 import { Box, Typography, Menu, MenuItem, Avatar, Dialog, DialogContent, useTheme } from '@mui/material';
 import ReplyIcon from '@mui/icons-material/Reply';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
@@ -20,7 +20,7 @@ const getReadByArray = createSelector(
   (chatroomMessages) => chatroomMessages?.map((message) => message?.readBy) || []
 );
 
-const Message = React.forwardRef(({
+const Message = ({
   message,
   self,
   onReply,
@@ -28,28 +28,34 @@ const Message = React.forwardRef(({
   setIsReplyingTo,
   mention,
   currentChat
-}, ref) => {
+}) => {
   const [menuOpen, setMenuOpen] = useState(false);
   const [infoOpen, setInfoOpen] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
   const menuRef = useRef(null);
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
-
   const deliveredToArray = useSelector((state) => getDeliveredToArray(state, currentChat));
   const readByArray = useSelector((state) => getReadByArray(state, currentChat));
 
   const deliveredToRef = useRef([]);
   const readByRef = useRef([]);
 
-  // Function to remove duplicates based on userId
-  const removeDuplicates = (array) => {
-    const uniqueUsers = {};
-    array.forEach((user) => {
-      uniqueUsers[user.userId] = user; // Use userId as the key to ensure uniqueness
-    });
-    return Object.values(uniqueUsers); // Return the array of unique users
-  };
+// Function to filter users with existing userId and remove duplicates
+const removeDuplicates = (array) => {
+  const uniqueUsers = {};
+  
+  // First, filter users where user is not null and userId exists
+  const filteredArray = array.filter((user) => user && user.userId);
+
+  // Then, remove duplicates based on userId
+  filteredArray.forEach((user) => {
+    uniqueUsers[user.userId] = user; // Use userId as the key to ensure uniqueness
+  });
+
+  return Object.values(uniqueUsers); // Return the array of unique users
+};
+
 
   useEffect(() => {
     // Remove duplicates from deliveredToArray based on userId
@@ -91,7 +97,6 @@ const Message = React.forwardRef(({
 
   return (
     <Box
-      ref={ref}
       sx={{
         width: 'auto',
         display: 'flex',
@@ -142,7 +147,6 @@ const Message = React.forwardRef(({
             justifyContent: 'center',
             width: '100%',
             flex: 1,
-            paddingRight: self !== message.sender.id ? 'none' : '10px',
           }}
         >
           <Typography
@@ -162,7 +166,7 @@ const Message = React.forwardRef(({
             <Box
               sx={{
                 position: 'absolute',
-                right: '5px',
+                right: '3px',
                 top: '50%',
                 marginLeft: '8%',
                 transform: 'translateY(-50%)',
@@ -172,7 +176,7 @@ const Message = React.forwardRef(({
             >
               <KeyboardArrowDownIcon
                 sx={{
-                  fontSize: self === message.sender.id ? '2rem' : '1.5rem',
+                  fontSize: self === message.sender.id ? '1.5rem' : '1.5rem',
                 }}
               />
             </Box>
@@ -215,10 +219,13 @@ const Message = React.forwardRef(({
               <MenuItem onClick={handleReply}>
                 <ReplyIcon sx={{ marginRight: 1 }} /> Reply
               </MenuItem>
-              <MenuItem onClick={() => setInfoOpen(true)}>
+              {
+                self === message.sender.id && <MenuItem onClick={() => setInfoOpen(true)}>
                 <InfoIcon sx={{ marginRight: 1 }} /> Info
               </MenuItem>
+              }
             </Menu>
+              
           </Box>
 
 
@@ -238,6 +245,6 @@ const Message = React.forwardRef(({
       </Box>
     </Box>
   );
-});
+};
 
-export default Message;
+export default React.memo(Message);
