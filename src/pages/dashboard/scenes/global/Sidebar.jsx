@@ -113,17 +113,20 @@ const Sidebar = () => {
 
   return (
     <Box
+      
       sx={{
         "& .pro-sidebar-inner": {
           background: `${theme.palette.mode === "light" ? colors.blueAccent[200] : colors.primary[400]} !important`,
           position: "fixed",
           overflow: "hidden",
+          margin:0,
+          // width:"50px"
         },
         "& .pro-icon-wrapper": {
           backgroundColor: "transparent !important",
         },
         "& .pro-inner-item": {
-          padding: "5px 35px 5px 20px !important",
+          padding: "10px 5px 5px 2px !important",
           color: "#fff !important",
         },
         "& .pro-inner-item:hover": {
@@ -143,14 +146,16 @@ const Sidebar = () => {
         },
       }}
     >
+      
       <ProSidebar collapsed={isCollapsed}>
+        
         <Menu iconShape="square">
           {/* LOGO AND MENU ICON */}
           <MenuItem
             onClick={() => setIsCollapsed(!isCollapsed)}
             icon={isCollapsed ? <MenuOutlinedIcon title="Menu" /> : undefined}
             style={{
-              margin: "10px 0 20px 0",
+              margin: "10px 0 0px 0",
               color: "#fff",
             }}
           >
