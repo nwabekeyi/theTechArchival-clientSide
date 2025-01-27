@@ -1,5 +1,5 @@
-import React, { useState } from "react";
-import '@fullcalendar/react/dist/vdom';
+import React, { useState, useEffect } from "react";
+import "@fullcalendar/react/dist/vdom";
 import FullCalendar, { formatDate } from "@fullcalendar/react";
 import interactionPlugin from "@fullcalendar/interaction";
 import dayGridPlugin from "@fullcalendar/daygrid";
@@ -13,6 +13,7 @@ import {
   ListItemText,
   Typography,
   useTheme,
+  useMediaQuery,
 } from "@mui/material";
 import Header from "../../components/Header";
 import { tokens } from "../../theme";
@@ -20,22 +21,43 @@ import { tokens } from "../../theme";
 const LearningPlan = () => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
+
+  const isTabletOrMobile = useMediaQuery("(max-width: 768px)");
+  const isSmallScreen = useMediaQuery("(max-width: 375px)");
+
   const [currentEvents, setCurrentEvents] = useState([]);
+
+  // Load events from localStorage on component mount
+  useEffect(() => {
+    const savedEvents =
+      JSON.parse(localStorage.getItem("learningPlanEvents")) || [];
+    setCurrentEvents(savedEvents);
+  }, []);
+
+  // Save events to localStorage whenever currentEvents changes
+  useEffect(() => {
+    localStorage.setItem(
+      "learningPlanEvents",
+      JSON.stringify(currentEvents)
+    );
+  }, [currentEvents]);
 
   const handleDateClick = (selected) => {
     const title = prompt("Please enter a new title for your event");
-    const calendarApi = selected.view.calendar;
-    calendarApi.unselect();
 
     if (title) {
-      calendarApi.addEvent({
+      const newEvent = {
         id: `${selected.dateStr}-${title}`,
         title,
         start: selected.startStr,
         end: selected.endStr,
         allDay: selected.allDay,
-      });
+      };
+
+      setCurrentEvents((prevEvents) => [...prevEvents, newEvent]);
     }
+
+    selected.view.calendar.unselect(); // Unselect the date
   };
 
   const handleEventClick = (selected) => {
@@ -44,23 +66,55 @@ const LearningPlan = () => {
         `Are you sure you want to delete the event '${selected.event.title}'`
       )
     ) {
-      selected.event.remove();
+      const updatedEvents = currentEvents.filter(
+        (event) => event.id !== selected.event.id
+      );
+      setCurrentEvents(updatedEvents);
     }
   };
 
   return (
-    <Box m="20px">
-      <Header title="Learning Plan" subtitle="Manage Your Learning Schedule" />
+    <Box 
+    sx={{
+     
+      margin:-3
+    }}>
+      <Header
+        title="Learning Plan"
+        subtitle="Manage Your Learning Schedule"
+        sx={{
+          "& h1": {
+            fontSize: isSmallScreen ? "20px" : "24px",
+          },
+          "& h2": {
+            fontSize: isSmallScreen ? "14px" : "16px",
+          },
+        }}
+      />
 
-      <Box display="flex" justifyContent="space-between">
+      <Box
+        display="flex"
+        flexDirection={isTabletOrMobile ? "column" : "row"}
+        justifyContent="space-between"
+        gap={isTabletOrMobile ? "20px" : "15px"}
+      >
         {/* CALENDAR SIDEBAR */}
         <Box
-          flex="1 1 20%"
+          flex="1"
+          maxWidth={isTabletOrMobile ? "100%" : "20%"}
           backgroundColor={colors.primary[400]}
           p="15px"
           borderRadius="4px"
         >
-          <Typography variant="h5">Scheduled Plans</Typography>
+          <Typography
+            variant="h5"
+            sx={{
+              fontSize: isSmallScreen ? "16px" : "18px",
+              whiteSpace: "nowrap",
+            }}
+          >
+            Scheduled Plans
+          </Typography>
           <List>
             {currentEvents.map((event) => (
               <ListItem
@@ -69,6 +123,7 @@ const LearningPlan = () => {
                   backgroundColor: colors.greenAccent[500],
                   margin: "10px 0",
                   borderRadius: "2px",
+                  fontSize: isSmallScreen ? "12px" : "14px",
                 }}
               >
                 <ListItemText
@@ -89,9 +144,13 @@ const LearningPlan = () => {
         </Box>
 
         {/* CALENDAR */}
-        <Box flex="1 1 100%" ml="15px">
+        <Box
+          flex="1"
+          width={isTabletOrMobile ? "100%" : "75%"}
+          ml={isTabletOrMobile ? "0" : "15px"}
+        >
           <FullCalendar
-            height="75vh"
+            height={isSmallScreen ? "45vh" : isTabletOrMobile ? "50vh" : "75vh"}
             plugins={[
               dayGridPlugin,
               timeGridPlugin,
@@ -101,28 +160,18 @@ const LearningPlan = () => {
             headerToolbar={{
               left: "prev,next today",
               center: "title",
-              right: "dayGridMonth,timeGridWeek,timeGridDay,listMonth",
+              right: isTabletOrMobile
+                ? "dayGridMonth,listMonth"
+                : "dayGridMonth,timeGridWeek,timeGridDay,listMonth",
             }}
-            initialView="dayGridMonth"
+            initialView={isTabletOrMobile ? "listMonth" : "dayGridMonth"}
             editable={true}
             selectable={true}
             selectMirror={true}
             dayMaxEvents={true}
             select={handleDateClick}
             eventClick={handleEventClick}
-            eventsSet={(events) => setCurrentEvents(events)}
-            initialEvents={[
-              {
-                id: "1",
-                title: "Math Homework",
-                date: "2024-07-21",
-              },
-              {
-                id: "2",
-                title: "Science Project",
-                date: "2024-07-22",
-              },
-            ]}
+            events={currentEvents} // Use state to populate calendar events
           />
         </Box>
       </Box>

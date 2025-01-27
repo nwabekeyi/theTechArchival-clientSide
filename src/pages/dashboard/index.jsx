@@ -131,7 +131,7 @@ function DashboardHome() {
     overflowY: "auto", // Enable vertical scrolling
   }}
 >
-  <Box sx={{ height: "auto" }}>
+  <Box sx={{ height: "auto"}}>
     <Topbar userData={userData} />
   </Box>
 

@@ -44,11 +44,14 @@ const Topbar = () => {
       justifyContent="space-between"
       py={2} 
       px={5} 
+      // m= {-20}
       sx={{
         position: 'sticky',
         top: 0,
         zIndex: 1000,
         backgroundColor: theme.palette.mode === "light" ? colors.blueAccent[200] : colors.primary[400],
+        // width: "150%",
+        // left:
       }}
     >
       {/* SEARCH BAR */}

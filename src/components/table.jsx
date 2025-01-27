@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import {
   TableContainer, Table, TableHead, TableBody, TableRow, TableCell, Paper, TableSortLabel,
-  TablePagination, Box, TextField, Typography, Divider, useTheme
+  TablePagination, Box, TextField, Typography, Divider, useTheme, useMediaQuery,
 } from '@mui/material';
 import { tokens } from "../pages/dashboard/theme";
 import { ArrowUpward, ArrowDownward } from '@mui/icons-material';
@@ -30,22 +30,22 @@ const TableComponent = ({
   rowsPerPage,
   onPageChange,
   onRowsPerPageChange,
-  onRowClick
+  onRowClick,
 }) => {
   const [searchQuery, setSearchQuery] = useState('');
   const [filteredData, setFilteredData] = useState(data);
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
+  const isSmallScreen = useMediaQuery(theme.breakpoints.down('sm'));
 
   useEffect(() => {
-    if(data){
-      setFilteredData(data.filter(row => 
-        columns.some(column => 
+    if (data) {
+      setFilteredData(data.filter((row) =>
+        columns.some((column) =>
           String(row[column.id]).toLowerCase().includes(searchQuery.toLowerCase())
         )
       ));
     }
-   
   }, [searchQuery, data, columns]);
 
   const sortedData = [...filteredData].sort((a, b) => {
@@ -57,34 +57,48 @@ const TableComponent = ({
   const paginatedData = sortedData.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage);
 
   return (
-
     <div>
-      {
-        data ? 
-        <TableContainer component={Paper} sx={{ 
-          maxHeight: '75vh', 
-          overflow: 'auto', 
-          backgroundColor : colors.primary[400],
-        }} style={{marginTop: "10px"}}>
-          <Box display="flex" justifyContent="space-between" alignItems="center" p={2}>
-            <Typography variant="h2">{tableHeader}</Typography>
+      {data ? (
+        <TableContainer
+          component={Paper}
+          sx={{
+            maxHeight: '75vh',
+            overflow: 'auto',
+            backgroundColor: colors.primary[400],
+            marginTop: '10px',
+            overflowX: 'auto', // Add horizontal scrolling
+          }}
+        >
+          <Box
+            display="flex"
+            flexDirection={isSmallScreen ? 'column' : 'row'}
+            justifyContent="space-between"
+            alignItems={isSmallScreen ? 'flex-start' : 'center'}
+            p={2}
+            gap={isSmallScreen ? 2 : 0}
+          >
+            <Typography variant={isSmallScreen ? 'h4' : 'h2'}>{tableHeader}</Typography>
             <TextField
               variant="outlined"
               placeholder="Search..."
+              size={isSmallScreen ? 'small' : 'medium'}
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
+              fullWidth={isSmallScreen}
             />
           </Box>
           <Divider />
           <Table stickyHeader>
             <TableHead>
               <TableRow>
-                {columns.map(column => (
-                  <TableCell key={column.id} 
+                {columns.map((column) => (
+                  <TableCell
+                    key={column.id}
                     sx={{
-                      fontWeight: "900",
-                      fontSize: "small",
-                      backgroundColor : colors.primary[400],
+                      fontWeight: '900',
+                      fontSize: isSmallScreen ? '0.8rem' : '1rem',
+                      backgroundColor: colors.primary[400],
+                      whiteSpace: 'nowrap', // Prevent text overflow
                     }}
                   >
                     <TableSortLabel
@@ -100,22 +114,19 @@ const TableComponent = ({
               </TableRow>
             </TableHead>
             <TableBody>
-              {paginatedData.map(row => (
+              {paginatedData.map((row) => (
                 <TableRow
                   key={row.id}
-                  onClick={() => onRowClick()}
+                  onClick={() => onRowClick(row)}
                   style={{ cursor: 'pointer', transition: 'background-color 0.3s' }}
                   sx={{
                     '&:hover': {
                       backgroundColor: colors.blueAccent[200],
-                      // Apply text color change to all TableCells inside the hovered row
-                      '& td': {
-                        color: '#fff',
-                      },
+                      '& td': { color: '#fff' },
                     },
                   }}
                 >
-                  {columns.map(column => (
+                  {columns.map((column) => (
                     <TableCell key={column.id}>
                       {column.renderCell ? column.renderCell(row) : formatCellData(row[column.id])}
                     </TableCell>
@@ -134,13 +145,10 @@ const TableComponent = ({
             onRowsPerPageChange={onRowsPerPageChange}
           />
         </TableContainer>
-        :
-        <Typography>
-          Data unavailable
-        </Typography>
-      }
+      ) : (
+        <Typography>Data unavailable</Typography>
+      )}
     </div>
-   
   );
 };
 
