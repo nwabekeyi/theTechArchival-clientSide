@@ -1,6 +1,5 @@
 import { useLocation, useNavigate } from 'react-router-dom';
 import { disablePageScroll, enablePageScroll } from 'scroll-lock'
-import {brainwave} from '../assets';
 import { navigation } from '../constants';
 import { HamburgerMenu } from '../components/design/Header'
 import { useState } from 'react';
@@ -61,7 +60,7 @@ const Header = () => {
             <HamburgerMenu />
          </nav>
 
-         <Button onClick={() => navigate('/offlineSignup')} className='button hidden mr-8 text-n-1/50  transition-colors hover:text-n-1 lg:block '>
+         <Button onClick={() => navigate('/code-authenticator')} className='button hidden mr-8 text-n-1/50  transition-colors hover:text-n-1 lg:block '>
             Sign up
          </Button>
          <Button className='hidden lg:flex' onClick={() => navigate('/signin')}>
