@@ -14,7 +14,7 @@ import './index.css'
 const App = () => {
   return (
     <>
-      <div className='pt-[4.75rem] lg:pt-[5.25rem] overflow-y-auto'>
+      <div className='pt-[4.75rem] lg:pt-[5.25rem] overflow-x-hidden overflow-y-auto'>
         <Header />
         <Hero />
         <Benefits />
