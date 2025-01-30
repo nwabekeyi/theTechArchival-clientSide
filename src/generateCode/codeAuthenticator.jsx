@@ -7,6 +7,7 @@ import Navbar from "../pages/homePage/components/Header";
 import Footer from "../pages/homePage/components/Footer";
 import { Button } from "../components/ButtonElement";
 import useApi from "../hooks/useApi"; // Adjust the path as necessary
+import { endpoints } from "../utils/constants";
 
 const CodeAuthenticator = () => {
   const [inputCode, setInputCode] = useState("");
@@ -14,10 +15,10 @@ const CodeAuthenticator = () => {
   const [error, setError] = useState("");
   const navigate = useNavigate();
 
+  const url =  endpoints.CODE_AUTH
+
   // Use the useApi hook
-  const { callApi, loading, data, error: apiError } = useApi(
-    "http://localhost:5000/api/v1/authenticate-code"
-  );
+  const { callApi, loading, data, error: apiError } = useApi();
 
   const handleInputChange = (e) => {
     setInputCode(e.target.value);
@@ -26,7 +27,7 @@ const CodeAuthenticator = () => {
   const handleSubmit = async () => {
     console.log("Input Code:", inputCode);
 
-    await callApi("POST", { inputCode });
+    await callApi(url, "POST", { inputCode });
 
     if (apiError) {
       setError(apiError);
@@ -45,14 +46,13 @@ const CodeAuthenticator = () => {
   return (
     <Box>
       {/* Navbar */}
-      <Navbar otp />
+      <Navbar />
 
       {/* Body */}
       <Box
         sx={{
           display: "flex",
-          height: "95vh",
-          marginTop: { xs: "-50px", md: "0" },
+          height: "100vh",
           flexDirection: { xs: "column", md: "row" },
           justifyContent: "center",
           backgroundColor: "#fff",

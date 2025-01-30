@@ -33,14 +33,13 @@ const LoadingButton = ({ isLoading, children, ...props }) => {
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
-            marginLeft: 1,
           }}
         >
           <CircularProgress size={20} />
         </Box>
       )}
     >
-      {children}
+      {isLoading ? null : children}
     </StyledButton>
   );
 };

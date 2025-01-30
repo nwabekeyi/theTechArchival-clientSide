@@ -33,38 +33,38 @@ import {
   
   export const navigation = [
     {
-      id: "0",
-      title: "Courses",
-      url: "#courses",
+        id: "0",
+        title: "Courses",
+        url: "#courses",
     },
     {
-      id: "1",
-      title: "About Us",
-      url: "#About",
+        id: "1",
+        title: "About Us",
+        url: "#About",
     },
     {
-      id: "2",
-      title: "Services",
-      url: "#services",
+        id: "2",
+        title: "Services",
+        url: "#services",
     },
     {
-      id: "3",
-      title: "Learning Approach",
-      url: "#roadmap",
+        id: "3",
+        title: "Learning Approach",
+        url: "#roadmap",
     },
     {
-      id: "4",
-      title: "Sign Up",
-      url: "#signup",
-      onlyMobile: true,
+        id: "4",
+        title: "Sign Up",
+        url: "/code-authenticator",
+        onlyMobile: true,
     },
     {
-      id: "5",
-      title: "Sign in",
-      url: "#login",
-      onlyMobile: true,
+        id: "5",
+        title: "Sign in",
+        url: "/signin",
+        onlyMobile: true,
     },
-  ];
+];
   
   
   export const notificationImages = [notification4, notification3, notification2];

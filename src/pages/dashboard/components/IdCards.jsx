@@ -30,7 +30,7 @@ x
     firstName,
     lastName,
     email,
-    phone,          
+    phone,
     role,
     studentId,
     instructorId,
@@ -139,7 +139,7 @@ x
           Student ID
         </Typography>
       </Grid>
-      
+
       <Grid item xs={8}>
         <Typography variant="body2" fontWeight="bold">: {studentId}</Typography>
       </Grid>
@@ -154,7 +154,7 @@ x
           Instructor ID
         </Typography>
       </Grid>
-    
+      
       <Grid item xs={8}>
         <Typography variant="body2" fontWeight="bold">: {instructorId}</Typography>
       </Grid>
