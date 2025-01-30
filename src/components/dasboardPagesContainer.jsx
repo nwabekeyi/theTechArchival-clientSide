@@ -5,7 +5,7 @@ import { Box } from "@mui/material";
 const withDashboardWrapper = (WrappedComponent) => {
   return (props) => {
     return (
-      <Box sx={{ p: 4 }}>
+      <Box sx={{ p: 4, margin: -3 }}>
         <WrappedComponent {...props} />
       </Box>
     );

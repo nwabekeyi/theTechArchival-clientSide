@@ -126,7 +126,7 @@ const Sidebar = () => {
           backgroundColor: "transparent !important",
         },
         "& .pro-inner-item": {
-          padding: "10px 5px 5px 2px !important",
+          padding: "5px 5px 5px 5px !important",
           color: "#fff !important",
         },
         "& .pro-inner-item:hover": {

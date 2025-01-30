@@ -13,11 +13,7 @@ const StudentProgress = () => {
   const { completedCourses, remainingCourses, progressPercentage } = useStudentData();
   console.log({ completedCourses, remainingCourses, progressPercentage })
   return (
-    <Box
-    sx={{
-     
-      margin:-3
-    }}>
+    <Box>
       <Header title="Student Progress" subtitle="Track Your Learning Progress" />
 
       <Box

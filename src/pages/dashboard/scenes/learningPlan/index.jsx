@@ -75,10 +75,7 @@ const LearningPlan = () => {
 
   return (
     <Box 
-    sx={{
-     
-      margin:-3
-    }}>
+    >
       <Header
         title="Learning Plan"
         subtitle="Manage Your Learning Schedule"

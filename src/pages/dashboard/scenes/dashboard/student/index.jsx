@@ -78,6 +78,10 @@ const Student = ({ user }) => {
                 p="10px"
                 borderRadius="10px"
                 textAlign="center"
+                display="flex" 
+                flexDirection= "column"
+                justifyContent="center" 
+                alignItems="center"
               >
                 <Typography variant="h6" fontWeight="600" mb="5px">
                   {progress.title}
@@ -95,6 +99,10 @@ const Student = ({ user }) => {
               p="10px"
               borderRadius="10px"
               textAlign="center"
+              display="flex" 
+                flexDirection= "column"
+                justifyContent="center" 
+                alignItems="center"
             >
               <Typography variant="h6" fontWeight="600" mb="5px">
                 Payment Rate ({parseInt(100 - outstandings.percentageDifference)}%)
