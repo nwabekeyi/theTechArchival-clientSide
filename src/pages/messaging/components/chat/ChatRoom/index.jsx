@@ -13,10 +13,10 @@ import GroupInfo from './GroupInfo';
 import { tokens } from "../../../../dashboard/theme"; // Your token function
 import SearchMessages from './SearchComponent';
 import GroupParticipants from './GroupParticipants';
-import useWebSocket from '../../../../../hooks/useWebocket'; // Import socket instance
+import useWebSocket from '../../../../../hooks/useWebSocket'; // Import socket instance
 import { useSelector, useDispatch } from 'react-redux';
 import { useChatroomVisibility } from '../../../../../hooks/useChatroomVisibilty';
-import { useMessageVisibility } from '../../../../../hooks/useMessageVisibity';
+import  useMessageVisibility  from '../../../../../hooks/useMessageVisibity';
 import { loadMessagesFromIndexedDB } from '../../../../../reduxStore/slices/messageSlice';
 import { checkDBFullnessAndSave, addChatroomMessage} from '../../../../../reduxStore/slices/messageSlice';
 

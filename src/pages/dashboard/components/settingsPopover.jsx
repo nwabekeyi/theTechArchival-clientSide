@@ -13,6 +13,7 @@ import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import Modal from './modal';
 import { useNavigate } from 'react-router-dom';
 
+
 const SettingsPopover = ({ anchorEl, handleClose, userDetails }) => {
   const [profileOpen, setProfileOpen] = useState(false);
   const [passwordModalOpen, setPasswordModalOpen] = useState(false);
@@ -31,9 +32,10 @@ const SettingsPopover = ({ anchorEl, handleClose, userDetails }) => {
   const { firstName, lastName, email, profilePictureUrl, role } = userDetails;
   const colorMode = useContext(ColorModeContext);
 
-  const handleLogout = () => {
+  const handleLogout = async () => {
     logout();
     navigate("/");
+    
   };
 
   const handleChangePassword = () => {

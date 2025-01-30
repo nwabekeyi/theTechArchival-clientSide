@@ -38,7 +38,7 @@ const StudentManagement = lazy(() => import("./scenes/studentManagement/studentM
 const OfflineStudentTable = lazy(() => import("./scenes/offlineStudent/offlineStudent"));
 const StudentInstructors = lazy(() => import("./scenes/studentInstructors"));
 const ChatApp = lazy(() => import("../messaging"));
-import useWebSocket from '../../hooks/useWebocket'; // Import socket instance
+import useWebSocket from '../../hooks/useWebSocket'; // Import socket instance
 
 
 function DashboardHome() {

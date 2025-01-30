@@ -1,14 +1,15 @@
 import { useDispatch, useSelector } from 'react-redux';
 import { setLoading, setError } from '../reduxStore/slices/uiSlice';
-import { setUser, resetUser} from '../reduxStore/slices/usersSlice';
+import { setUser, resetUser } from '../reduxStore/slices/usersSlice';
 import { endpoints } from '../utils/constants';
 import { useEffect } from 'react';
+import { deleteAllStores } from '../utils/indexedDBService';
+
+
 const useAuth = () => {
   const dispatch = useDispatch();
-  const { user} = useSelector((state) => state.users);
+  const { user } = useSelector((state) => state.users);
   const { loading, error } = useSelector((state) => state.ui);
-  
-
 
   // Function to login the user
   const login = async (email, password) => {
@@ -58,8 +59,8 @@ const useAuth = () => {
       // For example, you can call the login function again or a separate fetch to update user details.
 
     } catch (err) {
-      dispatch(setError(data.message));
-      console.log(err) // Handle any errors
+      dispatch(setError(err.message));
+      console.log(err); // Handle any errors
     }
   };
 
@@ -82,6 +83,10 @@ const useAuth = () => {
         credentials: 'include', // Ensure cookies are sent
       });
       dispatch(resetUser()); // Reset user data after logout
+      
+      // Delete the "Messages" store when logout is successful
+     await deleteAllStores('Messages');
+     console.log('Messages store deleted after logout.');
     } catch (err) {
       dispatch(setError(err.message)); // Handle any errors
     }

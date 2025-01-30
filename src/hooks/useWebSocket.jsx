@@ -118,7 +118,7 @@ const useWebSocket = (actionToSend = null) => {
   // Handle message read logic
   useEffect(() => {
     const handleMessageRead = ({ chatroomName, messageId, recipientDetails }) => {
-        console.log('message readd by ' + recipientDetails )
+        console.log(recipientDetails )
       dispatch(updateReadby({ chatroomName, messageId, recipientDetails }));
       dispatch(updateChatroomReadbyThunk({ chatroomName, messageId, recipientDetails }));
     };
@@ -138,20 +138,6 @@ const useWebSocket = (actionToSend = null) => {
     }
   }, [chatroomNames, recipientDetails, isConnected]);
 
-
-  // // Emit 'chatroomMessage readBy' for unread messages
-  // useEffect(() => {
-  //   if (unreadMessages.length && isConnected) {
-  //     unreadMessages.forEach((message) => {
-  //       socket.current.emit('chatroomMessage readBy', {
-  //         chatroomName: message.chatroomName,
-  //         messageId: message.messageId,
-  //         recipientDetails: recipientDetails,
-  //         senderId: message.senderId,
-  //       });
-  //     });
-  //   }
-  // }, [unreadMessages, isConnected, recipientDetails]);
 
   // Emit function for socket events
   const emit = (event, messageBody) => {

@@ -449,6 +449,36 @@ const updateChatroomDeliveredTo = async (chatroomName, messageId, recipientDetai
 };
 
 
+
+// Function to delete all stores from IndexedDB
+const deleteAllStores = async (dbName) => {
+  try {
+    const db = await openIndexedDB(dbName);
+
+    // Open a transaction for deleting object stores
+    const transaction = db.transaction([], 'readwrite');
+    const objectStoreNames = Array.from(db.objectStoreNames);
+
+    // Delete each object store
+    objectStoreNames.forEach((storeName) => {
+      db.deleteObjectStore(storeName);
+      console.log(`Object store "${storeName}" deleted.`);
+    });
+
+    transaction.oncomplete = () => {
+      console.log('All object stores deleted successfully.');
+    };
+
+    transaction.onerror = (event) => {
+      console.error('Transaction failed while deleting object stores:', event.target.error);
+    };
+
+  } catch (err) {
+    console.error('Failed to delete object stores:', err);
+  }
+};
+
+
 export {
   saveMessage,
   isDBFull,
@@ -456,5 +486,6 @@ export {
   openIndexedDB,
   updateDeliveredToIndexedDB,
   updateChatroomReadby,
-  updateChatroomDeliveredTo
+  updateChatroomDeliveredTo,
+  deleteAllStores
 };

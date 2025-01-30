@@ -1,5 +1,5 @@
 import { useDispatch, useSelector } from 'react-redux';
-import useWebSocket from '../../../../../hooks/useWebocket';
+import useWebSocket from '../../../../../hooks/useWebSocket';
 import useApi from '../../../../../hooks/useApi';
 import { setUsersData, setAllCourses } from '../../../../../reduxStore/slices/adminDataSlice';
 import { useEffect, useMemo, useState } from 'react';
