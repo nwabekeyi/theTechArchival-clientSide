@@ -21,7 +21,7 @@ const user = useSelector((state) => state.users.user)
       margin:-3
     }}>
       {/* HEADER */}
-      <Box display="flex" justifyContent="space-between" alignItems="center" mx='20px'>
+      <Box display="flex" justifyContent="space-between" alignItems="center" mx='10px'>
         <Header title={user.firstName} subtitle="Welcome to your Babtech virtual learning dashboard" />
 
         <Box sx={{display:'flex'}}>

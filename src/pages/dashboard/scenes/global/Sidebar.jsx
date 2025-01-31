@@ -134,7 +134,11 @@ const Sidebar = () => {
           position: "fixed",
           overflow: "hidden",
           margin:0,
-          // width:"50px"
+          width:"auto"
+        },
+        "& .pro-sidebar": {
+          width:"auto",
+          minWidth: isCollapsed ? "80px" : "250px",
         },
         "& .pro-icon-wrapper": {
           backgroundColor: "transparent !important",
@@ -161,7 +165,9 @@ const Sidebar = () => {
       }}
     >
       
-      <ProSidebar collapsed={isCollapsed}>
+      <ProSidebar 
+      collapsed={isCollapsed}
+      >
         
         <Menu iconShape="square">
           {/* LOGO AND MENU ICON */}

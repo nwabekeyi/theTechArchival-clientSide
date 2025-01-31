@@ -123,7 +123,7 @@ function DashboardHome() {
       <FloatingMessageIcon />
       <ThemeProvider theme={theme}>
         <CssBaseline />
-        <div style={{ display: "flex", height: "100%" }}>
+        <div style={{ display: "flex", height: "100%"}}>
           {/* Sidebar */}
           <Sidebar isSidebar={isSidebar} />
 
@@ -132,6 +132,7 @@ function DashboardHome() {
             id="dashboard"
             className="content"
             sx={{
+              width: '100%',
               backgroundColor:
                 theme.palette.mode === "light"
                   ? colors.primary[900]
