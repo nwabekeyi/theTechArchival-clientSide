@@ -61,7 +61,7 @@ const Sidebar = () => {
 
   const profileImage = user.profilePictureUrl ?? profileImg;
 
-  const adminMenuItems = [
+  const superAdminMenuItems = [
     { title: "Dashboard", to: "/dashboard", icon: <HomeOutlinedIcon /> },
     { title: "User Management", to: "/dashboard/userManagement", icon: <PeopleOutlinedIcon /> },
     { title: "Course Management", to: "/dashboard/courseManagement", icon: <ReceiptOutlinedIcon /> },
@@ -70,6 +70,19 @@ const Sidebar = () => {
     { title: "Team", to: "/dashboard/team", icon: <PersonOutlinedIcon /> },
     { title: "Analytics and Reporting", to: "/dashboard/analytics", icon: <MapOutlinedIcon /> },
     { title: "Growth & Innovation", to: "/dashboard/growth", icon: <TimelineOutlinedIcon /> },
+    { title: "Contacts", to: "/dashboard/contacts", icon: <SettingsOutlinedIcon /> },
+    { title: "Support", to: "/dashboard/support", icon: <SupportAgentIcon /> },
+    { title: "Feedbacks", to: "/dashboard/feedbacks", icon: <FeedbackIcon /> },
+    { title: "Enquiries", to: "/dashboard/enquiries", icon: <EmailIcon /> },
+    { title: "Generated Codes", to: "/dashboard/offlineStudents", icon: <PersonOutlinedIcon /> },
+  ];
+
+  const adminMenuItems = [
+    { title: "Dashboard", to: "/dashboard", icon: <HomeOutlinedIcon /> },
+    { title: "User Management", to: "/dashboard/userManagement", icon: <PeopleOutlinedIcon /> },
+    { title: "Course Management", to: "/dashboard/courseManagement", icon: <ReceiptOutlinedIcon /> },
+    { title: "Content Management", to: "/dashboard/contentManagement", icon: <AssignmentIcon /> },
+    { title: "Analytics and Reporting", to: "/dashboard/analytics", icon: <MapOutlinedIcon /> },
     { title: "Contacts", to: "/dashboard/contacts", icon: <SettingsOutlinedIcon /> },
     { title: "Support", to: "/dashboard/support", icon: <SupportAgentIcon /> },
     { title: "Feedbacks", to: "/dashboard/feedbacks", icon: <FeedbackIcon /> },
@@ -104,8 +117,10 @@ const Sidebar = () => {
         return studentMenuItems;
       case "instructor":
         return instructorMenuItems;
-      default:
+        case "admin":
         return adminMenuItems;
+      default:
+        return superAdminMenuItems;
     }
   };
 
@@ -113,7 +128,6 @@ const Sidebar = () => {
 
   return (
     <Box
-      
       sx={{
         "& .pro-sidebar-inner": {
           background: `${theme.palette.mode === "light" ? colors.blueAccent[200] : colors.primary[400]} !important`,

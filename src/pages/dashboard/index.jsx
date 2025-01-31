@@ -8,8 +8,8 @@ import "./index.css";
 import { useSelector, useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import FloatingMessageIcon from "./components/floatingMessageIcon";
-import { setNotifications } from "../../reduxStore/slices/notificationSlice";
 import { tokens } from "./theme";
+import SignIn from "../../components/Signin";
 
 
 
@@ -47,7 +47,8 @@ function DashboardHome() {
   const [userData, setUserData] = useState(null);
   const colors = tokens(theme.palette.mode);
   const user = useSelector((state) => state.users.user);
-  const userRole = user.role;
+  console.log(user)
+  const userRole = user ? user.role : 'not logged in';
   const navigate = useNavigate();
   const { emit, isConnected, listen} = useWebSocket();
 
@@ -107,48 +108,60 @@ function DashboardHome() {
   };
 
   return (
-    // <WebSocketProvider>
+
+    <>
+    {
+      userRole === 'not logged in' 
+      ?
+      <div>
+          <SignIn />
+      </div>
+
+      :
+
       <ColorModeContext.Provider value={colorMode}>
-        <FloatingMessageIcon />
-        <ThemeProvider theme={theme}>
-          <CssBaseline />
-          <div style={{ display: "flex", height: "100%" }}>
-            {/* Sidebar */}
-            <Sidebar isSidebar={isSidebar} />
+      <FloatingMessageIcon />
+      <ThemeProvider theme={theme}>
+        <CssBaseline />
+        <div style={{ display: "flex", height: "100%" }}>
+          {/* Sidebar */}
+          <Sidebar isSidebar={isSidebar} />
 
-            {/* Content */}
-            <Box
-  id="dashboard"
-  className="content"
-  sx={{
-    backgroundColor:
-      theme.palette.mode === "light"
-        ? colors.primary[900]
-        : colors.primary[500],
-    height: "100vh", // Make the content area take full height
-    display: "flex",
-    flexDirection: "column",
-    overflowY: "auto", // Enable vertical scrolling
-  }}
->
-  <Box sx={{ height: "auto"}}>
-    <Topbar userData={userData} />
-  </Box>
+          {/* Content */}
+          <Box
+            id="dashboard"
+            className="content"
+            sx={{
+              backgroundColor:
+                theme.palette.mode === "light"
+                  ? colors.primary[900]
+                  : colors.primary[500],
+              height: "100vh", // Make the content area take full height
+              display: "flex",
+              flexDirection: "column",
+              overflowY: "auto", // Enable vertical scrolling
+            }}
+            >
+            <Box sx={{ height: "auto"}}>
+              <Topbar userData={userData} />
+            </Box>
 
-  {/* Routes */}
-  <Box sx={{ flexGrow: 1, overflowY: "auto", height: "calc(100vh - 64px)" }}>
-    <Suspense fallback={<div>Loading...</div>}>
-      <Routes>
-        <Route path="/" element={<Dashboard userData={userData} />} />
-        {userRole && renderRoutesBasedOnRole(userRole)}
-      </Routes>
-    </Suspense>
-  </Box>
-</Box>
+            {/* Routes */}
+            <Box sx={{ flexGrow: 1, overflowY: "auto", height: "calc(100vh - 64px)" }}>
+              <Suspense fallback={<div>Loading...</div>}>
+                <Routes>
+                  <Route path={userRole === 'not logged in' ? "/signin" : "/"} element={<Dashboard userData={userData} />} />
+                  {userRole && renderRoutesBasedOnRole(userRole)}
+                </Routes>
+              </Suspense>
+            </Box>
+            </Box>
 
-          </div>
-        </ThemeProvider>
-      </ColorModeContext.Provider>
+        </div>
+      </ThemeProvider>
+    </ColorModeContext.Provider>
+    }
+     </>
  );
 }
 

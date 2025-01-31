@@ -8,7 +8,7 @@ import NotificationsPopover from '../../components/notificationPopper';
 import CodeGenerator from '../../../../generateCode/codeGenerator'; 
 import SettingsPopover from '../../components/settingsPopover';
 import { tokens } from "../../theme"; // Assuming tokens is your color utility function
-
+import { useLocation } from 'react-router-dom';
 const Topbar = () => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
@@ -38,6 +38,8 @@ const Topbar = () => {
   const isNotificationsOpen = Boolean(notificationsAnchorEl);
   const isSettingsOpen = Boolean(settingsAnchorEl);
 
+  const path = useLocation().pathname
+
   return (
     <Box 
       display="flex" 
@@ -66,7 +68,10 @@ const Topbar = () => {
             <SearchIcon />
           </IconButton>
         </Box>
-        {(userDetails.role === "superadmin" || userDetails.role === "admin") && <CodeGenerator />}
+        {
+        (userDetails.role === "superadmin" || userDetails.role === "admin") 
+          && path === '/dashboard/userManagement' 
+          &&<CodeGenerator />}
       </Box>
 
       {/* ICONS */}

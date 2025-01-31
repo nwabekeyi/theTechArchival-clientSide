@@ -9,7 +9,8 @@ import {
   DialogActions,
 } from "@mui/material";
 import Modal from "../pages/dashboard/components/modal";
-import useApi from "../hooks/useApi"; // Adjust the path to your useApi hook file
+import useApi from "../hooks/useApi";
+import { endpoints } from "../utils/constants";
 
 const CodeGenerator = () => {
   const [codes, setCodes] = useState(""); // Local state for handling codes
@@ -19,7 +20,7 @@ const CodeGenerator = () => {
   const [dialogOpen, setDialogOpen] = useState(false); // State for the dialog visibility
 
   // Hook for making API calls
-  const { loading, callApi, error } = useApi("http://localhost:5000/api/v1/store-code");
+  const { loading, callApi, error } = useApi();
 
   // Function to generate the code
   const generateCode = async () => {
@@ -63,8 +64,9 @@ const CodeGenerator = () => {
     };
 
     try {
+      const url = endpoints.STORE_CODE
       // Send the generated code to the backend
-      await callApi("POST", newCode);
+      await callApi(url, "POST", newCode);
 
       // Update local state and display the modal
       setCodes(result);
