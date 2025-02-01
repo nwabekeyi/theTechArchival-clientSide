@@ -114,6 +114,7 @@ const Student = ({ user }) => {
               p="10px"
               borderRadius="10px"
               textAlign="center"
+              height='100%'
             >
               <Typography variant="h6" fontWeight="600" mb="5px">
                 Next Class

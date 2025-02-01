@@ -1,7 +1,7 @@
 import React, { useState, useContext } from 'react';
 import { useDispatch } from 'react-redux';
 import { 
-  Box, Typography, Popover, IconButton, Avatar, Button, 
+  Box, Typography, Popover, Avatar, Button, 
   useTheme, Divider, TextField, Card, CardContent 
 } from '@mui/material';
 import { ColorModeContext, tokens } from '../theme';
@@ -12,7 +12,6 @@ import LogoutIcon from '@mui/icons-material/Logout';
 import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import Modal from './modal';
 import { useNavigate } from 'react-router-dom';
-
 
 const SettingsPopover = ({ anchorEl, handleClose, userDetails }) => {
   const [profileOpen, setProfileOpen] = useState(false);
@@ -35,7 +34,6 @@ const SettingsPopover = ({ anchorEl, handleClose, userDetails }) => {
   const handleLogout = async () => {
     logout();
     navigate("/");
-    
   };
 
   const handleChangePassword = () => {
@@ -60,7 +58,6 @@ const SettingsPopover = ({ anchorEl, handleClose, userDetails }) => {
   };
 
   const handleDownloadIdCard = () => {
-    // Logic to download the ID card as an image or PDF
     console.log("Download ID Card");
   };
 
@@ -79,10 +76,10 @@ const SettingsPopover = ({ anchorEl, handleClose, userDetails }) => {
           horizontal: 'right',
         }}
         PaperProps={{
-          style: { width: '20vw', padding: '16px' },
+          style: { width: '20vw'},
         }}
       >
-        <Box display="flex" alignItems="center" mb={2} onClick={handleProfileClick} sx={{ cursor: 'pointer' }}>
+        <Box display="flex" alignItems="center" p={2} onClick={handleProfileClick} sx={{ cursor: 'pointer', '&:hover': { backgroundColor: colors.grey[600] } }}>
           <Avatar src={profilePictureUrl} sx={{ width: 56, height: 56, mr: 2 }} />
           <Box>
             <Typography variant="h6">{`${firstName} ${lastName}`}</Typography>
@@ -93,29 +90,44 @@ const SettingsPopover = ({ anchorEl, handleClose, userDetails }) => {
 
         <Divider />
 
-        <Box display="flex" justifyContent="space-between" alignItems="center" mt={2}>
+        <Box 
+          p={2}
+          display="flex" 
+          justifyContent="space-between" 
+          alignItems="center" 
+          onClick={handleChangePassword} 
+          sx={{ cursor: 'pointer', '&:hover': { backgroundColor: colors.grey[600] } }}
+        >
           <Typography>Change Password</Typography>
-          <IconButton onClick={handleChangePassword}>
-            <LockOutlinedIcon />
-          </IconButton>
+          <LockOutlinedIcon />
         </Box>
 
         <Divider />
 
-        <Box display="flex" justifyContent="space-between" alignItems="center" mt={2}>
+        <Box 
+          p={2}
+          display="flex" 
+          justifyContent="space-between" 
+          alignItems="center" 
+          onClick={colorMode.toggleColorMode} 
+          sx={{ cursor: 'pointer', '&:hover': { backgroundColor: colors.grey[600] } }}
+        >
           <Typography>Switch Mode</Typography>
-          <IconButton onClick={colorMode.toggleColorMode}>
-            {theme.palette.mode === "dark" ? <DarkModeOutlinedIcon /> : <LightModeOutlinedIcon />}
-          </IconButton>
+          {theme.palette.mode === "dark" ? <DarkModeOutlinedIcon /> : <LightModeOutlinedIcon />}
         </Box>
 
         <Divider />
 
-        <Box display="flex" justifyContent="space-between" alignItems="center" mt={2}>
+        <Box 
+          display="flex" 
+          justifyContent="space-between" 
+          alignItems="center" 
+          p={2}
+          onClick={handleLogout} 
+          sx={{ cursor: 'pointer', '&:hover': { backgroundColor: colors.grey[600] } }}
+        >
           <Typography>Sign Out</Typography>
-          <IconButton onClick={handleLogout}>
-            <LogoutIcon />
-          </IconButton>
+          <LogoutIcon />
         </Box>
 
         <Modal
