@@ -42,10 +42,10 @@ const Topbar = () => {
 
   return (
     <Box 
-      display="flex" 
+      display="flex"
       justifyContent="space-between"
-      py={2} 
-      px={4} 
+      py={2}
+      px={4}
       sx={{
         position: 'sticky',
         top: 0,
