@@ -75,8 +75,14 @@ const SettingsPopover = ({ anchorEl, handleClose, userDetails }) => {
           vertical: 'top',
           horizontal: 'right',
         }}
-        PaperProps={{
-          style: { width: '20vw'},
+        sx={{
+          width: '70%', // Default width for small screens
+          [theme.breakpoints.up('md')]: {
+            width: '50%', // Width for medium screens
+          },
+          [theme.breakpoints.up('lg')]: {
+            width: '20%', // Width for large screens
+          },
         }}
       >
         <Box display="flex" alignItems="center" p={2} onClick={handleProfileClick} sx={{ cursor: 'pointer', '&:hover': { backgroundColor: colors.grey[600] } }}>

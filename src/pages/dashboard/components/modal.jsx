@@ -42,6 +42,8 @@ const Modal = ({
           color: color || theme.palette.text.primary,
           padding: padding || theme.spacing(2), // Ensure sufficient padding
           overflowY: overflowY || 'visible',
+          borderRadius: '12px', // Add rounded borders
+          boxShadow: `0 4px 20px rgba(0, 0, 0, 0.1)`, // Add box shadow
           ...customStyles,
         },
       }}
