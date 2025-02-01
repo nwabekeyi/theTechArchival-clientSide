@@ -85,7 +85,7 @@ function DashboardHome() {
             <Route path="/studentProgress" element={<StudentProgress />} />
             <Route path="/curriculum" element={<Curriculum />} />
             <Route path="/studentPayment" element={<StudentPayment />} />
-            {/* <Route path="/studentInstructors" element={<StudentInstructors />} /> */}
+            <Route path="/studentInstructors" element={<StudentInstructors />} />
           </>
         );
       case "instructor":

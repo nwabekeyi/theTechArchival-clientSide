@@ -13,13 +13,14 @@ function StudentInstructors() {
     const theme = useTheme();
     const colors = tokens(theme.palette.mode);
     const user = useSelector((state) => state.users.user);
-    const { loading, data, error, callApi } = useApi(); 
+    const { loading, data, error, callApi } = useApi();
     const [instructors, setInstructors] = useState([]);
     const [selectedInstructor, setSelectedInstructor] = useState([]);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [reviewData, setReviewData] = useState({ reviewText: '', rating: '' });
 
     useEffect(() => {
+        console.log('called')
         callApi(`${endpoints.COHORT}/instructors/${user.cohort}`, 'GET');
     }, []);
 
