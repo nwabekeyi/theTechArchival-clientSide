@@ -147,6 +147,9 @@ const Sidebar = () => {
           margin: 0,
           width: "auto",
         },
+        "& .pro-sidebar-layout": {
+         alignItems: 'center'
+        },
         "& .pro-sidebar": {
           width: "auto",
           minWidth: isCollapsed ? "80px" : "250px",

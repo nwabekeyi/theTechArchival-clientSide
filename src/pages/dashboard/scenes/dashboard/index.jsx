@@ -16,7 +16,7 @@ const user = useSelector((state) => state.users.user)
 const production =  import.meta.env.EVN
   return (
     <Box
-    sx={{px: production === "production" && 4}}>
+    sx={{pl: production === "production" && 4}}>
       {/* HEADER */}
       <Box display="flex" justifyContent="space-between" alignItems="center" mx='10px'>
         <Header title={user.firstName} subtitle="Welcome to your Babtech virtual learning dashboard" />
