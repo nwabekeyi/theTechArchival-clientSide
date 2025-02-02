@@ -43,13 +43,15 @@ export default function ChatLayout() {
     if (singleRoomData) {
       setSingleRoom(singleRoomData.getChatroom); // Set single room data
       // Dispatch addChatroom with the room name
-      dispatch(addChatroom(singleRoomData.getChatroom.name));      
+      dispatch(addChatroom(singleRoomData.getChatroom.name));
     }
   }, [singleRoomData]);
 
   useEffect(() => {
     if (allRoomsData) {
       setChatRooms(allRoomsData.getChatrooms); // Set all chatrooms data
+      console.log('chatroom fetched')
+
       allRoomsData.getChatrooms.forEach((chatRoom) => {
         dispatch(addChatroom(chatRoom.name));
       })
