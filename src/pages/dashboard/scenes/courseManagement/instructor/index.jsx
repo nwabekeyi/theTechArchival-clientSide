@@ -29,7 +29,7 @@ const Instructors = () => {
         // If the curriculum is available, display the mapped content
         curriculum && curriculum.length > 0 ? (
           <Box >
-            <Typography variant="h5" gutterBottom>
+            <Typography variant="h2" gutterBottom>
               Curriculum
             </Typography>
 
@@ -63,7 +63,7 @@ const Instructors = () => {
                   </Avatar>
 
                   <Box>
-                    <Typography variant="h6">
+                    <Typography variant="h3"   sx={{color: colors.blueAccent[200]}}>
                       {item.topic || "No topic available"} {/* Ensure item.topic exists */}
                     </Typography>
 
@@ -71,11 +71,11 @@ const Instructors = () => {
                       {item.description || "No description available"} {/* Ensure item.description exists */}
                     </Typography>
 
-                    <Typography variant="body2" sx={{ fontStyle: 'italic' }}>
+                    <Typography variant="body1" sx={{ fontStyle: 'italic' }}>
                       Duration: {item.duration || "Unknown"} {/* Ensure item.duration exists */}
                     </Typography>
 
-                    <Typography variant="body2">
+                    <Typography variant="h6" sx={{color: colors.blueAccent[200]}}>
                       Resources: {Array.isArray(item.resources) ? item.resources.join(', ') : "No resources available"}
                     </Typography>
                   </Box>
