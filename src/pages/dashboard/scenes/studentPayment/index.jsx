@@ -130,10 +130,7 @@ const PaymentHistory = () => {
 
   return (
     <Box 
-    sx={{
-     
-      margin:-3
-    }}>
+   >
          <Header title="Payment History" subtitle="Overview of Payments Made" />
 
          <Box backgroundColor={colors.primary[400]} p="20px" borderRadius="4px">

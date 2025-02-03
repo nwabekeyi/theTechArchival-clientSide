@@ -15,6 +15,7 @@ import { useNavigate } from 'react-router-dom';
 import useApi from '../../../hooks/useApi';
 import { endpoints } from '../../../utils/constants';
 import ConfirmationModal from './confirmationModal';
+import DownloadIdButton from './IdCards'
 
 const SettingsPopover = ({ anchorEl, handleClose, userDetails }) => {
   const [profileOpen, setProfileOpen] = useState(false);
@@ -261,15 +262,8 @@ const SettingsPopover = ({ anchorEl, handleClose, userDetails }) => {
             <Typography variant="body1" color="textSecondary">{email}</Typography>
             <Typography variant="body1" color="textSecondary">{role}</Typography>
           </CardContent>
-          <Button
-            variant="contained"
-            color="primary"
-            fullWidth
-            onClick={handleDownloadIdCard}
-            sx={{ mt: 2 }}
-          >
-            Download ID Card
-          </Button>
+           {/* The Download Button is now here */}
+           <DownloadIdButton userId={userDetails.id} /> 
         </Card>
 
       
