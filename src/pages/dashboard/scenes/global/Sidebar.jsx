@@ -158,11 +158,7 @@ const Sidebar = () => {
           backgroundColor: "transparent !important",
         },
         "& .pro-inner-item": {
-<<<<<<< HEAD
-          padding: "5px 5px 5px 5px !important",
-=======
           padding: "10px 5px 5px 5px !important",
->>>>>>> f4ab24f14a832167941a17e00be77d256be75db6
           color: "#fff !important",
         },
         "& .pro-inner-item:hover": {

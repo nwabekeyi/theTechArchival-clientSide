@@ -16,11 +16,7 @@ const Component = ({home}) => {
   const production = import.meta.env.EVN;
 
   return (
-<<<<<<< HEAD
-    <Box>
-=======
     <Box sx={{ pl: production === 'production' && 4 }}>
->>>>>>> f4ab24f14a832167941a17e00be77d256be75db6
       {/* HEADER */}
       <Box display="flex" justifyContent="space-between" alignItems="center" mx="10px">
         <Header title={user.firstName} subtitle="Welcome to your Babtech virtual learning dashboard" />

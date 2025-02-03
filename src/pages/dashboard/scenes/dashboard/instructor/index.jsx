@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Box, Typography, useTheme, Card, CardContent, Avatar, Rating } from '@mui/material';
+import { Box, Typography, useTheme, Card, CardContent, Avatar, useMediaQuery } from '@mui/material';
 import { tokens } from '../../../theme';
 import Calendar from './calendar';
 
@@ -14,12 +14,14 @@ import useInstructorData from './useInstructorData';
 const Instructor = () => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
+  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
+  const isTablet = useMediaQuery(theme.breakpoints.between('sm', 'md'));
 
   const [assignments, setAssignments] = useState([]);
   const [recommendations, setRecommendations] = useState([]);
 
-   // Mock Announcements Data
-   const mockAnnouncements = [
+  // Mock Announcements Data
+  const mockAnnouncements = [
     {
       id: 1,
       title: "New Semester Starts",
@@ -39,7 +41,7 @@ const Instructor = () => {
       date: "2024-12-22",
     }
   ];
-  
+
   const {
     instructorData,
     studentData,
@@ -47,8 +49,8 @@ const Instructor = () => {
     attendanceRate,
     nextClass,
     assignmentSubmissionRate,
-    topStudents, // Changed from highestActivityStudent to topStudents
-    leastStudents // Changed from lowestActivityStudent to leastStudents
+    topStudents,
+    leastStudents
   } = useInstructorData();
 
   useEffect(() => {
@@ -68,13 +70,12 @@ const Instructor = () => {
 
   const conBg = `${theme.palette.mode === "light" ? colors.blueAccent[800] : colors.greenAccent[600]} !important`
 
-
   return (
-    <Box>
+    <Box p={isMobile ? 1 : 3}>
       {/* ROW 1 */}
-      <Box display="grid" gridTemplateColumns="repeat(12, 1fr)" gap="20px">
+      <Box display="grid" gridTemplateColumns={`repeat(${isMobile ? 1 : isTablet ? 2 : 12}, 1fr)`} gap="20px">
         {/* Course Progress */}
-        <Box gridColumn="span 3" backgroundColor={colors.primary[400]} p="20px" borderRadius='8px'>
+        <Box gridColumn={`span ${isMobile ? 1 : isTablet ? 2 : 3}`} backgroundColor={colors.primary[400]} p="20px" borderRadius='8px'>
           <Typography variant="h5" fontWeight="600">
             Course Progress
           </Typography>
@@ -88,7 +89,7 @@ const Instructor = () => {
         </Box>
 
         {/* Attendance */}
-        <Box gridColumn="span 3" backgroundColor={colors.primary[400]} p="20px" borderRadius='8px'>
+        <Box gridColumn={`span ${isMobile ? 1 : isTablet ? 2 : 3}`} backgroundColor={colors.primary[400]} p="20px" borderRadius='8px'>
           <Typography variant="h5" fontWeight="600">
             Attendance
           </Typography>
@@ -102,7 +103,7 @@ const Instructor = () => {
         </Box>
 
         {/* Assignment submissions */}
-        <Box gridColumn="span 3" backgroundColor={colors.primary[400]} p="20px" borderRadius='8px'>
+        <Box gridColumn={`span ${isMobile ? 1 : isTablet ? 2 : 3}`} backgroundColor={colors.primary[400]} p="20px" borderRadius='8px'>
           <Typography variant="h5" fontWeight="600">
             Assignment submissions
           </Typography>
@@ -116,7 +117,7 @@ const Instructor = () => {
         </Box>
 
         {/* Next Lecture */}
-        <Box gridColumn="span 3" backgroundColor={colors.primary[400]} p="20px" borderRadius='8px'>
+        <Box gridColumn={`span ${isMobile ? 1 : isTablet ? 2 : 3}`} backgroundColor={colors.primary[400]} p="20px" borderRadius='8px'>
           <Typography variant="h5" fontWeight="600" mb="15px">
             Next Lecture
           </Typography>
@@ -135,39 +136,22 @@ const Instructor = () => {
         </Box>
       </Box>
 
-
       {/* ROW 2 */}
-       {/* THIRD ROW (MESSAGES + INSTRUCTOR PROFILE) */}
-       <Box gridColumn="span 12" display="flex" gap="20px" sx={{ height: '300px' }} mt="20px">
-
-         {/* Calendar */}
-         <Box
-            flex={2}
-            backgroundColor={colors.primary[400]}
-            p="20px"
-            sx={{ overflowY: 'auto' }}
-            borderRadius="10px"
-
-          >
-             <Typography variant="h5" fontWeight="600" mb="15px">
+      <Box display="grid" gridTemplateColumns={`repeat(${isMobile ? 1 : isTablet ? 2 : 12}, 1fr)`} gap="20px" mt="20px">
+        {/* Calendar */}
+        <Box gridColumn={`span ${isMobile ? 1 : isTablet ? 2 : 8}`} backgroundColor={colors.primary[400]} p="20px" borderRadius="10px">
+          <Typography variant="h5" fontWeight="600" mb="15px">
             Event calendar
           </Typography>
-           <Calendar />
-          </Box>
-          
-            {/* Announcement Box */}
-        <Box 
-             flex={1}
-             backgroundColor={colors.primary[400]}
-             p="20px"
-             sx={{ overflowY: 'auto' }}
-             borderRadius="10px"
->
+          <Calendar />
+        </Box>
 
+        {/* Announcement Box */}
+        <Box gridColumn={`span ${isMobile ? 1 : isTablet ? 2 : 4}`} backgroundColor={colors.primary[400]} p="20px" borderRadius="10px">
           <Typography variant="h5" fontWeight="600" mb="15px">Announcements</Typography>
           {mockAnnouncements.map((announcement) => (
             <Card key={announcement.id} sx={{ mb: 2 }}>
-              <CardContent sx={{backgroundColor: conBg}}>
+              <CardContent sx={{ backgroundColor: conBg }}>
                 <Typography variant="h6">{announcement.title}</Typography>
                 <Typography variant="body2">{announcement.message}</Typography>
                 <Typography variant="caption" color="gray">{announcement.date}</Typography>
@@ -175,93 +159,83 @@ const Instructor = () => {
             </Card>
           ))}
         </Box>
-
-        
-        </Box>
-
-
-        {/* ROW 3 */}
-
-      <Box display="grid" gridTemplateColumns="repeat(12, 1fr)" gap="20px" mt="20px" sx={{ height: '350px' }}>
-  {/* Top 5 Students by Activity */}
-  <Box gridColumn="span 6" backgroundColor={colors.primary[400]} p="20px" sx={{ overflowY: 'auto', height: "100%", borderRadius: '8px' }}>
-    <Typography variant="h5" fontWeight="600" mb="15px">
-      Top Students by Activity
-    </Typography>
-    {topStudents?.map((student, index) => (
-      <Box 
-        key={index} 
-        display="flex" 
-        alignItems="center" 
-        justifyContent="flex-start" 
-        mb={2} 
-        backgroundColor={theme.palette.mode === "light" ? colors.greenAccent[300] : colors.primary[500]} 
-        p="15px" 
-        borderRadius="8px"
-        sx={{
-          boxShadow: '0px 4px 8px rgba(0, 0, 0, 0.1)', // Apply box shadow here for each student content
-        }}
-      >
-        <Avatar
-          src={student?.profilePicture}
-          alt={`${student?.firstName} ${student?.lastName}`}
-          sx={{ width: 50, height: 50, mr: 2 }} // Added right margin for spacing
-        />
-        <Box>
-          <Typography variant="h6" color="white">
-            {`${student?.firstName} ${student?.lastName}`}
-          </Typography>
-          <Typography variant="body2" color="white">
-            {`Activity Rate: ${student?.activityRate}%`}
-          </Typography>
-        </Box>
-      </Box>
-    ))}
-  </Box>
-
-  {/* Least Active Students */}
-  <Box gridColumn="span 6" backgroundColor={colors.primary[400]} p="20px" sx={{ overflowY: 'auto', height: "100%", borderRadius: '8px' }}>
-    <Typography variant="h5" fontWeight="600" mb="15px">
-      Least Active Students
-    </Typography>
-    {leastStudents?.map((student, index) => (
-      <Box 
-        key={index} 
-        display="flex" 
-        alignItems="center" 
-        justifyContent="flex-start" 
-        mb={2} 
-        backgroundColor={theme.palette.mode === "light" ? colors.greenAccent[300] : colors.primary[500]} 
-        p="15px" 
-        borderRadius="8px"
-        sx={{
-          boxShadow: '0px 4px 8px rgba(0, 0, 0, 0.1)', // Apply box shadow here for each student content
-        }}
-      >
-        <Avatar
-          src={student?.profilePicture}
-          alt={`${student?.firstName} ${student?.lastName}`}
-          sx={{ width: 50, height: 50, mr: 2 }} // Added right margin for spacing
-        />
-        <Box>
-          <Typography variant="h6" color="white">
-            {`${student?.firstName} ${student?.lastName}`}
-          </Typography>
-          <Typography variant="body2" color="white">
-            {`Activity Rate: ${student?.activityRate}%`}
-          </Typography>
-        </Box>
-      </Box>
-    ))}
-  </Box>
-</Box>
-
-
-
-
-      
       </Box>
 
+      {/* ROW 3 */}
+      <Box display="grid" gridTemplateColumns={`repeat(${isMobile ? 1 : isTablet ? 2 : 12}, 1fr)`} gap="20px" mt="20px">
+        {/* Top 5 Students by Activity */}
+        <Box gridColumn={`span ${isMobile ? 1 : isTablet ? 2 : 6}`} backgroundColor={colors.primary[400]} p="20px" borderRadius="8px">
+          <Typography variant="h5" fontWeight="600" mb="15px">
+            Top Students by Activity
+          </Typography>
+          {topStudents?.map((student, index) => (
+            <Box
+              key={index}
+              display="flex"
+              alignItems="center"
+              justifyContent="flex-start"
+              mb={2}
+              backgroundColor={theme.palette.mode === "light" ? colors.greenAccent[300] : colors.primary[500]}
+              p="15px"
+              borderRadius="8px"
+              sx={{
+                boxShadow: '0px 4px 8px rgba(0, 0, 0, 0.1)',
+              }}
+            >
+              <Avatar
+                src={student?.profilePicture}
+                alt={`${student?.firstName} ${student?.lastName}`}
+                sx={{ width: 50, height: 50, mr: 2 }}
+              />
+              <Box>
+                <Typography variant="h6" color="white">
+                  {`${student?.firstName} ${student?.lastName}`}
+                </Typography>
+                <Typography variant="body2" color="white">
+                  {`Activity Rate: ${student?.activityRate}%`}
+                </Typography>
+              </Box>
+            </Box>
+          ))}
+        </Box>
+
+        {/* Least Active Students */}
+        <Box gridColumn={`span ${isMobile ? 1 : isTablet ? 2 : 6}`} backgroundColor={colors.primary[400]} p="20px" borderRadius="8px">
+          <Typography variant="h5" fontWeight="600" mb="15px">
+            Least Active Students
+          </Typography>
+          {leastStudents?.map((student, index) => (
+            <Box
+              key={index}
+              display="flex"
+              alignItems="center"
+              justifyContent="flex-start"
+              mb={2}
+              backgroundColor={theme.palette.mode === "light" ? colors.greenAccent[300] : colors.primary[500]}
+              p="15px"
+              borderRadius="8px"
+              sx={{
+                boxShadow: '0px 4px 8px rgba(0, 0, 0, 0.1)',
+              }}
+            >
+              <Avatar
+                src={student?.profilePicture}
+                alt={`${student?.firstName} ${student?.lastName}`}
+                sx={{ width: 50, height: 50, mr: 2 }}
+              />
+              <Box>
+                <Typography variant="h6" color="white">
+                  {`${student?.firstName} ${student?.lastName}`}
+                </Typography>
+                <Typography variant="body2" color="white">
+                  {`Activity Rate: ${student?.activityRate}%`}
+                </Typography>
+              </Box>
+            </Box>
+          ))}
+        </Box>
+      </Box>
+    </Box>
   );
 };
 

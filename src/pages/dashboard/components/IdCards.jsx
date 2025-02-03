@@ -1,21 +1,16 @@
-import React, { useRef, useState, useEffect } from 'react';
+import React, { useRef, useState } from 'react';
 import { jsPDF } from 'jspdf';
 import html2canvas from 'html2canvas';
-import { Button, Card, CardContent, CardMedia, Typography, Grid } from '@mui/material';
-// import logo from '../../../assets/logo.jpg';
-import logo from '../../../assets/idCompanyLogo.jpeg'
+import { Button, Card, CardContent, CardMedia, Typography, Grid, Modal, CircularProgress } from '@mui/material';
+import logo from '../../../assets/idCompanyLogo.jpeg';
 import backendDevImg from "../../../images/backend.jpeg";
 import frontendDevImg from "../../../images/frontend.jpeg";
 import imgplaceholder from "../../../images/karen.jpg";
 import { useSelector } from 'react-redux';
 
-
 // IDCard component (not exported, used internally for generating the card)
 const IDCard = ({ idCardRef }) => {
-  // Access user data from Redux store
-  const userData = useSelector(state => state.users.user);  // Assuming 'user' is stored in Redux state
-  console.log('aaaaa')
-  console.log(userData)
+  const userData = useSelector(state => state.users.user); // Access user data from Redux store
 
   // Fallback data if userData is not available
   const fallbackData = {
@@ -35,7 +30,7 @@ const IDCard = ({ idCardRef }) => {
     firstName,
     lastName,
     email,
-    phone,          
+    phone,
     role,
     studentId,
     instructorId,
@@ -43,261 +38,208 @@ const IDCard = ({ idCardRef }) => {
     profilePictureUrl,
   } = userData || fallbackData;
 
-
   const companyName = "Babtech School of Technology";
 
   return (
-    <div ref={idCardRef} style={{ display: 'flex', justifyContent:"center", width: 'auto' }}>
-
+    <div ref={idCardRef} style={{ display: 'flex', justifyContent: "center", width: 'auto' }}>
       {/* FRONT CARD */}
-    <Card sx={{ maxWidth: 400, height: 550, margin: 'auto', boxShadow: 3, borderRadius: 2,   backgroundColor: "#fff",  backgroundImage: `linear-gradient(rgba(255, 255, 255, 1), rgba(255, 255, 255, 0.9)), url(${frontendDevImg})`, margin:"2px"}} >
-    {/* <CardImage src={images.image} alt={images.name} /> */}
-      <CardContent>
-        {/* Company Logo and Company Name side by side */}
-        <Grid container direction="row" alignItems="center" justifyContent="center" spacing={1}>
-          {/* Company Logo */}
-          <Grid item>
-            <CardMedia
-              component="img"
-              image={logo}
-              alt="Company Logo"
-              sx={{ width: 40, height: 50,  }}
-            />
+      <Card sx={{
+        width: 300,
+        height: 450,
+        margin: 'auto',
+        boxShadow: 3,
+        borderRadius: 2,
+        backgroundColor: "#fff",
+        backgroundImage: `linear-gradient(rgba(255, 255, 255, 0.9), rgba(255, 255, 255, 0.9)), url(${frontendDevImg})`,
+        margin: "2px",
+        position: 'relative',
+        overflow: 'hidden',
+      }}>
+        {/* Gradient Overlay */}
+        <div style={{
+          position: 'absolute',
+          top: 0,
+          left: 0,
+          width: '100%',
+          height: '100%',
+          background: 'linear-gradient(135deg, rgba(31, 58, 147, 0.1), rgba(255, 255, 255, 0.1))',
+          zIndex: 1,
+        }}></div>
+
+        <CardContent style={{ position: 'relative', zIndex: 2 }}>
+          {/* Company Logo and Name */}
+          <Grid container direction="row" alignItems="center" justifyContent="center" spacing={1} mb={3}>
+            <Grid item>
+              <CardMedia
+                component="img"
+                image={logo}
+                alt="Company Logo"
+                sx={{ width: 30, height: 40 }}
+              />
+            </Grid>
+            <Grid item>
+              <Typography variant="h6" fontWeight="bold" color="#1F3A93">
+                {companyName}
+              </Typography>
+            </Grid>
           </Grid>
-  
-          {/* Company Name */}
-          <Grid item>
-            <Typography variant="h6" fontWeight="bold">
-              {companyName}
-            </Typography>
+
+          {/* Profile Picture */}
+          <Grid container justifyContent="center" mb={3}>
+            <Grid item>
+              <CardMedia
+                component="img"
+                image={profilePictureUrl || fallbackData.profilePictureUrl}
+                alt={firstName}
+                sx={{
+                  width: 60,
+                  height: 60,
+                  border: '4px solid #1F3A93',
+                  borderRadius: '50%',
+                  boxShadow: '0px 4px 10px rgba(0, 0, 0, 0.2)',
+                }}
+              />
+            </Grid>
           </Grid>
-        </Grid>
-  
-        {/* Centered Profile Picture */}
-        <Grid container justifyContent="center" marginTop={5}>
-          <Grid item>
-            <CardMedia
-              component="img"
-              image={profilePictureUrl || fallbackData.profilePictureUrl}
-              alt={firstName}
-              sx={{ width: 150, height: 150, border: '2px solid #3f51b5' }}
-            />
-          </Grid>
-        </Grid>
-  
-        {/* User Information */}
-        <Typography variant="h5" textAlign="center" fontWeight="bold" marginTop={0} fontFamily={'sans-serif'} fontSize={25}>
-          {firstName} {lastName}
-        </Typography>
-  
-        {/* Conditional rendering for Role below the name */}
-        <Typography variant="body2" fontWeight="smaller" textAlign="center" marginTop={0.5} fontFamily={'sans-serif'} fontSize={15}>
-          {role === 'student' ? 'Student' : role === 'instructor' ? 'Instructor' : ''}
-        </Typography>
-  
-        {/* Details Section */}
-        <Grid container spacing={1} justifyContent="center" marginTop={2} alignItems="center">
-  
-  {/* Email */}
-  <Grid item container color="textSecondary" sx={{ width: '80%' }}>
-    <Grid item xs={4}>
-      <Typography variant="body2" fontWeight="bold" sx={{ paddingLeft: '20%' }}>
-        Email
-      </Typography>
-    </Grid>
-    
-    <Grid item xs={8}>
-      <Typography variant="body2" fontWeight="bold">: {email}</Typography>
-    </Grid>
-  </Grid>
 
-  {/* Phone */}
-  <Grid item container  sx={{ width: '80%' }}>
-    <Grid item xs={4}>
-      <Typography variant="body2" fontWeight="bold" sx={{ paddingLeft: '20%' }}>
-        Phone
-      </Typography>
-    </Grid>
-    
-    <Grid item xs={8}>
-      <Typography variant="body2" fontWeight="bold">: {phone}</Typography>
-    </Grid>
-  </Grid>
-
- {/* Program */}
- <Grid item container sx={{ width: '80%' }}>
-    <Grid item xs={4}>
-      <Typography variant="body2" fontWeight="bold" sx={{ paddingLeft: '20%' }}>
-        Program
-      </Typography>
-    </Grid>
-
-    <Grid item xs={8}>
-      <Typography variant="body2" fontWeight="bold">: {program}</Typography>
-    </Grid>
-  </Grid>
-
-  {/* Student ID */}
-  {role === 'student' && (
-    <Grid item container sx={{ width: '80%' }}>
-      <Grid item xs={4}>
-        <Typography variant="body2" fontWeight="bold" sx={{ paddingLeft: '20%' }}>
-          Student ID
-        </Typography>
-      </Grid>
-      
-      <Grid item xs={8}>
-        <Typography variant="body2" fontWeight="bold">: {studentId}</Typography>
-      </Grid>
-    </Grid>
-  )}
-
-  {/* Instructor ID */}
-  {role === 'instructor' && (
-    <Grid item container sx={{ width: '80%' }}>
-      <Grid item xs={4}>
-        <Typography variant="body2" fontWeight="bold" sx={{ paddingLeft: '30%' }}>
-          Instructor ID
-        </Typography>
-      </Grid>
-    
-      <Grid item xs={8}>
-        <Typography variant="body2" fontWeight="bold">: {instructorId}</Typography>
-      </Grid>
-    </Grid>
-  )}
-
- 
-</Grid>
-
-  
-        {/* Company Address */}
-        <Typography variant="body2" textAlign="center" color="textSecondary" marginTop={3} fontWeight="bold">
-          {companyName}
-        </Typography>
-        <Typography variant="body2" textAlign="center" color="textSecondary" fontWeight="bold">
-          53, Governor's road, Anishere bus-stop, Ikotun, Lagos.
-        </Typography>
-      </CardContent>
-    </Card>
-    
-  {/* BACK CARD */}
-
- 
-  <Card sx={{ width: 400, height: 550, margin: 'auto', boxShadow: 3, borderRadius: 2 ,backgroundImage: `linear-gradient(rgba(255, 255, 255, 1), rgba(255, 255, 255, 0.8)), url(${backendDevImg})`, margin:'2px'}}>
-  <CardContent  sx={{ paddingX:"30px"}}>
-    {/* Top Section */}
-    <Grid container spacing={1} style={{ marginBottom: '0px', paddingTop: '30px' }}>
-      {/* First Text Section */}
-        <Typography style={{color:'darkblue', width:'auto', height:'20px' }} > </Typography>
-      <Grid container spacing={1}>
-        <Grid item xs={1}>
-          <Typography>•</Typography>
-        </Grid>
-        <Grid item xs={11}>
-          <Typography variant="body2" color="textSecondary" sx={{ fontWeight: 'bold' }}>
-          This is to certify that the bearer whose name, email and phone is affixed is a student/staff of Babtech 
-
+          {/* User Name and Role */}
+          <Typography variant="h5" textAlign="center" fontWeight="bold" color="#1F3A93" mb={1}>
+            {firstName} {lastName}
           </Typography>
-        </Grid>
-      </Grid>
-
-      {/* Second Text Section */}
-      <Grid container spacing={1} style={{ marginTop: '5px' }}>
-        <Grid item xs={1}>
-          <Typography>•</Typography>
-        </Grid>
-        <Grid item xs={11}>
-          <Typography variant="body2" color="textSecondary" sx={{ fontWeight: 'bold' }}>
-          If found, kindly return to the nearest police station or 53, Governor Road, Ikotun, Lagos.
+          <Typography variant="body2" textAlign="center" color="#1F3A93" mb={3}>
+            {role === 'student' ? 'Student' : role === 'instructor' ? 'Instructor' : ''}
           </Typography>
-        </Grid>
-      </Grid>
-    </Grid>
 
-    {/* Date and ID Section */}
-    <Grid container justifyContent="center" style={{ marginTop: '20px' }}>
-      <Grid item>
-        <Typography variant="body2" sx={{ marginBottom: '5px', fontWeight: 'bold' }}>
-          Joined Date: MM/DD/YEAR
-        </Typography>
-        <Typography variant="body2" sx={{ marginBottom: '5px', fontWeight: 'bold' }}>
-          Expire Date: MM/DD/YEAR
-        </Typography>
-        <Typography variant="body2" sx={{ marginBottom: '15px', fontWeight: 'bold' }}>
-          Emp ID: 00-0000
-        </Typography>
-      </Grid>
-    </Grid>
+          {/* User Details */}
+          <Grid container spacing={2} justifyContent="center" color="#1F3A93">
+            <DetailItem label="Email" value={email} />
+            <DetailItem label="Phone" value={phone} />
+            <DetailItem label="Program" value={program} />
+            {role === 'student' && <DetailItem label="Student ID" value={studentId} />}
+            {role === 'instructor' && <DetailItem label="Instructor ID" value={instructorId} />}
+          </Grid>
 
-    {/* Signature Section */}
-    <Grid container justifyContent="center" style={{ marginTop: '10px' }}>
-      <Grid item textAlign="center">
-        <Typography variant="body2" style={{ color: '#1F3A93', fontWeight: 'bold' }}>
-          Your Signature
-        </Typography>
-        <Typography variant="body2" style={{ color: '#1F3A93', marginTop: '5px', fontWeight: 'bold' }}>
-          Your Sincerely
-        </Typography>
-      </Grid>
-    </Grid>
-  </CardContent>
+          {/* Company Address */}
+          <Typography variant="body2" textAlign="center" color="#1F3A93" mt={3} fontWeight="bold">
+            {companyName}
+          </Typography>
+          <Typography variant="body2" textAlign="center" color="#1F3A93" fontWeight="bold">
+            53, Governor's road, Anishere bus-stop, Ikotun, Lagos.
+          </Typography>
+        </CardContent>
+      </Card>
 
-  {/* Bottom Section - Company Info */}
-  <Grid container style={{ 
-    backgroundColor:'#1F3A93',
-     padding: '50px 0', 
-     textAlign: 'center', 
-     color: 'white', 
-     borderRadius: '0 0 8px 8px',
-     margin:'50px 0'
-      }} alignItems="center" justifyContent="center" >
-  <Grid item>
-    <CardMedia
-      component="img"
-      image={logo}
-      alt="Company Logo"
-      sx={{ width: 40, height: 50, marginRight: '10px', marginBottom:'25px'}} // Add margin-right to create space between logo and text
-    />
-  </Grid>
-  
-  <Grid item>
-    <Typography variant="h6" sx={{ fontWeight: 'bold', textAlign: 'left' }}> {/* Align the text to the left */}
-      Babtech School of technology
-    </Typography>
-    <Typography variant="body2" sx={{ fontWeight: 'bold', letterSpacing: '1px', textAlign: 'left', marginTop:'10px'}}>
-    info@babtechcomputers.com
-    </Typography>
-  </Grid>
-</Grid>
+      {/* BACK CARD */}
+      <Card sx={{
+        width: 300,
+        height: 450,
+        margin: 'auto',
+        boxShadow: 3,
+        borderRadius: 2,
+        backgroundImage: `linear-gradient(rgba(255, 255, 255, 0.9), rgba(255, 255, 255, 0.9)), url(${backendDevImg})`,
+        margin: '2px',
+        position: 'relative',
+        overflow: 'hidden',
+      }}>
+        <CardContent style={{ position: 'relative', zIndex: 2, padding: '30px' }}>
+          {/* Top Section */}
+          <Typography variant="body2" color="#1F3A93" fontWeight="bold" mb={2}>
+            This is to certify that the bearer whose name, email, and phone is affixed is a student/staff of Babtech.
+          </Typography>
+          <Typography variant="body2" color="#1F3A93" fontWeight="bold" mb={4}>
+            If found, kindly return to the nearest police station or 53, Governor Road, Ikotun, Lagos.
+          </Typography>
 
-</Card>
+          {/* Date and ID Section */}
+          <Grid container justifyContent="center" mb={4} color="#1F3A93" >
+            <Grid item>
+              <Typography variant="body2" fontWeight="bold" mb={1}>
+                Joined Date: MM/DD/YEAR
+              </Typography>
+              <Typography variant="body2" fontWeight="bold" mb={1}>
+                Expire Date: MM/DD/YEAR
+              </Typography>
+              <Typography variant="body2" fontWeight="bold">
+                Emp ID: 00-0000
+              </Typography>
+            </Grid>
+          </Grid>
 
-       
-  </div>
-  
+          {/* Signature Section */}
+          <Grid container justifyContent="center" mb={4}>
+            <Grid item textAlign="center">
+              <Typography variant="body2" color="#1F3A93" fontWeight="bold">
+                Your Signature
+              </Typography>
+              <Typography variant="body2" color="#1F3A93" fontWeight="bold" mt={1}>
+                Your Sincerely
+              </Typography>
+            </Grid>
+          </Grid>
+
+          {/* Bottom Section - Company Info */}
+          <Grid container justifyContent="center" alignItems="center" sx={{
+            backgroundColor: '#1F3A93',
+            padding: '20px 0',
+            borderRadius: '0 0 8px 8px',
+            marginTop: '20px',
+          }}>
+            <Grid item>
+              <CardMedia
+                component="img"
+                image={logo}
+                alt="Company Logo"
+                sx={{ width: 40, height: 50, marginRight: '10px' }}
+              />
+            </Grid>
+            <Grid item>
+              <Typography variant="h6" fontWeight="bold" color="white">
+                Babtech School of Technology
+              </Typography>
+              <Typography variant="body2" fontWeight="bold" color="white" mt={1}>
+                info@babtechcomputers.com
+              </Typography>
+            </Grid>
+          </Grid>
+        </CardContent>
+      </Card>
+    </div>
   );
 };
+
+// Reusable DetailItem component
+const DetailItem = ({ label, value }) => (
+  <Grid item xs={12} container>
+    <Grid item xs={4}>
+      <Typography variant="body2" fontWeight="bold" color="#1F3A93">
+        {label}:
+      </Typography>
+    </Grid>
+    <Grid item xs={8}>
+      <Typography variant="body2" fontWeight="bold">
+        {value}
+      </Typography>
+    </Grid>
+  </Grid>
+);
 
 // Function to generate and upload PDF
 const generatePDFAndUpload = async (idCardRef, userId) => {
   try {
     if (!idCardRef.current) throw new Error('ID card reference is not set.');
 
-    // Set the exact width and height based on the component's size
     const componentWidth = idCardRef.current.offsetWidth;
     const componentHeight = idCardRef.current.offsetHeight;
 
     const canvas = await html2canvas(idCardRef.current, {
       useCORS: true,
-      scale: 1, // Retain original scale to avoid resizing
+      scale: 4, // Increase scale for better quality
+      width: componentWidth,
+      height: componentHeight,
     });
 
     const imgData = canvas.toDataURL('image/png');
     const pdf = new jsPDF('landscape', 'px', [componentWidth, componentHeight]);
-    pdf.addImage(imgData, 'JPEG', 0, 0, componentWidth, componentHeight);
-
-    
     pdf.addImage(imgData, 'PNG', 0, 0, componentWidth, componentHeight);
     pdf.save('ID_Card.pdf');
   } catch (error) {
@@ -305,36 +247,66 @@ const generatePDFAndUpload = async (idCardRef, userId) => {
   }
 };
 
+// Loader Modal Component
+const LoaderModal = ({ open }) => (
+  <Modal
+    open={open}
+    aria-labelledby="loader-modal"
+    aria-describedby="loading-indicator"
+    style={{
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+    }}
+  >
+    <div style={{
+      backgroundColor: '#1F3A93',
+      padding: '20px',
+      borderRadius: '8px',
+      outline: 'none',
+      display: 'flex',
+      flexDirection: 'column',
+      alignItems: 'center',
+    }}>
+      <CircularProgress color="primary" />
+      <Typography variant="h6" style={{ marginTop: '16px' }}>
+        Downloading...
+      </Typography>
+    </div>
+  </Modal>
+);
 
 // Exported DownloadButton component
 const DownloadIdButton = () => {
   const idCardRef = useRef(null);
-
-  // Accessing user data from Redux store
   const userData = useSelector(state => state.users.user);
-  console.log('ddd', userData)
-
-  // Ensure that userData exists and has a valid userId
-  const userId = userData?.userId;
-  console.log('aaa', userId)
+  const [loading, setLoading] = useState(false); // State to manage loading
 
   const handleDownload = async () => {
-    if (!userId) {
+    if (!userData?.userId) {
       console.error("User ID is required for downloading the ID card.");
       return;
     }
-    const downloadUrl = await generatePDFAndUpload(idCardRef, userId);
-    if (downloadUrl) {
-      window.open(downloadUrl, '_blank');
+
+    setLoading(true); // Show loader
+    try {
+      await generatePDFAndUpload(idCardRef, userData.userId);
+    } catch (error) {
+      console.error("Error during PDF generation:", error);
+    } finally {
+      setLoading(false); // Hide loader
     }
   };
 
   return (
     <>
-      <IDCard idCardRef={idCardRef} userData={userData} />
+      <div style={{ position: 'absolute', left: '-9999px' }}>
+        <IDCard idCardRef={idCardRef} />
+      </div>
       <Button variant="contained" color="primary" onClick={handleDownload} sx={{ marginTop: 2 }}>
         Download ID Card as PDF
       </Button>
+      <LoaderModal open={loading} /> {/* Loader Modal */}
     </>
   );
 };
