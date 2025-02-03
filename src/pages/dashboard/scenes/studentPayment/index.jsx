@@ -138,15 +138,36 @@ const PaymentHistory = () => {
           Payment Summary
         </Typography>
         <Box mb="20px">
-          <Typography variant="h6" mb="5px">
-            Total Amount Due: ₦{totalAmount.toFixed(2)}
-          </Typography>
-          <Typography variant="h6" mb="5px">
-            Total Paid: ₦{amountPaid.toFixed(2)}
-          </Typography>
-          <Typography variant="h6" mb="15px">
-            Payment Percentage: {paymentPercentage.toFixed(2)}%
-          </Typography>
+
+          <Box sx={{ 
+            display: 'flex',
+            alignItems: 'end',
+            marginBottom: '15px',
+            justifyContent: 'space-between',
+            width: '100%'
+            }}>
+            <Box>
+              <Typography variant="h6" mb="5px">
+              Total Amount Due: ₦{totalAmount.toFixed(2)}
+            </Typography>
+            <Typography variant="h6" mb="5px">
+              Total Paid: ₦{amountPaid.toFixed(2)}
+            </Typography>
+            <Typography variant="h6" >
+              Payment Percentage: {paymentPercentage.toFixed(2)}%
+            </Typography>
+            </Box>
+            <Box>
+            <Button
+              // onClick={() => handleOpenSubmitModal(row)}
+              variant="contained"
+              color="primary"
+            >
+              Make payment
+            </Button>
+            </Box>
+          </Box>
+          
           <LinearProgress
             variant="determinate"
             value={paymentPercentage}
