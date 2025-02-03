@@ -1,15 +1,16 @@
 import React, { useState, useEffect } from 'react';
-import { Box, Button, TextField, Tooltip, IconButton, Typography } from '@mui/material';
+import { Box, Button, CircularProgress, TextField, Tooltip, IconButton, Typography } from '@mui/material';
 import { tokens } from '../../theme';
 import { useTheme } from '@mui/material';
 import Header from '../../components/Header';
 import Modal from '../../components/modal';
 import TableComponent from '../../../../components/table';
-import VisibilityIcon from '@mui/icons-material/Visibility'; // Import the eye icon
+import VisibilityIcon from '@mui/icons-material/Visibility';
 import { useSelector } from 'react-redux';
 import useApi from '../../../../hooks/useApi';
 import { endpoints } from '../../../../utils/constants';
 import Loader from "../../../../utils/loader";
+import ConfirmationModal from '../../components/confirmationModal';
 
 const Assignment = () => {
   const theme = useTheme();
@@ -18,30 +19,27 @@ const Assignment = () => {
   const [assignments, setAssignments] = useState([]);
   const [selectedAssignment, setSelectedAssignment] = useState(null);
   const [openModal, setOpenModal] = useState(false);
-  const [openSubmitModal, setOpenSubmitModal] = useState(false); // New state for file submission modal
-  const [newAssignment, setNewAssignment] = useState({ title: '', dueDate: '', description: '' });
-  const [file, setFile] = useState(null); // State to store the uploaded file
+  const [submissionMessageModal, SetSubmissionMessageModal] = useState(false);
+  const [openSubmitModal, setOpenSubmitModal] = useState(false);
+  const [file, setFile] = useState(null);
   const [sortBy, setSortBy] = useState('id');
   const [sortDirection, setSortDirection] = useState('asc');
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(5);
-  const { loading, error, data, callApi } = useApi();
-  const { loading:postAssignmentLoad, error:postAssignmentError, data:postAssignmentData, callApi:postAssignment } = useApi();
-  console.log(assignments)
+  const { loading, data, callApi } = useApi();
+  const { loading: postAssignmentLoad, error: postAssignmentError, callApi: postAssignment } = useApi();
 
   const userDetails = useSelector((state) => state.users.user);
   const cohortName = userDetails.cohort;
+  const studentId = userDetails.studentId;
   const postUrl = `${endpoints.ASSIGNMENT}/${cohortName}`;
-  console.log(selectedAssignment)
 
-  // Use effect to fetch schedules
   useEffect(() => {
     if (postUrl) {
       callApi(postUrl, 'GET');
     }
   }, [postUrl, callApi]);
 
-  // Update timetable when data is available
   useEffect(() => {
     if (data) {
       setAssignments(data);
@@ -49,12 +47,17 @@ const Assignment = () => {
   }, [data]);
 
   const refinedAssignments = assignments.map((assignment, index) => {
+    const hasSubmitted = assignment.submissions.some(
+      (submission) => submission.studentId === studentId
+    );
+
     return {
       id: index + 1,
       title: assignment.title,
       dueDate: assignment.dueDate,
       description: assignment.description,
-      assignemntId: assignment.id
+      assignmentId: assignment.id,
+      hasSubmitted // Add flag indicating if the student has submitted
     };
   });
 
@@ -80,19 +83,38 @@ const Assignment = () => {
     setOpenSubmitModal(false);
   };
 
-  const handleFileChange = (e) => {
-    setFile(e.target.files[0]); // Set the uploaded file
+  const handleSubmissionMessageModal = () => {
+    SetSubmissionMessageModal(false);
   };
 
-  const handleFileSubmit = (assignemntId) => {
+  const handleFileChange = (e) => {
+    setFile(e.target.files[0]);
+  };
+
+  const handleFileSubmit = (assignmentId) => {
     if (file) {
       const formData = new FormData();
-      formData.append('submission', file); // Append the file to formData
-      formData.append('studentId', userDetails.studentId); // Append the studentId
-      // Logic for file submission (e.g., uploading to server)
-      postAssignment(`${endpoints.ASSIGNMENT}/submissions/${userDetails.cohort}/${assignemntId}`, 'PATCH', formData)
-    };
+      formData.append('submission', file);
+      formData.append('studentId', studentId);
+      postAssignment(`${endpoints.ASSIGNMENT}/submissions/${userDetails.cohort}/${assignmentId}`, 'PATCH', formData);
+      if (postAssignment || postAssignmentError) {
+        SetSubmissionMessageModal(true);
+      }
+    }
+    handleCloseSubmitModal();
+  };
 
+  //handle resubmission
+  const handleFileResubmit = (assignmentId) => {
+    if (file) {
+      const formData = new FormData();
+      formData.append('submission', file);
+      formData.append('studentId', studentId);
+      postAssignment(`${endpoints.ASSIGNMENT}/resubmissions/${userDetails.cohort}/${assignmentId}`, 'PATCH', formData);
+      if (postAssignment || postAssignmentError) {
+        SetSubmissionMessageModal(true);
+      }
+    }
     handleCloseSubmitModal();
   };
 
@@ -111,9 +133,13 @@ const Assignment = () => {
               <VisibilityIcon />
             </IconButton>
           </Tooltip>
-          <Tooltip title="Submit assignment">
-            <Button onClick={() => {handleOpenSubmitModal(row)}} variant="contained" color="primary">
-              Submit
+          <Tooltip title={row.hasSubmitted ? "Resubmit assignment" : "Submit assignment"}>
+            <Button
+              onClick={() => handleOpenSubmitModal(row)}
+              variant="contained"
+              color="primary"
+            >
+              {row.hasSubmitted ? "Resubmit" : "Submit"}
             </Button>
           </Tooltip>
         </>
@@ -174,15 +200,30 @@ const Assignment = () => {
       </Modal>
 
       {/* Modal to submit assignment as a file */}
-
-      <Modal open={openSubmitModal} onClose={handleCloseSubmitModal} title={selectedAssignment && `Submit assignment for ${selectedAssignment.title}`} onConfirm={() => {handleFileSubmit(selectedAssignment.id)}}>
-        <Box display="flex" flexDirection="column" gap="20px">
-          <input type="file" onChange={handleFileChange} />
-          <Button variant="contained" color="primary" onClick={() => {handleFileSubmit(selectedAssignment.assignemntId)}}>
-            Submit Assignement
+      <Modal open={openSubmitModal} onClose={handleCloseSubmitModal} title={`Submit assignment for ${selectedAssignment?.title}`} noConfirm>
+        <Box>
+          <TextField type="file" onChange={handleFileChange} fullWidth />
+          <Button
+            onClick={() => {selectedAssignment?.hasSubmitted ? handleFileResubmit(selectedAssignment?.assignmentId) : handleFileSubmit(selectedAssignment?.assignmentId)}}
+            variant="contained"
+            color="primary"
+            fullWidth
+            sx={{marginTop: '20px'}}
+          >
+            {selectedAssignment?.hasSubmitted ? "Resubmit" : "Submit"}
           </Button>
         </Box>
       </Modal>
+
+      {/* Modal for submission message */}
+
+      <ConfirmationModal
+        open={submissionMessageModal}
+        onClose={handleSubmissionMessageModal}
+        isLoading={postAssignmentLoad}
+        title= 'Assigment submission confirmation'
+        message= {postAssignmentError ? "Error submitting the assignment!" : "Assignment submitted successfully!"}
+        />
     </Box>
   );
 };

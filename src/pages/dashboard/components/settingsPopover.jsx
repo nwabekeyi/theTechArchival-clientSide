@@ -1,7 +1,7 @@
 import React, { useState, useContext } from 'react';
 import { useDispatch } from 'react-redux';
 import { 
-  Box, Typography, Popover, IconButton, Avatar, Button, 
+  Box, Typography, Popover, Avatar, Button, 
   useTheme, Divider, TextField, Card, CardContent 
 } from '@mui/material';
 import { ColorModeContext, tokens } from '../theme';
@@ -12,8 +12,9 @@ import LogoutIcon from '@mui/icons-material/Logout';
 import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import Modal from './modal';
 import { useNavigate } from 'react-router-dom';
-import DownloadIdButton from './IdCards'
-
+import useApi from '../../../hooks/useApi';
+import { endpoints } from '../../../utils/constants';
+import ConfirmationModal from './confirmationModal';
 
 const SettingsPopover = ({ anchorEl, handleClose, userDetails }) => {
   const [profileOpen, setProfileOpen] = useState(false);
@@ -30,13 +31,15 @@ const SettingsPopover = ({ anchorEl, handleClose, userDetails }) => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const { logout } = useAuth();
-  const { firstName, lastName, email, profilePictureUrl, role } = userDetails;
+  const { firstName, lastName, email, profilePictureUrl, role, userId } = userDetails;
   const colorMode = useContext(ColorModeContext);
+  const [submissionMessageModal, SetSubmissionMessageModal] = useState(false);
+  const { loading, error, data, callApi } = useApi();
+
 
   const handleLogout = async () => {
     logout();
     navigate("/");
-    
   };
 
   const handleChangePassword = () => {
@@ -45,6 +48,10 @@ const SettingsPopover = ({ anchorEl, handleClose, userDetails }) => {
 
   const handleClosePasswordModal = () => {
     setPasswordModalOpen(false);
+  };
+
+  const handleSubmissionMessageModal = () => {
+    SetSubmissionMessageModal(false);
   };
 
   const handlePasswordInputChange = (e) => {
@@ -60,8 +67,49 @@ const SettingsPopover = ({ anchorEl, handleClose, userDetails }) => {
     setProfileOpen(false);
   };
 
-  console.log("SettingsPopover anchorEl:", anchorEl);
+  const handleDownloadIdCard = () => {
+    console.log("Download ID Card");
+  };
 
+  const handleSubmitPasswordChange = async () => {
+    // Validate passwords match
+    if (passwordData.newPassword !== passwordData.confirmPassword) {
+      alert("New password and confirm password must match.");
+      return;
+    }
+  
+    // Prepare the body for the API call
+    const body = {
+      role,
+      userId,
+      currentPassword: passwordData.currentPassword,
+      newPassword: passwordData.newPassword
+    };
+  
+    try {
+      // Call the API to update the password
+      const response = await callApi(`${endpoints.USER}/changePassword`, 'PUT', body);
+      
+      // Ensure modal opens even if data isn't immediately available
+      SetSubmissionMessageModal(true);
+  
+      // Optionally, close the password modal regardless of result
+      setPasswordModalOpen(false);
+  
+      // Check for specific message if needed
+      if (data && data.message === 'Password updated successfully') {
+        console.log(data)
+      } else {
+        // Additional logic for other cases if needed
+        console.log(response)
+      }
+    } catch (error) {
+      console.error("Error updating password:", error);
+      SetSubmissionMessageModal(true); // Modal opens even on error
+    }
+  };
+
+  console.log(submissionMessageModal)
 
   return (
     <>
@@ -77,11 +125,17 @@ const SettingsPopover = ({ anchorEl, handleClose, userDetails }) => {
           vertical: 'top',
           horizontal: 'right',
         }}
-        PaperProps={{
-          style: { width: '20vw', padding: '16px' },
+        sx={{
+          width: '70%', // Default width for small screens
+          [theme.breakpoints.up('md')]: {
+            width: '50%', // Width for medium screens
+          },
+          [theme.breakpoints.up('lg')]: {
+            width: '20%', // Width for large screens
+          },
         }}
       >
-        <Box display="flex" alignItems="center" mb={2} onClick={handleProfileClick} sx={{ cursor: 'pointer' }}>
+        <Box display="flex" alignItems="center" p={2} onClick={handleProfileClick} sx={{ cursor: 'pointer', '&:hover': { backgroundColor: colors.grey[600] } }}>
           <Avatar src={profilePictureUrl} sx={{ width: 56, height: 56, mr: 2 }} />
           <Box>
             <Typography variant="h6">{`${firstName} ${lastName}`}</Typography>
@@ -92,29 +146,44 @@ const SettingsPopover = ({ anchorEl, handleClose, userDetails }) => {
 
         <Divider />
 
-        <Box display="flex" justifyContent="space-between" alignItems="center" mt={2}>
+        <Box 
+          p={2}
+          display="flex" 
+          justifyContent="space-between" 
+          alignItems="center" 
+          onClick={handleChangePassword} 
+          sx={{ cursor: 'pointer', '&:hover': { backgroundColor: colors.grey[600] } }}
+        >
           <Typography>Change Password</Typography>
-          <IconButton onClick={handleChangePassword}>
-            <LockOutlinedIcon />
-          </IconButton>
+          <LockOutlinedIcon />
         </Box>
 
         <Divider />
 
-        <Box display="flex" justifyContent="space-between" alignItems="center" mt={2}>
+        <Box 
+          p={2}
+          display="flex" 
+          justifyContent="space-between" 
+          alignItems="center" 
+          onClick={colorMode.toggleColorMode} 
+          sx={{ cursor: 'pointer', '&:hover': { backgroundColor: colors.grey[600] } }}
+        >
           <Typography>Switch Mode</Typography>
-          <IconButton onClick={colorMode.toggleColorMode}>
-            {theme.palette.mode === "dark" ? <DarkModeOutlinedIcon /> : <LightModeOutlinedIcon />}
-          </IconButton>
+          {theme.palette.mode === "dark" ? <DarkModeOutlinedIcon /> : <LightModeOutlinedIcon />}
         </Box>
 
         <Divider />
 
-        <Box display="flex" justifyContent="space-between" alignItems="center" mt={2}>
+        <Box 
+          display="flex" 
+          justifyContent="space-between" 
+          alignItems="center" 
+          p={2}
+          onClick={handleLogout} 
+          sx={{ cursor: 'pointer', '&:hover': { backgroundColor: colors.grey[600] } }}
+        >
           <Typography>Sign Out</Typography>
-          <IconButton onClick={handleLogout}>
-            <LogoutIcon />
-          </IconButton>
+          <LogoutIcon />
         </Box>
 
         <Modal
@@ -123,10 +192,7 @@ const SettingsPopover = ({ anchorEl, handleClose, userDetails }) => {
           title="Change Password"
           noConfirm={false}
           confirmText="Submit"
-          onConfirm={() => {
-            console.log("Password Data Submitted:", passwordData);
-            handleClosePasswordModal();
-          }}
+          onConfirm={handleSubmitPasswordChange}  // Submit the form on confirm
         >
           <TextField
             label="Current Password"
@@ -155,6 +221,16 @@ const SettingsPopover = ({ anchorEl, handleClose, userDetails }) => {
             onChange={handlePasswordInputChange}
           />
         </Modal>
+
+
+          {/* confrim chnage password modal */}
+          <ConfirmationModal
+        open={submissionMessageModal}
+        onClose={handleSubmissionMessageModal}
+        isLoading={loading}
+        title= 'Change password'
+        message= {data.message}
+        />
       </Popover>
 
       {/* Profile Popover */}
@@ -188,6 +264,8 @@ const SettingsPopover = ({ anchorEl, handleClose, userDetails }) => {
            {/* The Download Button is now here */}
            <DownloadIdButton userId={userDetails.id} /> {/* Pass the userId to DownloadIdButton */}
         </Card>
+
+      
       </Popover>
     </>
   );

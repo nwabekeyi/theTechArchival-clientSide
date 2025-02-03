@@ -22,7 +22,6 @@ const PaymentHistory = () => {
   const [sortBy, setSortBy] = useState('date');
   const [sortDirection, setSortDirection] = useState('asc');
   const [openReceiptModal, setOpenReceiptModal] = useState(false);
-  const [openDeleteModal, setOpenDeleteModal] = useState(false);
   const [selectedReceipt, setSelectedReceipt] = useState(null);
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
@@ -124,9 +123,6 @@ const PaymentHistory = () => {
           <IconButton onClick={() => handleViewReceipt(row)}>
             <Visibility />
           </IconButton>
-          <IconButton onClick={() => handleDeletePayment(row)}>
-            <Delete />
-          </IconButton>
         </Box>
       ),
     },
@@ -186,44 +182,12 @@ const PaymentHistory = () => {
         open={openReceiptModal}
         onClose={() => setOpenReceiptModal(false)}
         title="Receipt Details"
+        noConfirm
       >
         {selectedReceipt && <Receipt receipt={selectedReceipt} />}
-        <Button
-          variant="contained"
-          color="primary"
-          onClick={() => setOpenReceiptModal(false)}
-          sx={{ mt: 2 }}
-        >
-          Close
-        </Button>
+
       </Modal>
 
-      {/* Delete Confirmation Modal */}
-      <Modal
-        open={openDeleteModal}
-        onClose={() => setOpenDeleteModal(false)}
-        title="Confirm Deletion"
-        onConfirm={confirmDeletePayment}
-      >
-        <Typography>
-          Are you sure you want to delete this payment record?
-        </Typography>
-        <Button
-          variant="contained"
-          color="error"
-          onClick={confirmDeletePayment}
-          sx={{ mt: 2 }}
-        >
-          Confirm
-        </Button>
-        <Button
-          variant="outlined"
-          onClick={() => setOpenDeleteModal(false)}
-          sx={{ mt: 2, ml: 2 }}
-        >
-          Cancel
-        </Button>
-      </Modal>
     </Box>
     </Box>
   );

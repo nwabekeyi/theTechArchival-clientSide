@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { CssBaseline, Box, Button, Divider, FormControl, InputLabel, IconButton, Link, TextField, Typography, Stack } from '@mui/material';
+import { CssBaseline, Box, FormControl, IconButton, Link, TextField, Typography, Stack } from '@mui/material';
 import { DarkModeRounded as DarkModeRoundedIcon, LightModeRounded as LightModeRoundedIcon, ArrowBack as ArrowBackIcon, BadgeRounded as BadgeRoundedIcon } from '@mui/icons-material';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 import LoadingButton from '../loadingButton'; // Adjust path as needed
 import useAuth from '../../hooks/useAuth'; // Import useAuth hook
@@ -13,6 +13,7 @@ const SignIn = () => {
   const [password, setPassword] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false); // State for loading button
   const navigate = useNavigate();
+  const path = useLocation().pathname;
   const currentUser = useSelector((state) => state.users.user);
 
   useEffect(() => {
@@ -68,7 +69,7 @@ const SignIn = () => {
           }),
     },
   });
-
+console.log(path)
   return (
     <ThemeProvider theme={theme}>
       <CssBaseline />
@@ -134,7 +135,14 @@ const SignIn = () => {
             >
               {mode === 'light' ? <DarkModeRoundedIcon sx={{ color: '#fff' }}/> : <LightModeRoundedIcon />}
             </IconButton>
-          </Box>
+          </Box >
+
+          {
+            path === '/dashboard' && 
+            <Box sx={{ display: 'flex', justifyContent: 'center'}}>
+               <Typography variant="h6">You are not logged in, Kindly Login.</Typography>
+            </Box>
+          }
 
           <Box>
             <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 3 }}>

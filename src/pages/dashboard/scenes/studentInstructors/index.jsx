@@ -8,18 +8,22 @@ import { useSelector } from 'react-redux';
 import Modal from '../../components/modal';
 import CustomAccordion from '../../components/accordion';
 import Header from "../../components/Header";
+import ConfirmationModal from '../../components/confirmationModal';
 
 function StudentInstructors() {
     const theme = useTheme();
     const colors = tokens(theme.palette.mode);
     const user = useSelector((state) => state.users.user);
-    const { loading, data, error, callApi } = useApi(); 
+    const { loading, data, error, callApi } = useApi();
     const [instructors, setInstructors] = useState([]);
     const [selectedInstructor, setSelectedInstructor] = useState([]);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [reviewData, setReviewData] = useState({ reviewText: '', rating: '' });
+    const [confirmReviewOpen, setConfirmReviewOpen] = useState(false);
+
 
     useEffect(() => {
+        console.log('called')
         callApi(`${endpoints.COHORT}/instructors/${user.cohort}`, 'GET');
     }, []);
 
@@ -32,6 +36,10 @@ function StudentInstructors() {
     const handleReviewClick = (instructor) => {
         setSelectedInstructor(instructor);
         setIsModalOpen(true);
+    };
+
+    const handleCloseConfirmReview = (i) => {
+        setConfirmReviewOpen(false)
     };
 
     const handleCloseModal = () => {
@@ -54,6 +62,7 @@ function StudentInstructors() {
         try {
             await callApi(`${endpoints.REVIEW}/${selectedInstructor._id}`, 'POST', reviewPayload);
             console.log('Review submitted successfully');
+            setConfirmReviewOpen(true);
         } catch (err) {
             console.error('Error submitting review:', err);
         } finally {
@@ -139,6 +148,16 @@ function StudentInstructors() {
                     </TextField>
                 </Box>
             </Modal>
+
+            {/* review response modal */}
+
+            <ConfirmationModal
+        open={confirmReviewOpen}
+        onClose={handleCloseConfirmReview}
+        isLoading={loading}
+        title= 'Instructor review confirmation'
+        message= {error ? "Error submitting instructor review!" : "Instructor review submitted successfully!"}
+        />
         </Box>
     );
 }

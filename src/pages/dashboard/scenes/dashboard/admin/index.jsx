@@ -114,6 +114,7 @@ const Admin = () => {
           gridColumn="span 8"
           gridRow="span 2"
           backgroundColor={colors.primary[400]}
+          sx={{ borderRadius: '10px'}}
         >
           <Box
             mt="25px"

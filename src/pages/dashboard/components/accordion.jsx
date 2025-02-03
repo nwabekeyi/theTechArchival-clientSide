@@ -9,7 +9,6 @@ import Typography from '@mui/material/Typography';
 import { useTheme } from '@mui/material/styles';
 import { tokens } from '../theme';
 
-
 const CustomAccordion = ({
   title,
   details,
@@ -18,15 +17,25 @@ const CustomAccordion = ({
 }) => {
 
   const theme = useTheme();
-    const colors = tokens(theme.palette.mode);
+  const colors = tokens(theme.palette.mode);
+
   return (
-    <Accordion defaultExpanded={defaultExpanded} sx={{backgroundColor:theme.palette.mode === "light" ? colors.grey[900]: colors.primary[500]}}>
+    <Accordion defaultExpanded={defaultExpanded} sx={{backgroundColor: theme.palette.mode === "light" ? colors.grey[900] : colors.primary[500]}}>
       <AccordionSummary
         expandIcon={<ExpandMoreIcon />}
         aria-controls={`${title.replace(/\s+/g, '-').toLowerCase()}-content`}
         id={`${title.replace(/\s+/g, '-').toLowerCase()}-header`}
       >
-        <Typography>{title}</Typography>
+        <Typography 
+          variant="h6" 
+          sx={{
+            color: colors.blueAccent[200],
+            fontWeight: 'bold',
+            fontSize: '1.2rem', // Similar to Instagram style
+          }}
+        >
+          {title}
+        </Typography>
       </AccordionSummary>
       <AccordionDetails>
         {typeof details === 'string' ? <Typography>{details}</Typography> : details}

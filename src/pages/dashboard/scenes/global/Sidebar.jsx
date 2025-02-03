@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { ProSidebar, Menu, MenuItem } from "react-pro-sidebar";
 import { Box, IconButton, Typography, Avatar, useTheme } from "@mui/material";
 import { Link } from "react-router-dom";
@@ -50,10 +50,21 @@ const Item = ({ title, to, icon, selected, setSelected, isCollapsed }) => {
 const Sidebar = () => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
-  const [isCollapsed, setIsCollapsed] = useState(true); // Default state is now collapsed
+  const [isCollapsed, setIsCollapsed] = useState(true); // Default state is collapsed
   const [selected, setSelected] = useState("Dashboard");
   const navigate = useNavigate();
   const user = useSelector((state) => state.users.user);
+
+  // Detect if the user is on a mobile or tablet device
+  const [isMobileOrTablet, setIsMobileOrTablet] = useState(false);
+
+  useEffect(() => {
+    const userAgent = navigator.userAgent.toLowerCase();
+    const isMobileOrTabletDevice =
+      /iphone|ipod|ipad|android|windows phone|blackberry|opera mini|mobile|tablet/i.test(userAgent);
+
+    setIsMobileOrTablet(isMobileOrTabletDevice);
+  }, []);
 
   if (!user) {
     return null; // or a loading spinner, or some fallback UI
@@ -61,7 +72,7 @@ const Sidebar = () => {
 
   const profileImage = user.profilePictureUrl ?? profileImg;
 
-  const adminMenuItems = [
+  const superAdminMenuItems = [
     { title: "Dashboard", to: "/dashboard", icon: <HomeOutlinedIcon /> },
     { title: "User Management", to: "/dashboard/userManagement", icon: <PeopleOutlinedIcon /> },
     { title: "Course Management", to: "/dashboard/courseManagement", icon: <ReceiptOutlinedIcon /> },
@@ -70,6 +81,19 @@ const Sidebar = () => {
     { title: "Team", to: "/dashboard/team", icon: <PersonOutlinedIcon /> },
     { title: "Analytics and Reporting", to: "/dashboard/analytics", icon: <MapOutlinedIcon /> },
     { title: "Growth & Innovation", to: "/dashboard/growth", icon: <TimelineOutlinedIcon /> },
+    { title: "Contacts", to: "/dashboard/contacts", icon: <SettingsOutlinedIcon /> },
+    { title: "Support", to: "/dashboard/support", icon: <SupportAgentIcon /> },
+    { title: "Feedbacks", to: "/dashboard/feedbacks", icon: <FeedbackIcon /> },
+    { title: "Enquiries", to: "/dashboard/enquiries", icon: <EmailIcon /> },
+    { title: "Generated Codes", to: "/dashboard/offlineStudents", icon: <PersonOutlinedIcon /> },
+  ];
+
+  const adminMenuItems = [
+    { title: "Dashboard", to: "/dashboard", icon: <HomeOutlinedIcon /> },
+    { title: "User Management", to: "/dashboard/userManagement", icon: <PeopleOutlinedIcon /> },
+    { title: "Course Management", to: "/dashboard/courseManagement", icon: <ReceiptOutlinedIcon /> },
+    { title: "Content Management", to: "/dashboard/contentManagement", icon: <AssignmentIcon /> },
+    { title: "Analytics and Reporting", to: "/dashboard/analytics", icon: <MapOutlinedIcon /> },
     { title: "Contacts", to: "/dashboard/contacts", icon: <SettingsOutlinedIcon /> },
     { title: "Support", to: "/dashboard/support", icon: <SupportAgentIcon /> },
     { title: "Feedbacks", to: "/dashboard/feedbacks", icon: <FeedbackIcon /> },
@@ -104,8 +128,10 @@ const Sidebar = () => {
         return studentMenuItems;
       case "instructor":
         return instructorMenuItems;
-      default:
+      case "admin":
         return adminMenuItems;
+      default:
+        return superAdminMenuItems;
     }
   };
 
@@ -113,20 +139,30 @@ const Sidebar = () => {
 
   return (
     <Box
-      
       sx={{
         "& .pro-sidebar-inner": {
           background: `${theme.palette.mode === "light" ? colors.blueAccent[200] : colors.primary[400]} !important`,
           position: "fixed",
           overflow: "hidden",
-          margin:0,
-          // width:"50px"
+          margin: 0,
+          width: "auto",
+        },
+        "& .pro-sidebar-layout": {
+         alignItems: 'center'
+        },
+        "& .pro-sidebar": {
+          width: "auto",
+          minWidth: isCollapsed ? "80px" : "250px",
         },
         "& .pro-icon-wrapper": {
           backgroundColor: "transparent !important",
         },
         "& .pro-inner-item": {
+<<<<<<< HEAD
           padding: "5px 5px 5px 5px !important",
+=======
+          padding: "10px 5px 5px 5px !important",
+>>>>>>> f4ab24f14a832167941a17e00be77d256be75db6
           color: "#fff !important",
         },
         "& .pro-inner-item:hover": {
@@ -146,28 +182,28 @@ const Sidebar = () => {
         },
       }}
     >
-      
       <ProSidebar collapsed={isCollapsed}>
-        
         <Menu iconShape="square">
           {/* LOGO AND MENU ICON */}
-          <MenuItem
-            onClick={() => setIsCollapsed(!isCollapsed)}
-            icon={isCollapsed ? <MenuOutlinedIcon title="Menu" /> : undefined}
-            style={{
-              margin: "10px 0 0px 0",
-              color: "#fff",
-            }}
-          >
-            {!isCollapsed && (
-              <Box display="flex" justifyContent="space-between" alignItems="center" ml="15px">
-                <Typography variant="h4">Babtech E-learning</Typography>
-                <IconButton onClick={() => setIsCollapsed(!isCollapsed)} sx={{ color: "#fff" }}>
-                  <MenuOutlinedIcon />
-                </IconButton>
-              </Box>
-            )}
-          </MenuItem>
+          {!isMobileOrTablet && (
+            <MenuItem
+              onClick={() => setIsCollapsed(!isCollapsed)}
+              icon={isCollapsed ? <MenuOutlinedIcon title="Menu" /> : undefined}
+              style={{
+                margin: "10px 0 0px 0",
+                color: "#fff",
+              }}
+            >
+              {!isCollapsed && (
+                <Box display="flex" justifyContent="space-between" alignItems="center" ml="15px">
+                  <Typography variant="h4">Babtech E-learning</Typography>
+                  <IconButton onClick={() => setIsCollapsed(!isCollapsed)} sx={{ color: "#fff" }}>
+                    <MenuOutlinedIcon />
+                  </IconButton>
+                </Box>
+              )}
+            </MenuItem>
+          )}
 
           {!isCollapsed && (
             <Box mb="25px">
@@ -182,26 +218,23 @@ const Sidebar = () => {
                 <Typography variant="h2" fontWeight="bold" fontSize="medium" sx={{ p: "10px 0 0 0" }}>
                   {`${user.firstName} ${user.lastName}`}
                 </Typography>
-                <Typography variant="h5">
-                  {user?.role ? user.role.charAt(0).toUpperCase() + user.role.slice(1) : ""}
+                <Typography variant="h5" sx={{ color: colors.grey[300] }}>
+                  {user.role.charAt(0).toUpperCase() + user.role.slice(1)}
                 </Typography>
               </Box>
             </Box>
           )}
-
-          <Box paddingLeft={isCollapsed ? undefined : "10%"} paddingTop={"10%"}>
-            {menuItems.map((item) => (
-              <Item
-                key={item.title}
-                title={item.title}
-                to={item.to}
-                icon={item.icon}
-                selected={selected}
-                setSelected={setSelected}
-                isCollapsed={isCollapsed} // Pass isCollapsed here
-              />
-            ))}
-          </Box>
+          {menuItems.map((item) => (
+            <Item
+              key={item.title}
+              title={item.title}
+              to={item.to}
+              icon={item.icon}
+              selected={selected}
+              setSelected={setSelected}
+              isCollapsed={isCollapsed}
+            />
+          ))}
         </Menu>
       </ProSidebar>
     </Box>
