@@ -24,6 +24,7 @@ const Topbar = () => {
   };
 
   const handleOpenSettings = (event) => {
+    console.log("Settings clicked", event.currentTarget);
     setSettingsAnchorEl(event.currentTarget);
   };
 

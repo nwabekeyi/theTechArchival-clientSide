@@ -12,6 +12,7 @@ import LogoutIcon from '@mui/icons-material/Logout';
 import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import Modal from './modal';
 import { useNavigate } from 'react-router-dom';
+import DownloadIdButton from './IdCards'
 
 
 const SettingsPopover = ({ anchorEl, handleClose, userDetails }) => {
@@ -59,10 +60,8 @@ const SettingsPopover = ({ anchorEl, handleClose, userDetails }) => {
     setProfileOpen(false);
   };
 
-  const handleDownloadIdCard = () => {
-    // Logic to download the ID card as an image or PDF
-    console.log("Download ID Card");
-  };
+  console.log("SettingsPopover anchorEl:", anchorEl);
+
 
   return (
     <>
@@ -186,15 +185,8 @@ const SettingsPopover = ({ anchorEl, handleClose, userDetails }) => {
             <Typography variant="body1" color="textSecondary">{email}</Typography>
             <Typography variant="body1" color="textSecondary">{role}</Typography>
           </CardContent>
-          <Button
-            variant="contained"
-            color="primary"
-            fullWidth
-            onClick={handleDownloadIdCard}
-            sx={{ mt: 2 }}
-          >
-            Download ID Card
-          </Button>
+           {/* The Download Button is now here */}
+           <DownloadIdButton userId={userDetails.id} /> {/* Pass the userId to DownloadIdButton */}
         </Card>
       </Popover>
     </>

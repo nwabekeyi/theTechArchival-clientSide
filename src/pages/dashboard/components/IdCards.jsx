@@ -1,23 +1,28 @@
 import React, { useRef, useState, useEffect } from 'react';
 import { jsPDF } from 'jspdf';
 import html2canvas from 'html2canvas';
-import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
-import { doc, updateDoc } from 'firebase/firestore';
-import { storage, db } from '../../../firebase/config';
 import { Button, Card, CardContent, CardMedia, Typography, Grid } from '@mui/material';
-import logo from '../../../assets/logo.jpg';
+// import logo from '../../../assets/logo.jpg';
+import logo from '../../../assets/idCompanyLogo.jpeg'
 import backendDevImg from "../../../images/backend.jpeg";
 import frontendDevImg from "../../../images/frontend.jpeg";
 import imgplaceholder from "../../../images/karen.jpg";
-import useSessionStorage from '../../../hooks/useSessionStorage';
+import { useSelector } from 'react-redux';
+
 
 // IDCard component (not exported, used internally for generating the card)
-const IDCard = ({ idCardRef, userData }) => {
+const IDCard = ({ idCardRef }) => {
+  // Access user data from Redux store
+  const userData = useSelector(state => state.users.user);  // Assuming 'user' is stored in Redux state
+  console.log('aaaaa')
+  console.log(userData)
+
+  // Fallback data if userData is not available
   const fallbackData = {
     firstName: 'John',
     lastName: 'Doe',
     email: 'john.doe@example.com',
-    phone:'00000000000',
+    phone: '00000000000',
     role: 'student',
     studentId: 'btech/std/Data Analysis/10',
     instructorId: '',
@@ -25,18 +30,19 @@ const IDCard = ({ idCardRef, userData }) => {
     profilePictureUrl: imgplaceholder,
     address: '123 Tech Street, Babtech',
   };
-x
+
   const {
     firstName,
     lastName,
     email,
-    phone,
+    phone,          
     role,
     studentId,
     instructorId,
     program,
     profilePictureUrl,
   } = userData || fallbackData;
+
 
   const companyName = "Babtech School of Technology";
 
@@ -139,7 +145,7 @@ x
           Student ID
         </Typography>
       </Grid>
-
+      
       <Grid item xs={8}>
         <Typography variant="body2" fontWeight="bold">: {studentId}</Typography>
       </Grid>
@@ -154,7 +160,7 @@ x
           Instructor ID
         </Typography>
       </Grid>
-      
+    
       <Grid item xs={8}>
         <Typography variant="body2" fontWeight="bold">: {instructorId}</Typography>
       </Grid>
@@ -178,7 +184,7 @@ x
   {/* BACK CARD */}
 
  
-  <Card sx={{ width: 400, height: 550, margin: 'auto', boxShadow: 3, borderRadius: 2 ,backgroundImage: `linear-gradient(rgba(255, 255, 255, 1), rgba(255, 255, 255, 0.8)), url(${backendDevImg})`, margin:"2px"}}>
+  <Card sx={{ width: 400, height: 550, margin: 'auto', boxShadow: 3, borderRadius: 2 ,backgroundImage: `linear-gradient(rgba(255, 255, 255, 1), rgba(255, 255, 255, 0.8)), url(${backendDevImg})`, margin:'2px'}}>
   <CardContent  sx={{ paddingX:"30px"}}>
     {/* Top Section */}
     <Grid container spacing={1} style={{ marginBottom: '0px', paddingTop: '30px' }}>
@@ -291,30 +297,26 @@ const generatePDFAndUpload = async (idCardRef, userId) => {
     const pdf = new jsPDF('landscape', 'px', [componentWidth, componentHeight]);
     pdf.addImage(imgData, 'JPEG', 0, 0, componentWidth, componentHeight);
 
-    // PDF upload and Firestore update
-    const pdfBlob = pdf.output('blob');
-    const storageRef = ref(storage, `idcards/${Date.now()}_${userId}.pdf`);
-    await uploadBytes(storageRef, pdfBlob);
-    const downloadUrl = await getDownloadURL(storageRef);
-    const userDocRef = doc(db, 'users', userId);
-    await updateDoc(userDocRef, { idCardUrl: downloadUrl });
-
-    return downloadUrl;
+    
+    pdf.addImage(imgData, 'PNG', 0, 0, componentWidth, componentHeight);
+    pdf.save('ID_Card.pdf');
   } catch (error) {
-    console.error('Error generating or uploading PDF:', error);
+    console.error("Error generating PDF:", error);
   }
 };
 
 
 // Exported DownloadButton component
-const DownloadIdButton = ({ userId }) => {
+const DownloadIdButton = () => {
   const idCardRef = useRef(null);
-  const [userData, setUserData] = useState(null);
 
-  useEffect(() => {
-    const storedUser = useSessionStorage().memoizedUserDetails;
-    setUserData(storedUser);
-  }, []);
+  // Accessing user data from Redux store
+  const userData = useSelector(state => state.users.user);
+  console.log('ddd', userData)
+
+  // Ensure that userData exists and has a valid userId
+  const userId = userData?.userId;
+  console.log('aaa', userId)
 
   const handleDownload = async () => {
     if (!userId) {
