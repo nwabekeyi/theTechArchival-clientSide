@@ -9,6 +9,7 @@ import { Button } from "../components/ButtonElement";
 import useApi from "../hooks/useApi"; // Adjust the path as necessary
 import { endpoints } from "../utils/constants";
 
+
 const CodeAuthenticator = () => {
   const [inputCode, setInputCode] = useState("");
   const [isAuthenticated, setIsAuthenticated] = useState(false);

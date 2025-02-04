@@ -1,7 +1,6 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import React, { Suspense, lazy } from 'react';
 import Loader from './utils/loader'; // Assuming Loader is a spinner or fallback UI
-
 // Lazy loading components
 const Home = lazy(() => import('./pages/homePage'));
 const SignInPage = lazy(() => import('./pages/signin'));
@@ -10,6 +9,7 @@ const DashboardHome = lazy(() => import('./pages/dashboard'));
 const CodeAuthenticator = lazy(() => import('./generateCode/codeAuthenticator'));
 const OfflineSignUp = lazy(() => import('./pages/offlineSignUp'));
 const VideoCall = lazy(() => import('./pages/VideoCalls'));
+const ResetPassword  = lazy(() => import('./pages/resetPassword'));
 
 function MyRoute() {
   return (
@@ -24,7 +24,7 @@ function MyRoute() {
           <Route path="/code-authenticator" element={<CodeAuthenticator />} />
           <Route path="/offlineSignup" element={<OfflineSignUp />} />
           <Route path="/videoCall" element={<VideoCall />} />
-        </Routes>
+          <Route path="/reset-password" element={<ResetPassword />} />        </Routes>
       </Suspense>
     </Router>
   );
