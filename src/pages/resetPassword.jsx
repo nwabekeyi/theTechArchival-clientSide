@@ -5,7 +5,6 @@ import Footer from './homePage/components/Footer';
 import Navbar from './homePage/components/Header';
 import LoadingButton from "../components/loadingButton";
 
-
 const ConfirmPassword = () => {
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
@@ -41,49 +40,96 @@ const ConfirmPassword = () => {
     <div>
       {/* Navbar */}
       <Navbar />
-      <Box sx={{height: '100vh', display: 'grid', placeContent: 'center'}}>
 
-      <Container maxWidth="sm" sx={{ mt: 4, p: 4, bgcolor: '#f5f5f5', borderRadius: 2}}>
-        <Typography variant="h4" align="center" gutterBottom>
-          Reset Password
-        </Typography>
-        <form onSubmit={handleSubmit}>
-          <Box mb={2}  >
-            <Typography variant="subtitle1">Email: {email}</Typography>
-          </Box>
-          <TextField
-            label="New Password"
-            type="password"
-            fullWidth
-            variant="outlined"
-            value={newPassword}
-            onChange={(e) => setNewPassword(e.target.value)}
-            required
-            sx={{ mb: 2 }}
-          />
-          <TextField
-            label="Confirm New Password"
-            type="password"
-            fullWidth
-            variant="outlined"
-            value={confirmPassword}
-            onChange={(e) => setConfirmPassword(e.target.value)}
-            required
-            sx={{ mb: 2 }}
-          />
-         <LoadingButton
+      {/* Main Content */}
+      <Box
+        sx={{
+          minHeight: '100vh',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          background: 'linear-gradient(135deg, #f5f7fa, #c3cfe2)', // Gradient background
+          p: 3,
+        }}
+      >
+        <Container
+          maxWidth="sm"
+          sx={{
+            p: 4,
+            background: 'linear-gradient(135deg, rgba(255,255,255,0.2), rgba(255,255,255,0.1))',
+            backdropFilter: 'blur(80px)',
+            borderRadius: 2,
+            boxShadow: 3, // Add shadow for depth
+            textAlign: 'start',
+          }}
+        >
+          <Typography variant="h4" gutterBottom sx={{ fontWeight: 'bold', color: 'black' }}>
+            Reset Password
+          </Typography>
+          <Typography variant="subtitle1" sx={{ mb: 3, color: 'text.secondary' }}>
+            Enter your new password below.
+          </Typography>
+
+          <form onSubmit={handleSubmit}>
+            {/* <Box mb={2}>
+              <Typography variant="body1" sx={{ color: 'text.secondary' }}>
+                Email: <strong>{email}</strong>
+              </Typography>
+            </Box> */}
+
+            <TextField
+              label="New Password"
+              type="password"
+              fullWidth
+              variant="outlined"
+              value={newPassword}
+              onChange={(e) => setNewPassword(e.target.value)}
+              required
+              sx={{ mb: 2 }}
+            />
+            <TextField
+              label="Confirm New Password"
+              type="password"
+              fullWidth
+              variant="outlined"
+              value={confirmPassword}
+              onChange={(e) => setConfirmPassword(e.target.value)}
+              required
+              sx={{ mb: 3 }}
+            />
+
+            <LoadingButton
+              type="submit"
+              variant="contained"
+              color="primary"
+              fullWidth
+              size="large"
+              loading={loading}
+              disabled={loading}
+              sx={{
+                py: 1.5,
+                fontSize: '1rem',
+                fontWeight: 'bold',
+                textTransform: 'none',
+              }}
             >
-           RESET PASSWORD
-         </LoadingButton>
-        </form>
+              {loading ? <CircularProgress size={24} /> : 'Reset Password'}
+            </LoadingButton>
+          </form>
 
-        {error && <Alert severity="error">{error}</Alert>}
-        {success && <Alert severity="success">{success}</Alert>}
-      </Container>
-
+          {/* Error and Success Messages */}
+          {error && (
+            <Alert severity="error" sx={{ mt: 3 }}>
+              {error}
+            </Alert>
+          )}
+          {success && (
+            <Alert severity="success" sx={{ mt: 3 }}>
+              {success}
+            </Alert>
+          )}
+        </Container>
       </Box>
-
-     
 
       {/* Footer */}
       <Footer />
