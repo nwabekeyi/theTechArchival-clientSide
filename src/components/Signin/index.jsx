@@ -192,7 +192,7 @@ console.log(path)
                   Continue
                 </LoadingButton>
 
-                <Link href="#forgot-password" underline="hover">
+                <Link href="/forgot-password" underline="hover">
                   Forgot password?
                 </Link>
               </Stack>
