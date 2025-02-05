@@ -5,6 +5,7 @@ import LoadingButton from "../../components/loadingButton";
 import useApi from "../../hooks/useApi"; 
 import Footer from '../../pages/homePage/components/Footer'
 import NavBar from '../../pages/homePage/components/Header'
+import {endpoints} from '../../utils/constants'
 
 const ForgotPassword = () => {
   const [email, setEmail] = useState("");
@@ -20,7 +21,7 @@ const ForgotPassword = () => {
       return setMessage("Please enter your email");
     }
 
-    await callApi("YOUR_API_URL/forgot-password", "POST", { email });
+    await callApi(endpoints.PASSWORD_LINK, "POST", { email });
 
     if (data) {
       setMessage(data.message || "Password reset link sent!");
