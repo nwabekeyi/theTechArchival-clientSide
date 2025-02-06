@@ -22,7 +22,7 @@ const App = () => {
         <Services />
         <About />
         <Roadmap />
-        <Footer />
+        <Footer home/>
       </div>
       <ButtonGradient />
     </>
