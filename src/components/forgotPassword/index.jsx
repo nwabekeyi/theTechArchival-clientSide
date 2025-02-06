@@ -10,7 +10,8 @@ import {endpoints} from '../../utils/constants'
 const ForgotPassword = () => {
   const [email, setEmail] = useState("");
   const [message, setMessage] = useState("");
-  const { data, loading, error, callApi} = useApi();
+  const [error, setError] = useState("");
+  const { data, loading, error: apiError, callApi} = useApi();
   const navigate = useNavigate(); // Hook for navigation
 
   const handleSubmit = async (e) => {
@@ -23,8 +24,11 @@ const ForgotPassword = () => {
 
     await callApi(endpoints.PASSWORD_LINK, "POST", { email });
 
-    if (data) {
-      setMessage(data.message || "Password reset link sent!");
+    if (data.message === 'Password reset link sent successfully') {
+      setMessage("Password reset link sent. Kindly check your email!");
+      setEmail('');
+    }else {
+      setError("Password link not sent, something went wrong or you can check if your email is correctly inputted");
     }
   };
 
@@ -40,8 +44,8 @@ x
           Enter your email and we will send you a password reset link.
         </Typography>
 
-        {message && <Alert severity="success">{message}</Alert>}
-        {error && <Alert severity="error">{error}</Alert>}
+        {data && <Alert severity="success">{message}</Alert>}
+        {apiError && <Alert severity="error">{error}</Alert>}
 
         <form onSubmit={handleSubmit}>
           <TextField

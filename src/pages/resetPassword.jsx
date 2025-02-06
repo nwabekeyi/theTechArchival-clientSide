@@ -1,28 +1,35 @@
 import React, { useState } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
-import { Container, Typography, TextField, Box, Alert } from '@mui/material';
+import { Container, Typography, TextField, Button, Box, CircularProgress, Alert } from '@mui/material';
 import Footer from './homePage/components/Footer';
 import Navbar from './homePage/components/Header';
 import LoadingButton from "../components/loadingButton";
 import useApi from '../hooks/useApi';
 import { endpoints } from '../utils/constants';
+import Modal from '../pages/dashboard/components/modal'
 
 const ConfirmPassword = () => {
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
+  const [success, setSuccess] = useState('');
+  const [error, setError] = useState('');
+  
 
   const [searchParams] = useSearchParams();
   const email = searchParams.get('email');
   const token = searchParams.get('token');
   console.log(endpoints.RESET_PASSWORD)
 
-  const { loading, data, error, callApi } = useApi();
+  const { loading, data, error: apiError, callApi } = useApi();
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();  // Prevent page reload
-    console.log('called');
 
+    if (newPassword !== confirmPassword) {
+      setError('Passwords do not match.');
+      return;
+    }
     const body = {
       email,
       token,
@@ -30,21 +37,52 @@ const ConfirmPassword = () => {
     };
 
     await callApi(endpoints.RESET_PASSWORD, 'PATCH', body);
+    if(data){
+      setSuccess(data.message)
+    }
   };
 
   return (
     <div>
       {/* Navbar */}
       <Navbar />
-      <Box sx={{height: '100vh', display: 'grid', placeContent: 'center'}}>
-        <Container maxWidth="sm" sx={{ mt: 4, p: 4, bgcolor: '#f5f5f5', borderRadius: 2 }}>
-          <Typography variant="h4" align="center" gutterBottom>
+
+      {/* Main Content */}
+      <Box
+        sx={{
+          minHeight: '100vh',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          background: 'linear-gradient(135deg, #f5f7fa, #c3cfe2)', // Gradient background
+          p: 3,
+        }}
+      >
+        <Container
+          maxWidth="sm"
+          sx={{
+            p: 4,
+            background: 'linear-gradient(135deg, rgba(255,255,255,0.2), rgba(255,255,255,0.1))',
+            backdropFilter: 'blur(80px)',
+            borderRadius: 2,
+            boxShadow: 3, // Add shadow for depth
+            textAlign: 'start',
+          }}
+        >
+          <Typography variant="h4" gutterBottom sx={{ fontWeight: 'bold', color: 'black' }}>
             Reset Password
           </Typography>
+          <Typography variant="subtitle1" sx={{ mb: 3, color: 'text.secondary' }}>
+            Enter your new password below.
+          </Typography>
+
           <form onSubmit={handleSubmit}>
-            <Box mb={2}>
-              <Typography variant="subtitle1">Email: {email}</Typography>
-            </Box>
+            {/* <Box mb={2}>
+              <Typography variant="body1" sx={{ color: 'text.secondary' }}>
+                Email: <strong>{email}</strong>
+              </Typography>
+            </Box> */}
+
             <TextField
               label="New Password"
               type="password"
@@ -63,19 +101,39 @@ const ConfirmPassword = () => {
               value={confirmPassword}
               onChange={(e) => setConfirmPassword(e.target.value)}
               required
-              sx={{ mb: 2 }}
+              sx={{ mb: 3 }}
             />
+
             <LoadingButton
               type="submit"
+              variant="contained"
+              color="primary"
+              fullWidth
+              size="large"
               loading={loading}
-              disabled={loading || !newPassword || newPassword !== confirmPassword}
+              disabled={loading}
+              sx={{
+                py: 1.5,
+                fontSize: '1rem',
+                fontWeight: 'bold',
+                textTransform: 'none',
+              }}
             >
-              RESET PASSWORD
+              {loading ? <CircularProgress size={24} /> : 'Reset Password'}
             </LoadingButton>
           </form>
 
-          {error && <Alert severity="error">{error}</Alert>}
-          {data && <Alert severity="success">{data.message}</Alert>}
+          {/* Error and Success Messages */}
+          {error && (
+            <Alert severity="error" sx={{ mt: 3 }}>
+              {error}
+            </Alert>
+          )}
+          {success && (
+            <Alert severity="success" sx={{ mt: 3 }}>
+              {success}
+            </Alert>
+          )}
         </Container>
       </Box>
 
