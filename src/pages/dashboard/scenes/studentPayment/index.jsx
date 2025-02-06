@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Box, IconButton, Typography, Button, LinearProgress,
-  useTheme} from '@mui/material';
+import { Box, IconButton, Typography, Button, LinearProgress, useTheme} from '@mui/material';
 import { Visibility, Delete } from '@mui/icons-material';
 import TableComponent from '../../../../components/table';
 import useApi from '../../../../hooks/useApi';
@@ -12,6 +11,7 @@ import Header from "../../components/Header";
 import { tokens } from "../../theme";
 import useStudentData from "../dashboard/student/useStudentData";
 import withDashboardWrapper from '../../../../components/dasboardPagesContainer';
+import PaystackButton from './PaystcakButton';
 
 const PaymentHistory = () => {
   const user = useSelector((state) => state.users.user);
@@ -93,7 +93,6 @@ const PaymentHistory = () => {
       } catch (error) {
         console.error('Error deleting payment:', error);
       } finally {
-        setOpenDeleteModal(false);
       }
     }
   };
@@ -158,13 +157,7 @@ const PaymentHistory = () => {
             </Typography>
             </Box>
             <Box>
-            <Button
-              // onClick={() => handleOpenSubmitModal(row)}
-              variant="contained"
-              color="primary"
-            >
-              Make payment
-            </Button>
+            <PaystackButton />
             </Box>
           </Box>
           

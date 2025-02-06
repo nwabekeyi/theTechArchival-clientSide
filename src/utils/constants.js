@@ -21,7 +21,8 @@ const CODE_AUTHENTICATOR = import.meta.env.VITE_CODE_AUTHENTICATOR
 const STORE_CODE = import.meta.env.VITE_STORE_CODE
 const PASSWORD_LINK = import.meta.env.VITE_PASSWORD_LINK
 const RESET_PASSWORD = import.meta.env.VITE_RESET_PASSWORD
-
+const PAYSTACK_PAYMENT = import.meta.env.VITE_PAYSTACK_PAYMENT
+const PAYSTACK_INIT = import.meta.env.VITE_PAYSTACK_INIT
 
 
 const endpoints = {
@@ -46,7 +47,8 @@ const endpoints = {
   STORE_CODE: `${BASE_URL}${STORE_CODE}`,
   PASSWORD_LINK: `${BASE_URL}${PASSWORD_LINK}`,
   RESET_PASSWORD: `${BASE_URL}${RESET_PASSWORD}`,
-
+  PAYSTACK_PAYMENT: `${BASE_URL}${PAYSTACK_PAYMENT}`,
+  PAYSTACK_INIT: `${BASE_URL}${PAYSTACK_INIT}`
 };
 
 export {endpoints};

@@ -9,6 +9,7 @@ import { tokens } from '../theme';
 import { useTheme } from "@mui/material";
 
 const ScrollDialog = ({
+  confirm,
   buttonLabel,
   dialogTitle,
   dialogContent,
@@ -58,7 +59,7 @@ const ScrollDialog = ({
         </DialogContent>
         <DialogActions>
           <Button sx={{ color: colors.redAccent[500], border: `solis 2px ${colors.redAccent[500]}` }} onClick={onClose}>{actionText1}</Button>
-          <Button sx={{ color: colors.greenAccent[500], border: `solis 2px ${colors.greenAccent[500]}` }} onClick={onConfirm} >{actionText2}</Button>
+          {confirm && <Button sx={{ color: colors.greenAccent[500], border: `solis 2px ${colors.greenAccent[500]}` }} onClick={onConfirm} >{actionText2}</Button>}
         </DialogActions>
       </Dialog>
     </React.Fragment>
