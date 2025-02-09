@@ -59,15 +59,17 @@ const SmapleComponent = () => {
     <Box>
       <NavBar />
       <Box
-        sx={{
-          minHeight: "100vh",
-          display: "flex",
-          justifyContent: "center",
-          alignItems: "center",
-          flexDirection: "column",
-          gap: "30px",
-        }}
-      >
+  sx={{
+    minHeight: "100vh",
+    display: "flex",
+    justifyContent: "center",
+    alignItems: "center",
+    flexDirection: "column",
+    gap: "30px",
+    mx: { xs: 4, sm: 4, md: 0 }, // mx of 4 on extra-small and small devices (phone and tablet), no margin on medium and larger screens
+  }}
+>
+
         <Box
           sx={{
             p: 3,

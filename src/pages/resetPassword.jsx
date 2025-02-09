@@ -70,6 +70,8 @@ const SmapleComponent = () => {
           alignItems: "center",
           flexDirection: "column",
           gap: "30px",
+          mx: 4, // mx of 4 on extra-small and small devices (phone and tablet), no margin on medium and larger screens
+
         }}
       >
         <Box
@@ -79,6 +81,7 @@ const SmapleComponent = () => {
             backgroundColor: "white",
             boxShadow: 10,
             borderRadius: 2,
+
           }}
         >
           <Typography variant="h4" gutterBottom sx={{ fontWeight: 'bold', color: 'black' }}>
