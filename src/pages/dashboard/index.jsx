@@ -10,6 +10,7 @@ import { useNavigate } from "react-router-dom";
 import FloatingMessageIcon from "./components/floatingMessageIcon";
 import { tokens } from "./theme";
 import SignIn from "../../components/Signin";
+import Loader from "../../utils/loader";
 
 
 
@@ -49,7 +50,6 @@ function DashboardHome() {
   const user = useSelector((state) => state.users.user);
   console.log(user)
   const userRole = user ? user.role : 'not logged in';
-  const navigate = useNavigate();
   const { emit, isConnected, listen} = useWebSocket();
 
 
@@ -149,7 +149,7 @@ function DashboardHome() {
 
             {/* Routes */}
             <Box sx={{ flexGrow: 1, overflowY: "auto", height: "calc(100vh - 64px)" }}>
-              <Suspense fallback={<div>Loading...</div>}>
+              <Suspense fallback={<Loader />}>
                 <Routes>
                   <Route path={userRole === 'not logged in' ? "/signin" : "/"} element={<Dashboard userData={userData} />} />
                   {userRole && renderRoutesBasedOnRole(userRole)}

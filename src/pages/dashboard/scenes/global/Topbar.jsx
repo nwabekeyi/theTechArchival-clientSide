@@ -28,9 +28,6 @@ const Topbar = () => {
   const searchData = [
     { name: 'Dashboard', path: '/dashboard' },
     { name: 'User Management', path: '/dashboard/userManagement' },
-    { name: 'Settings', path: '/settings' },
-    { name: 'Profile', path: '/profile' },
-    { name: 'Notifications', path: '/notifications' },
     { name: 'Timetable', path: '/dashboard/timeTable' },
     // Add more pages or sections as required
   ];
