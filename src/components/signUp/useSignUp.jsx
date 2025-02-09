@@ -16,22 +16,23 @@ const useSignUp = ({ offline, role, selectedUser }) => {
     const [modalMessage, setModalMessage] = useState('');
     const [confirmationModal, setConfirmationModal] = useState(false);
     const { data: courseData, loading: courseLoading, error: courseError, callApi: courseApi } = useApi();
+    const [courses, setCourses] = useState([]);
 
     const dispatch = useDispatch();
     //get courses
-    useEffect(() => {
-        courseApi(endpoints.COURSES, 'GET');
-      }, []);
+
     
-      useEffect(() => {
-        if (!courseLoading && courseData) {
+      useEffect(async () => {
+        const getCourses = await courseApi(endpoints.COURSES, 'GET');
+
+        if (getCourses && getCourses.courses) {
           console.log('Data received:', data);
-          dispatch(setAllCourses(data));
+          dispatch(setAllCourses(getCourses.courses));
+          setCourses(getCourses.courses)
         }
-      }, [loading, data]); 
+      }, []); 
 
 
-    const courses = useSelector((state) => state.adminData.courses.courses);
     const users = useSelector((state) => state.adminData.usersData);
 
     const instructors = users.instructors || [];

@@ -143,15 +143,16 @@ const Sidebar = () => {
         "& .pro-sidebar-inner": {
           background: `${theme.palette.mode === "light" ? colors.blueAccent[200] : colors.primary[400]} !important`,
           position: "fixed",
-          overflow: "hidden",
           margin: 0,
-          width: "auto",
+          width: 'fit-content',
         },
         "& .pro-sidebar-layout": {
-         alignItems: 'center'
+         alignItems: 'center',
+         width: 'fit-content',
+
         },
         "& .pro-sidebar": {
-          width: "auto",
+          width: 'fit-content',
           minWidth: isCollapsed ? "80px" : "250px",
         },
         "& .pro-icon-wrapper": {
