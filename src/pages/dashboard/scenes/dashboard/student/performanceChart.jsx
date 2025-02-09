@@ -16,7 +16,6 @@ const PerfromanceLineChart = ({ isCustomLineColors = false, isDashboard = false 
   const userId = useSelector((state) => state.users.user.userId);
   const studentId = useSelector((state) => state.users.user.studentId);
 
-  console.log(assignmentData)
   // Helper function to generate color for lines dynamically
   const generateColor = (index) => {
     const hue = (index * 360) / 10 % 360;
@@ -129,11 +128,13 @@ const PerfromanceLineChart = ({ isCustomLineColors = false, isDashboard = false 
   }, [assignmentData, timeTableData, students, studentId, isCustomLineColors, colors.primary, currentYear]);
 
   if (lineData.length === 0) {
-    return <Box>Loading data...</Box>;
+    return <Box sx={{display: 'grid', placeContent:'center'}}><p>Your cohort is yet to get a time-table</p></Box>;
   }
 
   return (
     <Box width="98%" height="100%">
+
+      
       {performance !== "Yet to start classes" && (
         <Box>
           <h2>Student Performance: {performance}</h2>

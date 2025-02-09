@@ -73,7 +73,7 @@ const Receipt = ({ receipt }) => {
           <Typography fontWeight="bold">Amount Paid:</Typography>
         </Grid>
         <Grid item xs={6} align="right">
-          <Typography>₦{(receipt.amount / 100).toFixed(2)}</Typography>
+          <Typography>₦{(receipt.amount ).toFixed(2)}</Typography>
         </Grid>
 
         <Grid item xs={6}>
