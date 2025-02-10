@@ -8,6 +8,7 @@ import Footer from "../pages/homePage/components/Footer";
 import { Button } from "../components/ButtonElement";
 import useApi from "../hooks/useApi"; // Adjust the path as necessary
 import { endpoints } from "../utils/constants";
+import LoadingButton from "../components/loadingButton";
 
 
 const CodeAuthenticator = () => {
@@ -57,7 +58,6 @@ const CodeAuthenticator = () => {
           flexDirection: { xs: "column", md: "row" },
           justifyContent: "center",
           backgroundColor: "#fff",
-          paddingX: "20px",
         }}
       >
         {/* Image placeholder on the left */}
@@ -87,7 +87,7 @@ const CodeAuthenticator = () => {
           <Typography
             variant="h5"
             gutterBottom
-            color="#000000"
+            color='#15131D'
             fontWeight="bold"
             sx={{
               fontSize: { xs: "1.2em", md: "2em" },
@@ -132,12 +132,21 @@ const CodeAuthenticator = () => {
               value={inputCode}
               onChange={handleInputChange}
               inputProps={{ minLength: 11 }}
-              sx={{ marginBottom: "20px", width: "100%" }}
+              sx={{ marginBottom: "10px", width: "100%" }}
             />
 
-            <Button onClick={handleSubmit} primary otp disabled={loading}>
-              {loading ? "Submitting..." : "Submit"}
-            </Button>
+
+            <LoadingButton
+                  onClick={handleSubmit} 
+                  type="submit"
+                  variant="contained"
+                  color="primary"
+                  isLoading={loading}
+                  fullWidth
+                >
+                  Submit
+                </LoadingButton>
+
 
             {(error || apiError) && (
               <Typography color="error" sx={{ marginTop: "20px" }}>

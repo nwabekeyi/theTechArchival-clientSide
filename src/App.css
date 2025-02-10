@@ -5,3 +5,6 @@
   font-family: 'Encode Sans Expanded', sans-serif;
 }
 
+input{
+  -webkit-box-shadow: none !important;
+}

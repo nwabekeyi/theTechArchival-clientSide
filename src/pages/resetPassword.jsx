@@ -6,9 +6,8 @@ import Navbar from './homePage/components/Header';
 import LoadingButton from "../components/loadingButton";
 import useApi from '../hooks/useApi';
 import { endpoints } from '../utils/constants';
-import Modal from '../pages/dashboard/components/modal'
+import Modal from '../pages/dashboard/components/modal';
 import BackgroundWithHOme from "../components/backgroundWithHome";
-
 
 const SmapleComponent = () => {
   const [newPassword, setNewPassword] = useState('');
@@ -17,11 +16,9 @@ const SmapleComponent = () => {
   const [error, setError] = useState('');
   const [successModal, setSuccessModal] = useState(false);
 
-
   const [searchParams] = useSearchParams();
   const email = searchParams.get('email');
   const token = searchParams.get('token');
-  console.log(endpoints.RESET_PASSWORD)
 
   const { loading, data, error: apiError, callApi } = useApi();
   const navigate = useNavigate();
@@ -29,28 +26,28 @@ const SmapleComponent = () => {
   const handleSucessModalClose = () => {
     setSuccessModal(false);
     navigate('/');
-
   };
 
   const handleSucessModalConfrim = () => {
-      navigate('/signin');
+    navigate('/signin');
   };
 
   const handleSubmit = async (e) => {
-    e.preventDefault();  // Prevent page reload
+    e.preventDefault();
 
     if (newPassword !== confirmPassword) {
       setError('Passwords do not match.');
       return;
     }
+
     const body = {
       email,
       token,
-      newPassword
+      newPassword,
     };
 
     const response = await callApi(endpoints.RESET_PASSWORD, 'PATCH', body);
-    if(response && response.message === 'Password reset successful'){
+    if (response && response.message === 'Password reset successful') {
       setSuccessModal(true);
       setSuccess(data.message);
     }
@@ -70,21 +67,22 @@ const SmapleComponent = () => {
           alignItems: "center",
           flexDirection: "column",
           gap: "30px",
-          mx: 4, // mx of 4 on extra-small and small devices (phone and tablet), no margin on medium and larger screens
-
+          mx: 2,
         }}
       >
         <Box
           sx={{
             p: 3,
             textAlign: "start",
-            backgroundColor: "white",
+            backgroundColor: "rgba(255, 255, 255, 0.8)", // Glassy white background with transparency
             boxShadow: 10,
             borderRadius: 2,
-
+            backdropFilter: "blur(10px)", // Glassy blur effect
+            filter: "blur(0.3px)", // Additional blur for smoothness
+            border: "1px solid rgba(255, 255, 255, 0.18)", // Optional border for glass effect
           }}
         >
-          <Typography variant="h4" gutterBottom sx={{ fontWeight: 'bold', color: 'black' }}>
+          <Typography variant="h4" gutterBottom sx={{ fontWeight: 'bold', color: '#15131D' }}>
             Reset Password
           </Typography>
           <Typography variant="subtitle1" sx={{ mb: 3, color: 'text.secondary' }}>
@@ -92,12 +90,6 @@ const SmapleComponent = () => {
           </Typography>
 
           <form onSubmit={handleSubmit}>
-            {/* <Box mb={2}>
-              <Typography variant="body1" sx={{ color: 'text.secondary' }}>
-                Email: <strong>{email}</strong>
-              </Typography>
-            </Box> */}
-
             <TextField
               label="New Password"
               type="password"
@@ -154,12 +146,12 @@ const SmapleComponent = () => {
       {/* Footer */}
       <Footer />
 
-       {/* Confirmation Modal for Deleting Assignment */}
-       <Modal
+      {/* Confirmation Modal for Deleting Assignment */}
+      <Modal
         open={successModal}
         onClose={handleSucessModalClose}
-        title="Confirm Deletion"
-        onConfirm={handleSucessModalConfrim }
+        title="Password Reset Successful"
+        onConfirm={handleSucessModalConfrim}
       >
         <Box>
           <p>Password reset successful. Do you want to login?</p>
@@ -169,8 +161,6 @@ const SmapleComponent = () => {
   );
 };
 
-
 const ForgotPassword = BackgroundWithHOme(SmapleComponent);
-
 
 export default ForgotPassword;

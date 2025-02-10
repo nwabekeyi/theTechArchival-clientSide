@@ -221,17 +221,25 @@ const Sidebar = () => {
               </Box>
             </Box>
           )}
-          {menuItems.map((item) => (
-            <Item
-              key={item.title}
-              title={item.title}
-              to={item.to}
-              icon={item.icon}
-              selected={selected}
-              setSelected={setSelected}
-              isCollapsed={isCollapsed}
-            />
-          ))}
+      {menuItems.map((item, index) => (
+      <Item
+        key={item.title}
+        title={item.title}
+        to={item.to}
+        icon={item.icon}
+        selected={selected}
+        setSelected={setSelected}
+        isCollapsed={isCollapsed}
+        sx={{
+          mt: {
+            xs: 5,  // equivalent to 40px for mobile screens
+            sm: 5,  // equivalent to 40px for tablets
+            md: 0,  // reset the margin-top to 0 for larger screens
+          }
+        }}
+      />
+))}
+
         </Menu>
       </ProSidebar>
     </Box>

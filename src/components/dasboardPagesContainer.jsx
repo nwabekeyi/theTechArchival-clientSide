@@ -8,8 +8,7 @@ const withDashboardWrapper = (WrappedComponent) => {
     console.log('Home prop in HOC:', home); // Should log 'true'
 
     return (
-      <Box sx={{ p: 3, mx: 0}}>
-        {/* Pass all props down to the WrappedComponent */}
+<Box sx={{ p: { xs: 1, sm: 1, md: 1, lg: 2 }, mx: { xs: 1, md: 0 } }}>
         <WrappedComponent {...props} />
       </Box>
     );
