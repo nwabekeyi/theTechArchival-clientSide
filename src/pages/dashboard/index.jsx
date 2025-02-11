@@ -1,12 +1,11 @@
-import React, { useState, useEffect, lazy, Suspense } from "react";
+import React, { useState,lazy, Suspense } from "react";
 import { Routes, Route } from "react-router-dom";
 import Topbar from "./scenes/global/Topbar";
 import Sidebar from "./scenes/global/Sidebar";
 import { CssBaseline, ThemeProvider, Box } from "@mui/material";
 import { ColorModeContext, useMode } from "./theme";
 import "./index.css";
-import { useSelector, useDispatch } from "react-redux";
-import { useNavigate } from "react-router-dom";
+import { useSelector } from "react-redux";
 import FloatingMessageIcon from "./components/floatingMessageIcon";
 import { tokens } from "./theme";
 import SignIn from "../../components/Signin";
@@ -123,7 +122,7 @@ function DashboardHome() {
       <FloatingMessageIcon />
       <ThemeProvider theme={theme}>
         <CssBaseline />
-        <div style={{ display: "flex", height: "100%"}}>
+        <div style={{ display: "flex", height: "100%", gap: '0'}}>
           {/* Sidebar */}
           <Sidebar isSidebar={isSidebar} />
 
@@ -132,6 +131,8 @@ function DashboardHome() {
             id="dashboard"
             className="content"
             sx={{
+               px:{xs:0, md: 2, lg:0},
+              marginX: "0",
               width: '100%',
               backgroundColor:
                 theme.palette.mode === "light"
@@ -140,15 +141,23 @@ function DashboardHome() {
               height: "100vh", // Make the content area take full height
               display: "flex",
               flexDirection: "column",
-              overflowY: "auto", // Enable vertical scrolling
+              overflowY: "auto", // Enable vertical scrolling,
+              justifyContent: 'center',
+              alignItems: 'center'
             }}
             >
-            <Box sx={{ height: "auto"}}>
+            <Box 
+            sx={{ 
+              height: "auto", 
+              width:'100%', 
+              display: 'flex', 
+              justifyContent:'center',
+              backgroundColor:'none'}}>
               <Topbar userData={userData} />
             </Box>
 
             {/* Routes */}
-            <Box sx={{ flexGrow: 1, overflowY: "auto", height: "calc(100vh - 64px)" }}>
+            <Box sx={{ flexGrow: 1, overflowY: "auto", minWidth: '100%'}}>
               <Suspense fallback={<Loader />}>
                 <Routes>
                   <Route path={userRole === 'not logged in' ? "/signin" : "/"} element={<Dashboard userData={userData} />} />

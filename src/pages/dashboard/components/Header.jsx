@@ -5,18 +5,22 @@ const Header = ({ title, subtitle }) => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
   return (
-    <Box pb="30px"
-    sx={{color: theme.palette.mode === "light" ? colors.blueAccent[200]: colors.blueAccent[400],
+    <Box pt="30px" pb='10px'
+    sx={{color: theme.palette.mode === "light" ? colors.blueAccent[200]: colors.primary[100],
     }}
     >
-      <Typography
-        variant="h2"
-        fontWeight="bold"
-        sx={{ m: "0 0 5px 0" }}
-      >
+   <Typography
+  variant="h2"
+  fontWeight="bold"
+  sx={{
+    m: "0 0 5px 0",
+    fontSize: { xs: "1.5rem", sm: "2rem", md: "2.5rem" }, // Adjust font sizes for different screen sizes
+  }}
+>
         {title}
       </Typography>
-      <Typography variant="h5" >
+      <Typography variant="h5" sx={{fontSize: { xs: "0.8rem", sm: "1rem", md: "1.5rem" }, // Adjust font sizes for different screen sizes
+  }}>
         {subtitle}
       </Typography>
     </Box>

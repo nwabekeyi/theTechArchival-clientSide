@@ -13,12 +13,11 @@ const Component = ({home}) => {
   const colors = tokens(theme.palette.mode);
   const user = useSelector((state) => state.users.user);
 
-  const production = import.meta.env.EVN;
 
   return (
-    <Box>
+    <Box >
       {/* HEADER */}
-      <Box display="flex" justifyContent="space-between" alignItems="center" mx="10px">
+      <Box display="flex" justifyContent="space-between" alignItems="center">
         <Header title={user.firstName} subtitle="Welcome to your Babtech virtual learning dashboard" />
         <Box sx={{ display: 'flex' }}>
           {user.role === 'superadmin' && (
@@ -38,8 +37,8 @@ const Component = ({home}) => {
 
           {user.role === 'instructor' && (
             <Box>
-              <Rating value={user.rating} readOnly precision={0.1} />
-              <Typography variant="h6">Rating: {user.rating}</Typography>
+              <Rating sx={{fontSize:{xs:'1em', sm:'1.2em'}}} value={user.rating} readOnly precision={0.1} />
+              <Typography variant="h6" sx={{fontSize:{xs:'0.8em', sm:'1em'}}}>Rating: {user.rating}</Typography>
             </Box>
           )}
         </Box>

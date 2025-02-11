@@ -2,11 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Box, Typography, useTheme, Card, CardContent, Avatar, useMediaQuery } from '@mui/material';
 import { tokens } from '../../../theme';
 import Calendar from './calendar';
-
-import {
-  mockInstructorAssignments,
-  mockInstructorRecommendations,
-} from '../../../data/mockData';
+import DashboardDataBox from '../../../components/dashbaordDataBox';
 import SchoolIcon from '@mui/icons-material/School';
 import ProgressCircle from '../../../components/ProgressCircle';
 import useInstructorData from './useInstructorData';
@@ -17,8 +13,6 @@ const Instructor = () => {
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
   const isTablet = useMediaQuery(theme.breakpoints.between('sm', 'md'));
 
-  const [assignments, setAssignments] = useState([]);
-  const [recommendations, setRecommendations] = useState([]);
 
   // Mock Announcements Data
   const mockAnnouncements = [
@@ -43,8 +37,6 @@ const Instructor = () => {
   ];
 
   const {
-    instructorData,
-    studentData,
     courseProgress,
     attendanceRate,
     nextClass,
@@ -53,44 +45,37 @@ const Instructor = () => {
     leastStudents
   } = useInstructorData();
 
-  useEffect(() => {
-    let isMounted = true;
-
-    setTimeout(() => {
-      if (isMounted) {
-        setAssignments(mockInstructorAssignments);
-        setRecommendations(mockInstructorRecommendations);
-      }
-    }, 1000);
-
-    return () => {
-      isMounted = false;
-    };
-  }, []);
 
   const conBg = `${theme.palette.mode === "light" ? colors.blueAccent[800] : colors.greenAccent[600]} !important`
 
   return (
-    <Box p={isMobile ? 1 : 3}>
+    <Box>
       {/* ROW 1 */}
+
+
       <Box display="grid" gridTemplateColumns={`repeat(${isMobile ? 1 : isTablet ? 2 : 12}, 1fr)`} gap="20px">
         {/* Course Progress */}
-        <Box gridColumn={`span ${isMobile ? 1 : isTablet ? 2 : 3}`} backgroundColor={colors.primary[400]} p="20px" borderRadius='8px'>
-          <Typography variant="h5" fontWeight="600">
+
+        <DashboardDataBox
+        gridColumn = {`span ${isMobile ? 1 : isTablet ? 2 : 3}`}>
+            <Typography variant="h5" fontWeight="600" textAlign='center'>
             Course Progress
           </Typography>
-          <Box display="flex" flexDirection="column" alignItems="center" mt="25px">
+            <Box display="flex" flexDirection="column" alignItems="center" mt="25px" 
+           >
             <ProgressCircle size="125" progress={courseProgress} />
             <Typography variant="h5" color={colors.blueAccent[500]} sx={{ mt: "15px" }}>
               {`${courseProgress}% completed`}
             </Typography>
             <Typography>Completion rate</Typography>
           </Box>
-        </Box>
+      </DashboardDataBox>
 
         {/* Attendance */}
-        <Box gridColumn={`span ${isMobile ? 1 : isTablet ? 2 : 3}`} backgroundColor={colors.primary[400]} p="20px" borderRadius='8px'>
-          <Typography variant="h5" fontWeight="600">
+
+        <DashboardDataBox
+        gridColumn = {`span ${isMobile ? 1 : isTablet ? 2 : 3}`}>
+             <Typography variant="h5" fontWeight="600" textAlign='center'>
             Attendance
           </Typography>
           <Box display="flex" flexDirection="column" alignItems="center" mt="25px">
@@ -100,11 +85,13 @@ const Instructor = () => {
             </Typography>
             <Typography>Total attendance rate of students</Typography>
           </Box>
-        </Box>
+      </DashboardDataBox>
 
         {/* Assignment submissions */}
-        <Box gridColumn={`span ${isMobile ? 1 : isTablet ? 2 : 3}`} backgroundColor={colors.primary[400]} p="20px" borderRadius='8px'>
-          <Typography variant="h5" fontWeight="600">
+
+        <DashboardDataBox
+        gridColumn = {`span ${isMobile ? 1 : isTablet ? 2 : 3}`}>
+             <Typography variant="h5" fontWeight="600" textAlign='center'>
             Assignment submissions
           </Typography>
           <Box display="flex" flexDirection="column" alignItems="center" mt="25px">
@@ -114,11 +101,14 @@ const Instructor = () => {
             </Typography>
             <Typography>Total assignment submission rate</Typography>
           </Box>
-        </Box>
+      </DashboardDataBox>
 
         {/* Next Lecture */}
-        <Box gridColumn={`span ${isMobile ? 1 : isTablet ? 2 : 3}`} backgroundColor={colors.primary[400]} p="20px" borderRadius='8px'>
-          <Typography variant="h5" fontWeight="600" mb="15px">
+
+        
+        <DashboardDataBox
+        gridColumn = {`span ${isMobile ? 1 : isTablet ? 2 : 3}`}>
+            <Typography variant="h5" fontWeight="600" mb="15px" textAlign='center'>
             Next Lecture
           </Typography>
           <Box display="flex" alignItems="center" justifyContent="center" height="100%">
@@ -133,22 +123,28 @@ const Instructor = () => {
               <Typography>No upcoming lectures.</Typography>
             )}
           </Box>
-        </Box>
+      </DashboardDataBox>
       </Box>
 
       {/* ROW 2 */}
       <Box display="grid" gridTemplateColumns={`repeat(${isMobile ? 1 : isTablet ? 2 : 12}, 1fr)`} gap="20px" mt="20px">
         {/* Calendar */}
-        <Box gridColumn={`span ${isMobile ? 1 : isTablet ? 2 : 8}`} backgroundColor={colors.primary[400]} p="20px" borderRadius="10px">
-          <Typography variant="h5" fontWeight="600" mb="15px">
+
+        <DashboardDataBox
+          sx={{overflowX: 'scroll'}}
+          gridColumn = {`span ${isMobile ? 1 : isTablet ? 2 : 8}`}>
+           <Typography variant="h5" fontWeight="600" mb="15px">
             Event calendar
           </Typography>
           <Calendar />
-        </Box>
+      </DashboardDataBox>
 
         {/* Announcement Box */}
-        <Box gridColumn={`span ${isMobile ? 1 : isTablet ? 2 : 4}`} backgroundColor={colors.primary[400]} p="20px" borderRadius="10px">
-          <Typography variant="h5" fontWeight="600" mb="15px">Announcements</Typography>
+
+        
+        <DashboardDataBox
+        gridColumn = {`span ${isMobile ? 1 : isTablet ? 2 : 4}`} big>
+            <Typography variant="h5" fontWeight="600" mb="15px">Announcements</Typography>
           {mockAnnouncements.map((announcement) => (
             <Card key={announcement.id} sx={{ mb: 2 }}>
               <CardContent sx={{ backgroundColor: conBg }}>
@@ -158,14 +154,17 @@ const Instructor = () => {
               </CardContent>
             </Card>
           ))}
-        </Box>
+      </DashboardDataBox>
+
       </Box>
 
       {/* ROW 3 */}
       <Box display="grid" gridTemplateColumns={`repeat(${isMobile ? 1 : isTablet ? 2 : 12}, 1fr)`} gap="20px" mt="20px">
         {/* Top 5 Students by Activity */}
-        <Box gridColumn={`span ${isMobile ? 1 : isTablet ? 2 : 6}`} backgroundColor={colors.primary[400]} p="20px" borderRadius="8px">
-          <Typography variant="h5" fontWeight="600" mb="15px">
+
+        <DashboardDataBox
+        gridColumn = {`span ${isMobile ? 1 : isTablet ? 2 : 6}`}>
+           <Typography variant="h5" fontWeight="600" mb="15px">
             Top Students by Activity
           </Typography>
           {topStudents?.map((student, index) => (
@@ -196,12 +195,15 @@ const Instructor = () => {
                 </Typography>
               </Box>
             </Box>
-          ))}
-        </Box>
+           ))}
+      </DashboardDataBox>
 
         {/* Least Active Students */}
-        <Box gridColumn={`span ${isMobile ? 1 : isTablet ? 2 : 6}`} backgroundColor={colors.primary[400]} p="20px" borderRadius="8px">
-          <Typography variant="h5" fontWeight="600" mb="15px">
+
+        
+        <DashboardDataBox
+        gridColumn = {`span ${isMobile ? 1 : isTablet ? 2 : 6}`}>
+             <Typography variant="h5" fontWeight="600" mb="15px">
             Least Active Students
           </Typography>
           {leastStudents?.map((student, index) => (
@@ -233,7 +235,8 @@ const Instructor = () => {
               </Box>
             </Box>
           ))}
-        </Box>
+      </DashboardDataBox>
+
       </Box>
     </Box>
   );

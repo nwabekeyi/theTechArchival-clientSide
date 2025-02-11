@@ -8,6 +8,7 @@ import { tokens } from '../../theme';
 import useApi from '../../../../hooks/useApi';
 import { useSelector } from 'react-redux';
 import { endpoints } from '../../../../utils/constants';
+import ConfirmationModal from '../../components/confirmationModal';
 
 const Instructor = () => {
   const theme = useTheme();
@@ -23,10 +24,24 @@ const Instructor = () => {
   const [sortDirection, setSortDirection] = useState('asc');
   const [scheduleToDelete, setScheduleToDelete] = useState(null);
   const [schedules, setSchedules] = useState([]);
-  
+  const [deleteConfirm, setDeleteConfrim] = useState(false);
+  const [updateConfirm, setUpdateConfrim] = useState(false)
+
+
   const userDetails = useSelector((state) => state.users.user);
   const cohortName = userDetails.cohort;
   const postUrl = `${endpoints.TIMETABLE}/${cohortName}`;
+
+  //handle confirm modal close
+  const handleConfirmModalClose = () => {
+    if(deleteConfirm === true){
+      setDeleteConfrim(false);
+    };
+
+    if(updateConfirm === true){
+      setUpdateConfrim(false);
+    }
+  };
 
   const { loading: postLoading, data: postData, error: postError, callApi: postCallApi } = useApi();
   const { loading: getLoading, error: getError, callApi: getCallApi } = useApi();
@@ -44,35 +59,70 @@ const Instructor = () => {
     fetchSchedules();
   }, []);
 
+  const formatDateTime = (dateStr, timeStr) => {
+    if (!dateStr || !timeStr) return 'Invalid Date';
+  
+    const formattedDate = new Date(dateStr).toISOString().split('T')[0];
+    const scheduleDateTime = new Date(`${formattedDate}T${timeStr}`);
+  
+    if (isNaN(scheduleDateTime)) {
+      return 'Invalid Date';
+    }
+  
+    return scheduleDateTime; // Return the Date object for comparison
+  };
+  
   const columns = [
-    { id: 'date', label: 'Date' },
+    {
+      id: 'date',
+      label: 'Date',
+      renderCell: (row) => formatDateTime(row.date, row.time).toLocaleDateString(), // Format date for display
+    },
     { id: 'time', label: 'Time' },
     { id: 'location', label: 'Location' },
     { id: 'topic', label: 'Topic' },
     {
       id: 'actions',
       label: 'Actions',
-      renderCell: (row) => (
-        <>
-          <Button
-            variant="contained"
-            color="primary"
-            onClick={() => handleEdit(row)}
-            sx={{ mr: 1 }}
-          >
-            Edit
-          </Button>
-          <Button
-            variant="contained"
-            color="secondary"
-            onClick={() => handleDelete(row)}
-          >
-            Delete
-          </Button>
-        </>
-      ),
+      renderCell: (row) => {
+        const scheduleDateTime = formatDateTime(row.date, row.time); // Get the scheduled date and time
+        const currentDateTime = new Date(); // Get the current date and time
+  
+        const isPast = scheduleDateTime <= currentDateTime; // Check if the scheduled time is in the past
+  
+        return (
+          <>
+            <Button
+              variant="contained"
+              color="primary"
+              onClick={() => handleEdit(row)}
+              sx={{ mr: 1,
+                fontSize: { xs: '0.5rem', sm: '0.7rem' },  // Smaller font on small screens
+              padding: { xs: '4px', sm: '8px' },  // Adjust padding for small screens
+              minWidth: { xs: '50px', sm: '70px' },  
+              }}
+            >
+              Edit
+            </Button>
+            <Button
+            sx={{
+              fontSize: { xs: '0.5rem', sm: '0.7rem' },  // Smaller font on small screens
+              padding: { xs: '4px', sm: '8px' },  // Adjust padding for small screens
+              minWidth: { xs: '50px', sm: '70px' },  // Reduce width on small screens
+            }}
+              variant="contained"
+              color={isPast ? 'success' : 'secondary'} // Change color if past
+              onClick={() => (handleDelete(row))}
+            >
+              {isPast ? 'Mark as Done' : 'Delete'} {/* Change text conditionally */}
+            </Button>
+          </>
+        );
+      },
     },
   ];
+  
+  
 
   const handleOpenEditModal = () => setOpenEditModal(true);
   const handleCloseEditModal = () => {
@@ -121,6 +171,11 @@ const Instructor = () => {
             schedule.id === editingSchedule.id ? { ...schedule, ...updatedSchedule } : schedule
           )
         );
+        setUpdateConfrim(true);
+
+      }else{
+        setUpdateConfrim(true);
+
       }
 
       handleCloseEditModal();
@@ -141,9 +196,12 @@ const Instructor = () => {
         setSchedules((prevSchedules) =>
           prevSchedules.filter((schedule) => schedule.id !== editingSchedule.id)
         );
+      }else{
+        setDeleteConfrim(true);
       }
 
       handleCloseDeleteModal();
+      setDeleteConfrim(true);
     }
   };
 
@@ -182,12 +240,12 @@ const Instructor = () => {
   };
 
   return (
-    <Box m="20px">
+    <Box>
       <Header title="TIME TABLE" subtitle="Overview of Weekly Schedule" />
 
       <Button
         variant="contained"
-        color="primary"
+        color="secondary"
         onClick={handleOpenEditModal}
         sx={{ mb: '15px' }}
       >
@@ -204,6 +262,8 @@ const Instructor = () => {
         sortDirection={sortDirection}
         onPageChange={handlePageChange}
         onRowsPerPageChange={handleRowsPerPageChange}
+        hiddenColumnsSmallScreen={['topic', 'location']}
+
       />
 
       {/* Edit Modal */}
@@ -266,6 +326,23 @@ const Instructor = () => {
       >
         Are you sure you want to delete this schedule?
       </Modal>
+
+      <ConfirmationModal
+        open={deleteConfirm || updateConfirm}
+        onClose={handleConfirmModalClose}
+        title= {deleteConfirm ? "Delete Confirmation" : 'Update confirmation'}
+        isLoading= {deleteConfirm ? deleteLoading : putLoading}
+        message= {deleteConfirm ?
+          "Time Table successfully deleted" :
+          updateConfirm ? 'Time Table successfully updated' :
+          deleteConfirm && deleteError ? "Could not update time tab;e, something went wrong" :
+          updateConfirm && putError ? "Could not update time table, something went wrong" :
+           "something went wrong"
+          }
+
+      >
+        
+      </ConfirmationModal>
     </Box>
   );
 };

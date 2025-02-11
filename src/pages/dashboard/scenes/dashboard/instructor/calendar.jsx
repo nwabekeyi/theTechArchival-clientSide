@@ -18,7 +18,7 @@ import {
 import { tokens } from "../../../theme";
 import Modal from "../../../components/modal";
 import { List as ListIcon, Close as CloseIcon } from "@mui/icons-material"; // Import icons
-
+import './calendar.css'
 const Calendar = () => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
@@ -92,15 +92,16 @@ const Calendar = () => {
   };
 
   return (
-    <Box my="20px">
+    <Box my="10px">
       <Box display="flex" justifyContent="center" flexDirection='column'>
         {/* CALENDAR SIDEBAR */}
         <Box
           flex="1 1 20%"
           backgroundColor={colors.primary[400]}
-          p="15px"
+          py="15px"
           borderRadius="4px"
           sx={{
+            width: '100%',
             height: "75vh", // Set the desired height for the sidebar
             overflowY: "auto", // Make the event list scrollable if it overflows
             overflowX: "hidden", // Prevent horizontal overflow
@@ -182,7 +183,7 @@ const Calendar = () => {
         </Box>
 
         {/* CALENDAR */}
-        <Box flex="1 1 100%" ml="15px">
+        <Box flex="1 1 100%" sx={{width: '100%'}}>
           <FullCalendar
             height="75vh"
             plugins={[dayGridPlugin, timeGridPlugin, interactionPlugin, listPlugin]}
@@ -199,18 +200,7 @@ const Calendar = () => {
             select={handleDateClick}
             eventClick={handleEventClick}
             events={events} // Use events from state (loaded from localStorage)
-            sx={{
-              "& .fc-header-title": {
-                fontSize: "0.5em", // Set smaller font size for month and year
-                fontWeight: "lighter", // Optional: make the title lighter
-              },
-              "& .fc-header-toolbar": {
-                padding: "5px", // Optional: reduce toolbar padding
-              },
-              "& .fc-daygrid-day": {
-                cursor: "pointer", // Show pointer cursor on hover
-              },
-            }}
+            
           />
         </Box>
       </Box>
