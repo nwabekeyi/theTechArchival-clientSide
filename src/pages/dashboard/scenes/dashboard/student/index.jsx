@@ -5,7 +5,6 @@ import {
   useTheme,
   Card,
   CardContent,
-  Avatar,
   Grid,
 } from "@mui/material";
 import { tokens } from "../../../theme";
@@ -14,6 +13,12 @@ import SchoolIcon from "@mui/icons-material/School";
 import ProgressCircle from "../../../components/ProgressCircle";
 import useStudentData from "./useStudentData";
 import PerfromanceLineChart from "./performanceChart";
+import {
+  RowGrid,
+  RowContainer,
+  ResponsiveContainer,
+  DashboardDataBox
+} from '../../../components/dashbaordDataBox'
 
 const Student = ({ user }) => {
   const theme = useTheme();
@@ -68,21 +73,12 @@ const Student = ({ user }) => {
   return (
     <Box
     >
-      <Grid container spacing={2}>
+      <RowGrid>
         {/* FIRST ROW */}
-        <Grid container item xs={12} spacing={2}>
+        <RowContainer>
           {progressData.map((progress, index) => (
-            <Grid item xs={12} sm={6} md={3} key={index}>
-              <Box
-                backgroundColor={colors.primary[400]}
-                p="10px"
-                borderRadius="10px"
-                textAlign="center"
-                display="flex" 
-                flexDirection= "column"
-                justifyContent="center" 
-                alignItems="center"
-              >
+            <ResponsiveContainer sm={6} md={3} key={index}>
+              <DashboardDataBox>
                 <Typography variant="h6" fontWeight="600" mb="5px">
                   {progress.title}
                 </Typography>
@@ -90,20 +86,12 @@ const Student = ({ user }) => {
                 <Typography variant="body2" mt="10px">
                   {progress.details}: {progress.value}%
                 </Typography>
-              </Box>
-            </Grid>
+              </DashboardDataBox>
+            </ResponsiveContainer>
           ))}
-          <Grid item xs={12} sm={6} md={3}>
-            <Box
-              backgroundColor={colors.primary[400]}
-              p="10px"
-              borderRadius="10px"
-              textAlign="center"
-              display="flex" 
-                flexDirection= "column"
-                justifyContent="center" 
-                alignItems="center"
-            >
+
+          <ResponsiveContainer sm={6} md={3}>
+            <DashboardDataBox>
               <Typography variant="h6" fontWeight="600" mb="5px">
                 Payment Rate ({parseInt(100 - outstandings.percentageDifference)}%)
               </Typography>
@@ -114,16 +102,11 @@ const Student = ({ user }) => {
               <Typography variant="body2" mt="10px">
                 Outstanding Payments: {outstandings.totalOutstanding}
               </Typography>
-            </Box>
-          </Grid>
-          <Grid item xs={12} sm={6} md={3}>
-            <Box
-              backgroundColor={colors.primary[400]}
-              p="10px"
-              borderRadius="10px"
-              textAlign="center"
-              height='100%'
-            >
+            </DashboardDataBox>
+          </ResponsiveContainer>
+
+          <ResponsiveContainer sm={6} md={3} >
+            <DashboardDataBox >
               <Typography variant="h6" fontWeight="600" mb="5px">
                 Next Class
               </Typography>
@@ -138,28 +121,19 @@ const Student = ({ user }) => {
               ) : (
                 <Typography>No upcoming lectures.</Typography>
               )}
-            </Box>
-          </Grid>
-        </Grid>
+            </DashboardDataBox>
+          </ResponsiveContainer>
+        </RowContainer>
 
         {/* SECOND ROW */}
-        <Grid container item xs={12} spacing={2}>
-          <Grid item xs={12} md={8}>
-            <Box
-              backgroundColor={colors.primary[400]}
-              p="20px"
-              sx={{ overflowY: "auto", height: "350px" }}
-              borderRadius="10px"
-            >
+        <RowContainer>
+          <ResponsiveContainer md={8}>
+            <DashboardDataBox height='350px'>
               <PerfromanceLineChart />
-            </Box>
-          </Grid>
-          <Grid item xs={12} md={4}>
-            <Box
-              backgroundColor={colors.primary[400]}
-              p="20px"
-              sx={{ overflowY: "auto", height: "350px" }}
-              borderRadius="10px"
+            </DashboardDataBox>
+          </ResponsiveContainer>
+          <ResponsiveContainer md={4}>
+            <DashboardDataBox
             >
               <Typography variant="h5" fontWeight="600" mb="15px">
                 Upcoming Schedule
@@ -178,19 +152,19 @@ const Student = ({ user }) => {
               ) : (
                 <Typography>No timetable found</Typography>
               )}
-            </Box>
-          </Grid>
-        </Grid>
+            </DashboardDataBox>
+          </ResponsiveContainer>
+        </RowContainer>
 
         {/* THIRD ROW */}
-        <Grid container item xs={12} spacing={2}>
-          <Grid item xs={12} md={6}>
-            <Box
-              backgroundColor={colors.primary[400]}
-              p="20px"
-              sx={{ overflowY: "auto", height: "300px" }}
-              borderRadius="10px"
-            >
+        <RowContainer>
+          <ResponsiveContainer md={6}>
+            <DashboardDataBox noFlex
+                moreStyles={{
+                  height: '400px',
+                  overflowY: 'auto'
+                }}
+                >
               <Typography variant="h5" fontWeight="600" mb="15px">
                 Announcements
               </Typography>
@@ -205,15 +179,13 @@ const Student = ({ user }) => {
                   </CardContent>
                 </Card>
               ))}
-            </Box>
-          </Grid>
-          <Grid item xs={12} md={6}>
-            <Box
-              backgroundColor={colors.primary[400]}
-              p="20px"
-              sx={{ overflowY: "auto", height: "300px" }}
-              borderRadius="10px"
-            >
+            </DashboardDataBox>
+          </ResponsiveContainer>
+          <ResponsiveContainer md={6} >
+            <DashboardDataBox noFlex   moreStyles={{
+            height: '400px',
+            overflowY: 'auto'
+          }}>
               <Typography variant="h5" fontWeight="600" mb="15px">
                 Useful Resources
               </Typography>
@@ -227,10 +199,10 @@ const Student = ({ user }) => {
                   </CardContent>
                 </Card>
               ))}
-            </Box>
-          </Grid>
-        </Grid>
-      </Grid>
+            </DashboardDataBox>
+          </ResponsiveContainer>
+        </RowContainer>
+      </RowGrid>
     </Box>
   );
 };

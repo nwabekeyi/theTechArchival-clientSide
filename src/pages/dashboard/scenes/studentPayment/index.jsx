@@ -114,8 +114,6 @@ const handlePaymentSuccess = async () => {
   // Table Columns
   const columns = [
     { id: 'transactionId', label: 'Transaction ID' },
-    { id: 'userName', label: 'Student Name' },
-    { id: 'program', label: 'Program' },
     {
       id: 'amount',
       label: 'Amount (₦)',
@@ -201,6 +199,7 @@ const handlePaymentSuccess = async () => {
         page={page}
         rowsPerPage={rowsPerPage}
         onPageChange={(e, newPage) => setPage(newPage)}
+        hiddenColumnsSmallScreen={[ 'status', 'transactionId']}
         onRowsPerPageChange={(e) =>
           setRowsPerPage(parseInt(e.target.value, 10))
         }

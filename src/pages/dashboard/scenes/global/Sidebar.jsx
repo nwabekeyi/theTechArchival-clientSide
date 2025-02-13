@@ -140,7 +140,7 @@ const Sidebar = () => {
     <Box
       sx={{
         "& .pro-sidebar .pro-menu": {
-          padding: `${isCollapsed ? '20px 0 0 0' : '20px'}`,
+          padding: `${isCollapsed ? '8px 0 0 0' : '20px'}`,
           display: !isCollapsed && 'flex'
         },
         "& .pro-sidebar-inner": {
@@ -187,7 +187,7 @@ const Sidebar = () => {
         "& .pro-inner-item": {
           padding: "10px 5px 5px 5px !important",
           color: theme.palette.mode === "light"
-            ? colors.blueAccent[300]
+            ? colors.grey[100]
             : colors.primary[200],
         },
         "& .pro-inner-item:hover": {

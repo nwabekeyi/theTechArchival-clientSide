@@ -1,8 +1,12 @@
-import React, { useState, useEffect } from 'react';
 import { Box, Typography, useTheme, Card, CardContent, Avatar, useMediaQuery } from '@mui/material';
 import { tokens } from '../../../theme';
 import Calendar from './calendar';
-import DashboardDataBox from '../../../components/dashbaordDataBox';
+import {
+  DashboardDataBox,
+  RowGrid,
+  RowContainer,
+  ResponsiveContainer
+} from '../../../components/dashbaordDataBox';
 import SchoolIcon from '@mui/icons-material/School';
 import ProgressCircle from '../../../components/ProgressCircle';
 import useInstructorData from './useInstructorData';
@@ -50,64 +54,65 @@ const Instructor = () => {
 
   return (
     <Box>
-      {/* ROW 1 */}
+      <RowGrid>
+       {/* ROW 1 */}
+      <RowContainer>
 
-
-      <Box display="grid" gridTemplateColumns={`repeat(${isMobile ? 1 : isTablet ? 2 : 12}, 1fr)`} gap="20px">
         {/* Course Progress */}
+        <ResponsiveContainer sm={6} md={3}>
+            <DashboardDataBox>
+                <Typography variant="h5" fontWeight="600" textAlign='center'>
+                Course Progress
+              </Typography>
+                <Box display="flex" flexDirection="column" alignItems="center" mt="25px" 
+              >
+                <ProgressCircle size="125" progress={courseProgress} />
+                <Typography variant="h5" color={colors.blueAccent[500]} sx={{ mt: "15px" }}>
+                  {`${courseProgress}% completed`}
+                </Typography>
+                <Typography>Completion rate</Typography>
+              </Box>
+          </DashboardDataBox>
+        </ResponsiveContainer>
 
-        <DashboardDataBox
-        gridColumn = {`span ${isMobile ? 1 : isTablet ? 2 : 3}`}>
-            <Typography variant="h5" fontWeight="600" textAlign='center'>
-            Course Progress
-          </Typography>
-            <Box display="flex" flexDirection="column" alignItems="center" mt="25px" 
-           >
-            <ProgressCircle size="125" progress={courseProgress} />
-            <Typography variant="h5" color={colors.blueAccent[500]} sx={{ mt: "15px" }}>
-              {`${courseProgress}% completed`}
-            </Typography>
-            <Typography>Completion rate</Typography>
-          </Box>
-      </DashboardDataBox>
 
         {/* Attendance */}
-
-        <DashboardDataBox
-        gridColumn = {`span ${isMobile ? 1 : isTablet ? 2 : 3}`}>
-             <Typography variant="h5" fontWeight="600" textAlign='center'>
-            Attendance
-          </Typography>
-          <Box display="flex" flexDirection="column" alignItems="center" mt="25px">
-            <ProgressCircle size="125" progress={attendanceRate} />
-            <Typography variant="h5" color={colors.blueAccent[500]} sx={{ mt: "15px" }}>
-              {`${attendanceRate}% attendance rate`}
-            </Typography>
-            <Typography>Total attendance rate of students</Typography>
-          </Box>
-      </DashboardDataBox>
+        <ResponsiveContainer sm={6} md={3}>
+            <DashboardDataBox>
+                <Typography variant="h5" fontWeight="600" textAlign='center'>
+                Attendance
+              </Typography>
+              <Box display="flex" flexDirection="column" alignItems="center" mt="25px">
+                <ProgressCircle size="125" progress={attendanceRate} />
+                <Typography variant="h5" color={colors.blueAccent[500]} sx={{ mt: "15px" }}>
+                  {`${attendanceRate}% attendance rate`}
+                </Typography>
+                <Typography>Total attendance rate of students</Typography>
+              </Box>
+          </DashboardDataBox>
+        </ResponsiveContainer>
 
         {/* Assignment submissions */}
 
-        <DashboardDataBox
-        gridColumn = {`span ${isMobile ? 1 : isTablet ? 2 : 3}`}>
-             <Typography variant="h5" fontWeight="600" textAlign='center'>
-            Assignment submissions
-          </Typography>
-          <Box display="flex" flexDirection="column" alignItems="center" mt="25px">
-            <ProgressCircle size="125" progress={assignmentSubmissionRate} />
-            <Typography variant="h5" color={colors.blueAccent[500]} sx={{ mt: "15px" }}>
-              {`${assignmentSubmissionRate}% submission rate`}
-            </Typography>
-            <Typography>Total assignment submission rate</Typography>
-          </Box>
-      </DashboardDataBox>
+      <ResponsiveContainer sm={6} md={3}>
+          <DashboardDataBox>
+                <Typography variant="h5" fontWeight="600" textAlign='center'>
+                Assignment submissions
+              </Typography>
+              <Box display="flex" flexDirection="column" alignItems="center" mt="25px">
+                <ProgressCircle size="125" progress={assignmentSubmissionRate} />
+                <Typography variant="h5" color={colors.blueAccent[500]} sx={{ mt: "15px" }}>
+                  {`${assignmentSubmissionRate}% submission rate`}
+                </Typography>
+                <Typography>Total assignment submission rate</Typography>
+              </Box>
+          </DashboardDataBox>
+      </ResponsiveContainer>
 
         {/* Next Lecture */}
 
-        
-        <DashboardDataBox
-        gridColumn = {`span ${isMobile ? 1 : isTablet ? 2 : 3}`}>
+      <ResponsiveContainer sm={6} md={3}>
+      <DashboardDataBox>
             <Typography variant="h5" fontWeight="600" mb="15px" textAlign='center'>
             Next Lecture
           </Typography>
@@ -124,85 +129,103 @@ const Instructor = () => {
             )}
           </Box>
       </DashboardDataBox>
-      </Box>
+      </ResponsiveContainer>
+      
+      </RowContainer>
 
       {/* ROW 2 */}
-      <Box display="grid" gridTemplateColumns={`repeat(${isMobile ? 1 : isTablet ? 2 : 12}, 1fr)`} gap="20px" mt="20px">
+      <RowContainer>
         {/* Calendar */}
-
-        <DashboardDataBox
-          sx={{overflowX: 'scroll'}}
-          gridColumn = {`span ${isMobile ? 1 : isTablet ? 2 : 8}`}>
-           <Typography variant="h5" fontWeight="600" mb="15px">
-            Event calendar
-          </Typography>
-          <Calendar />
-      </DashboardDataBox>
-
+        <ResponsiveContainer md={8}> 
+            <DashboardDataBox noFlex  moreStyles={{
+            height: '500px',
+            overflowY: 'auto'
+            
+          }}> 
+              <Typography variant="h5" fontWeight="600" mb="15px">
+                Event calendar
+              </Typography>
+              <Calendar />
+          </DashboardDataBox>
+        </ResponsiveContainer>
         {/* Announcement Box */}
+        <ResponsiveContainer md={4}>
+            <DashboardDataBox noFlex  moreStyles={{
+            height: '500px',
+            overflowY: 'auto'
+            
+          }}>                
+              <Typography variant="h5" fontWeight="600" mb="15px">Announcements</Typography>
+              {mockAnnouncements.map((announcement) => (
+                <Card key={announcement.id} sx={{ mb: 2 }}>
+                  <CardContent sx={{ backgroundColor: conBg }}>
+                    <Typography variant="h6">{announcement.title}</Typography>
+                    <Typography variant="body2">{announcement.message}</Typography>
+                    <Typography variant="caption" color="gray">{announcement.date}</Typography>
+                  </CardContent>
+                </Card>
+              ))}
+          </DashboardDataBox>
+        </ResponsiveContainer>
+       
 
-        
-        <DashboardDataBox
-        gridColumn = {`span ${isMobile ? 1 : isTablet ? 2 : 4}`} big>
-            <Typography variant="h5" fontWeight="600" mb="15px">Announcements</Typography>
-          {mockAnnouncements.map((announcement) => (
-            <Card key={announcement.id} sx={{ mb: 2 }}>
-              <CardContent sx={{ backgroundColor: conBg }}>
-                <Typography variant="h6">{announcement.title}</Typography>
-                <Typography variant="body2">{announcement.message}</Typography>
-                <Typography variant="caption" color="gray">{announcement.date}</Typography>
-              </CardContent>
-            </Card>
-          ))}
-      </DashboardDataBox>
-
-      </Box>
+      </RowContainer>
 
       {/* ROW 3 */}
-      <Box display="grid" gridTemplateColumns={`repeat(${isMobile ? 1 : isTablet ? 2 : 12}, 1fr)`} gap="20px" mt="20px">
+      <RowContainer>
         {/* Top 5 Students by Activity */}
-
-        <DashboardDataBox
-        gridColumn = {`span ${isMobile ? 1 : isTablet ? 2 : 6}`}>
-           <Typography variant="h5" fontWeight="600" mb="15px">
-            Top Students by Activity
-          </Typography>
-          {topStudents?.map((student, index) => (
-            <Box
-              key={index}
-              display="flex"
-              alignItems="center"
-              justifyContent="flex-start"
-              mb={2}
-              backgroundColor={theme.palette.mode === "light" ? colors.greenAccent[300] : colors.primary[500]}
-              p="15px"
-              borderRadius="8px"
-              sx={{
-                boxShadow: '0px 4px 8px rgba(0, 0, 0, 0.1)',
-              }}
-            >
-              <Avatar
-                src={student?.profilePicture}
-                alt={`${student?.firstName} ${student?.lastName}`}
-                sx={{ width: 50, height: 50, mr: 2 }}
-              />
-              <Box>
-                <Typography variant="h6" color="white">
-                  {`${student?.firstName} ${student?.lastName}`}
+      <ResponsiveContainer md={6}>
+            <DashboardDataBox noFlex  
+            moreStyles={{
+            height: '400px',
+            overflowY: 'auto'
+            
+          }}>
+              <Typography variant="h5" fontWeight="600" mb="15px">
+                  Top Students by Activity
                 </Typography>
-                <Typography variant="body2" color="white">
-                  {`Activity Rate: ${student?.activityRate}%`}
-                </Typography>
-              </Box>
-            </Box>
-           ))}
-      </DashboardDataBox>
+                {topStudents?.map((student, index) => (
+                  <Box
+                    key={index}
+                    display="flex"
+                    alignItems="center"
+                    justifyContent="flex-start"
+                    mb={2}
+                    backgroundColor={theme.palette.mode === "light" ? colors.greenAccent[300] : colors.primary[500]}
+                    p="15px"
+                    borderRadius="8px"
+                    sx={{
+                      boxShadow: '0px 4px 8px rgba(0, 0, 0, 0.1)',
+                    }}
+                  >
+                    <Avatar
+                      src={student?.profilePicture}
+                      alt={`${student?.firstName} ${student?.lastName}`}
+                      sx={{ width: 50, height: 50, mr: 2 }}
+                    />
+                    <Box>
+                      <Typography variant="h6" color="white">
+                        {`${student?.firstName} ${student?.lastName}`}
+                      </Typography>
+                      <Typography variant="body2" color="white">
+                        {`Activity Rate: ${student?.activityRate}%`}
+                      </Typography>
+                    </Box>
+                  </Box>
+                ))}
+            </DashboardDataBox>
 
+      {/* last row */}
+      </ResponsiveContainer>
         {/* Least Active Students */}
-
-        
-        <DashboardDataBox
-        gridColumn = {`span ${isMobile ? 1 : isTablet ? 2 : 6}`}>
+      <ResponsiveContainer md={6}>
+          <DashboardDataBox noFlex 
+          moreStyles={{
+            height: '400px',
+            overflowY: 'auto'
+            
+          }}
+        >
              <Typography variant="h5" fontWeight="600" mb="15px">
             Least Active Students
           </Typography>
@@ -236,9 +259,12 @@ const Instructor = () => {
             </Box>
           ))}
       </DashboardDataBox>
+      </ResponsiveContainer>
 
-      </Box>
+      </RowContainer>
+    </RowGrid>
     </Box>
+    
   );
 };
 

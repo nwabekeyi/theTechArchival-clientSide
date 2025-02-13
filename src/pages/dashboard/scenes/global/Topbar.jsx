@@ -153,7 +153,7 @@ const Topbar = () => {
       {/* ICONS */}
       <Box display="flex" sx={{justifyContent:'end', marginLeft: '10px'}}>
         <IconButton onClick={handleOpenNotifications} sx={{ color:theme.palette.mode === "light"
-            ? colors.blueAccent[300]
+            ? colors.grey[100]
             : colors.primary[200], 
           padding: '4px'
         }}
@@ -163,7 +163,7 @@ const Topbar = () => {
           </Badge>
         </IconButton>
         <IconButton onClick={handleOpenSettings} sx={{ color:theme.palette.mode === "light"
-            ? colors.blueAccent[300]
+            ? colors.grey[100]
             : colors.primary[200], 
             padding: '4px'
           }}

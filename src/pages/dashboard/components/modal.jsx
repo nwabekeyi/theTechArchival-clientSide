@@ -39,12 +39,12 @@ const Modal = ({
       maxWidth="sm"
       sx={{
         '& .MuiDialog-paper': {
-          backgroundColor: backgroundColor || theme.palette.background.paper,
+          backgroundColor: theme.palette.mode === 'dark' ? '#141B2D' : "#fff",
           color: color || theme.palette.text.primary,
           padding: padding || theme.spacing(2), // Ensure sufficient padding
           overflowY: overflowY || 'visible',
           borderRadius: '12px', // Add rounded borders
-          boxShadow: `0 4px 20px rgba(0, 0, 0, 0.1)`, // Add box shadow
+          boxShadow: `0 4px 20px rgba(0, 0, 0, 0.5)`, // Add box shadow
           ...customStyles,
         },
       }}
@@ -68,22 +68,22 @@ const Modal = ({
               fontWeight: '700',
               fontSize: '1em',
               color: theme.palette.mode === 'light'
-              ?  colors.greenAccent[200] 
+              ?  colors.grey[500] 
               : colors.greenAccent[500],
               border: `2px solid ${theme.palette.mode === 'light'
-                ?  colors.greenAccent[200] 
+                ?  'none'
                 : colors.greenAccent[500]}`,
               borderRadius: '8px',
               padding: theme.spacing(1, 3),
               textTransform: 'none',
               '&:hover': {
                 backgroundColor: theme.palette.mode === 'light'
-                ?  colors.greenAccent[200] 
+                ?  colors.blueAccent[200] 
                 : colors.greenAccent[500],
-                color: colors.primary[100],
+                color: 'white',
               },
 
-              boxShadow:'0px 4px 16px rgba(0, 0, 0, 0.2)' // Lighter shadow for light mode
+              boxShadow:'0px 0px 4px rgba(0, 0, 0, 0.5)' // Lighter shadow for light mode
             }}
           >
             {confirmMessage || 'Confirm'}

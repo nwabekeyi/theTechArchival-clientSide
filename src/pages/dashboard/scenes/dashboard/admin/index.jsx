@@ -1,4 +1,4 @@
-import { Box, Typography, useTheme, Avatar } from '@mui/material';
+import { Box, Typography, useTheme, Avatar, useMediaQuery, Grid } from '@mui/material';
 import { tokens } from '../../../theme';
 import GroupsIcon from '@mui/icons-material/Groups';
 import PersonAddIcon from '@mui/icons-material/PersonAdd';
@@ -10,6 +10,11 @@ import useAdminData from './useAdminData';
 import { useState, useEffect } from 'react';
 import Loader from '../../../../../utils/loader';
 import ProgressCircle from '../../../components/ProgressCircle';
+import {
+  DashboardDataBox,
+  RowGrid,
+  RowContainer
+} from '../../../components/dashbaordDataBox';
 
 const Admin = () => {
   const theme = useTheme();
@@ -18,6 +23,8 @@ const Admin = () => {
   const [students, setStudents] = useState(0);
   const [instructors, setInstructors] = useState(0);
   const { usersData, totalRevenue, programStats, topInstructors, outstandingPayments, mockCohorts } = useAdminData();
+  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
+  const isTablet = useMediaQuery(theme.breakpoints.between('sm', 'md'));
 
   useEffect(() => {
     if (usersData) {
@@ -41,58 +48,79 @@ const Admin = () => {
       .sort((a, b) => b.studentCount - a.studentCount); // Sorting by student count
 
     return (
-      <Box
-        display="grid"
-        gridTemplateColumns="repeat(12, 1fr)"
-        gridAutoRows="140px"
-        gap="20px"
-      >
+      <Box>
+
+      <RowGrid>
+        {/* first row */}
+        <RowContainer>
         {/* UI components */}
-        <Box
-          gridColumn="span 3"
-          backgroundColor={colors.primary[400]}
-          display="flex"
-          alignItems="center"
-          justifyContent="center"
-          sx={{ borderRadius: '10px'}}
 
-        >
-          <StatBox
-            figure={students}
-            subtitle="Students"
-            icon={<GroupsIcon sx={{ fontSize: '100%' }} />}
-          />
-        </Box>
-        <Box
-          gridColumn="span 3"
-          backgroundColor={colors.primary[400]}
-          display="flex"
-          alignItems="center"
-          justifyContent="center"
-          sx={{ borderRadius: '10px'}}
+        <DashboardDataBox
+        gridColumn = {`span ${isMobile ? 1 : isTablet ? 2 : 3}`}>
+            <Typography variant="h5" fontWeight="600" textAlign='center'>
+              Students
+          </Typography>
+            <Box display="flex" flexDirection="column" alignItems="center" mt="25px" 
+           >
+           <GroupsIcon sx={{ fontSize: '70px' }} />
+            <Typography variant="h5" color={colors.blueAccent[500]} sx={{ mt: "15px" }}>
+              {`${students} students`}
+            </Typography>
+            <Typography>Total students</Typography>
+          </Box>
+      </DashboardDataBox>
 
-        >
-          <StatBox
-            figure={instructors}
-            subtitle="Instructors"
-            icon={<SchoolIcon sx={{ fontSize: '100%' }} />}
-          />
-        </Box>
-        <Box
-          gridColumn="span 3"
-          backgroundColor={colors.primary[400]}
-          display="flex"
-          alignItems="center"
-          justifyContent="center"
-          sx={{ borderRadius: '10px'}}
+      {/* instructors */}
 
-        >
-          <StatBox
-            figure={usersData.studentsIn24Hrs || 0}
-            subtitle="New Students"
-            icon={<PersonAddIcon sx={{ fontSize: '100%' }} />}
-          />
-        </Box>
+      <DashboardDataBox
+        gridColumn = {`span ${isMobile ? 1 : isTablet ? 2 : 3}`}>
+            <Typography variant="h5" fontWeight="600" textAlign='center'>
+              Instructors
+          </Typography>
+            <Box display="flex" flexDirection="column" alignItems="center" mt="25px" 
+           >
+            <SchoolIcon sx={{ fontSize: '70px' }} />
+            <Typography variant="h5" color={colors.blueAccent[500]} sx={{ mt: "15px" }}>
+              {`${instructors} students`}
+            </Typography>
+            <Typography>Total instrcutord</Typography>
+          </Box>
+      </DashboardDataBox>
+
+      {/* students registered in 24 hours */}
+
+      <DashboardDataBox
+        gridColumn = {`span ${isMobile ? 1 : isTablet ? 2 : 3}`}>
+            <Typography variant="h5" fontWeight="600" textAlign='center'>
+              New students
+          </Typography>
+            <Box display="flex" flexDirection="column" alignItems="center" mt="25px" 
+           >
+            <PersonAddIcon  sx={{ fontSize: '70px' }} />
+            <Typography variant="h5" color={colors.blueAccent[500]} sx={{ mt: "15px" }}>
+              {`${usersData.studentsIn24Hrs || 0} students`}
+            </Typography>
+            <Typography>Sudents registered within 24hrs</Typography>
+          </Box>
+      </DashboardDataBox>
+
+      {/* enquiries */}
+
+      <DashboardDataBox
+        gridColumn = {`span ${isMobile ? 1 : isTablet ? 2 : 3}`}>
+            <Typography variant="h5" fontWeight="600" textAlign='center'>
+              Unread Enquiries
+          </Typography>
+            <Box display="flex" flexDirection="column" alignItems="center" mt="25px" 
+           >
+            <PersonAddIcon  sx={{ fontSize: '70px' }} />
+            <Typography variant="h5" color={colors.blueAccent[500]} sx={{ mt: "15px" }}>
+              {`2 Enquiries unread`}
+            </Typography>
+            <Typography>Read enquiries</Typography>
+          </Box>
+      </DashboardDataBox>
+
         <Box
           gridColumn="span 3"
           backgroundColor={colors.primary[400]}
@@ -110,12 +138,7 @@ const Admin = () => {
         </Box>
 
         {/* ROW 2 */}
-        <Box
-          gridColumn="span 8"
-          gridRow="span 2"
-          backgroundColor={colors.primary[400]}
-          sx={{ borderRadius: '10px'}}
-        >
+        <RowContainer>
           <Box
             mt="25px"
             p="0 30px"
@@ -137,9 +160,9 @@ const Admin = () => {
           <Box height="250px" m="-20px 0 0 0">
             <LineChart isDashboard={true} />
           </Box>
-        </Box>
 
-        {/* Outstanding Payments */}
+
+             {/* Outstanding Payments */}
         <Box
           gridColumn="span 4"
           gridRow="span 2"
@@ -177,13 +200,11 @@ const Admin = () => {
           </Box>
         </Box>
 
+        </RowContainer>
+
+
         {/* ROW 3 - Cohorts, Course Stats, Top Instructors */}
-        <Box
-          gridColumn="span 4"
-          gridRow="span 2"
-          overflow="auto"
-          p="15px"
-        >
+        <RowContainer>
           <Typography variant="h5" fontWeight="600" gutterBottom>
             Courses Stats
           </Typography>
@@ -212,7 +233,7 @@ const Admin = () => {
               </Box>
             </Box>
           ))}
-        </Box>
+        </RowContainer>
 
         {/* Top Instructors */}
         <Box
@@ -281,7 +302,10 @@ const Admin = () => {
             </Box>
           ))}
         </Box>
-      </Box>
+      </RowContainer>
+  </RowGrid>
+ </Box>
+
     );
   }
 };
