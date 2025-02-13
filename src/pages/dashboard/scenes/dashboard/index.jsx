@@ -9,13 +9,14 @@ import { useSelector } from 'react-redux';
 import withDashboardWrapper from '../../../../components/dasboardPagesContainer';
 import { useState } from 'react';
 import AnnouncementIcon from '@mui/icons-material/Announcement';
-import { MakeAnnouncement } from './modals';
+import { MakeAnnouncement, SubmitFeedback } from './modals';
 
 const Component = ({home}) => {
-  const [openAnouncementModal, setOpenAnouncementModal] = useState(false);
+  const [openFeedbackModal, setOpenFeedbackModal] = useState(false);
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
   const user = useSelector((state) => state.users.user);
+  const [openAnouncementModal, setOpenAnouncementModal] = useState(false);
 
   return (
     <Box >
@@ -72,6 +73,50 @@ const Component = ({home}) => {
       </Box>
       
           )}
+          {/* student feedbacks button */}
+          {user.role === 'student' && (
+        <Box
+        sx={{
+          display: 'flex',
+          flexDirection: { xs: 'column', sm: 'column', md: 'row' }, // Column layout on small and medium screens, row on larger screens
+          alignItems: 'center',  // Align center
+          justifyContent: 'center',  // Justify center
+          gap: '10px', // Optional: Adds some space between items
+        }}
+      >
+
+        <Button
+          onClick={() => {setOpenFeedbackModal(true)}}
+          sx={{
+            justifyItems: 'center',
+            backgroundColor: theme.palette.mode === 'light' ? colors.blueAccent[500] : colors.greenAccent[600],
+            color: theme.palette.mode === 'light' ? colors.grey[900] : colors.grey[100],
+            fontSize: { xs: '6px', sm: '10px', md: '12px' }, // Responsive font size
+            fontWeight: 'bold',
+            width: { xs: '100%', sm: '130px', md: '160px' }, // Responsive width for consistent size
+            height: { xs: '30px', sm: '40px' }, // Responsive width for consistent size
+            boxShadow: '0px 0px 4px rgba(0, 0, 0, 0.5)', // Lighter shadow for light mode
+          }}
+        >
+          <AnnouncementIcon sx={{ fontSize: { xs: '16px' } }} />
+          Submit Feeback
+        </Button>
+      
+        {/* Make Announcement modal */}
+        <MakeAnnouncement
+          openAnnoucementModal={openAnouncementModal}
+          setModalOpen={setOpenAnouncementModal}
+        />
+
+         {/* send feeback modal */}
+         <SubmitFeedback
+          openFeedbackModal={openFeedbackModal}
+          setModalOpen={setOpenFeedbackModal}
+        />
+      </Box>
+      
+          )}
+
 
           {user.role === 'instructor' && (
             <Box>

@@ -13,7 +13,8 @@ import ProgressCircle from '../../../components/ProgressCircle';
 import {
   DashboardDataBox,
   RowGrid,
-  RowContainer
+  RowContainer,
+  ResponsiveContainer
 } from '../../../components/dashbaordDataBox';
 
 const Admin = () => {
@@ -52,257 +53,249 @@ const Admin = () => {
 
       <RowGrid>
         {/* first row */}
-        <RowContainer>
-        {/* UI components */}
 
-        <DashboardDataBox
-        gridColumn = {`span ${isMobile ? 1 : isTablet ? 2 : 3}`}>
+      <RowContainer>
+      <ResponsiveContainer sm={6} md={3}>
+          <DashboardDataBox>
             <Typography variant="h5" fontWeight="600" textAlign='center'>
               Students
-          </Typography>
-            <Box display="flex" flexDirection="column" alignItems="center" mt="25px" 
-           >
-           <GroupsIcon sx={{ fontSize: '70px' }} />
-            <Typography variant="h5" color={colors.blueAccent[500]} sx={{ mt: "15px" }}>
-              {`${students} students`}
             </Typography>
-            <Typography>Total students</Typography>
-          </Box>
-      </DashboardDataBox>
+            <Box display="flex" flexDirection="column" alignItems="center" mt="25px">
+              <GroupsIcon sx={{ fontSize: '70px' }} />
+              <Typography variant="h5" color={colors.blueAccent[500]} sx={{ mt: "15px" }}>
+                {`${students} students`}
+              </Typography>
+              <Typography>Total students</Typography>
+            </Box>
+          </DashboardDataBox>
+        </ResponsiveContainer>
 
-      {/* instructors */}
-
-      <DashboardDataBox
-        gridColumn = {`span ${isMobile ? 1 : isTablet ? 2 : 3}`}>
+        {/* Instructors */}
+        <ResponsiveContainer sm={6} md={3}>
+          <DashboardDataBox>
             <Typography variant="h5" fontWeight="600" textAlign='center'>
               Instructors
-          </Typography>
-            <Box display="flex" flexDirection="column" alignItems="center" mt="25px" 
-           >
-            <SchoolIcon sx={{ fontSize: '70px' }} />
-            <Typography variant="h5" color={colors.blueAccent[500]} sx={{ mt: "15px" }}>
-              {`${instructors} students`}
             </Typography>
-            <Typography>Total instrcutord</Typography>
-          </Box>
-      </DashboardDataBox>
+            <Box display="flex" flexDirection="column" alignItems="center" mt="25px">
+              <SchoolIcon sx={{ fontSize: '70px' }} />
+              <Typography variant="h5" color={colors.blueAccent[500]} sx={{ mt: "15px" }}>
+                {`${instructors} instructors`}
+              </Typography>
+              <Typography>Total instructors</Typography>
+            </Box>
+          </DashboardDataBox>
+        </ResponsiveContainer>
 
-      {/* students registered in 24 hours */}
-
-      <DashboardDataBox
-        gridColumn = {`span ${isMobile ? 1 : isTablet ? 2 : 3}`}>
+        {/* New Students */}
+        <ResponsiveContainer sm={6} md={3}>
+          <DashboardDataBox>
             <Typography variant="h5" fontWeight="600" textAlign='center'>
               New students
-          </Typography>
-            <Box display="flex" flexDirection="column" alignItems="center" mt="25px" 
-           >
-            <PersonAddIcon  sx={{ fontSize: '70px' }} />
-            <Typography variant="h5" color={colors.blueAccent[500]} sx={{ mt: "15px" }}>
-              {`${usersData.studentsIn24Hrs || 0} students`}
             </Typography>
-            <Typography>Sudents registered within 24hrs</Typography>
-          </Box>
-      </DashboardDataBox>
+            <Box display="flex" flexDirection="column" alignItems="center" mt="25px">
+              <PersonAddIcon sx={{ fontSize: '70px' }} />
+              <Typography variant="h5" color={colors.blueAccent[500]} sx={{ mt: "15px" }}>
+                {`${usersData.studentsIn24Hrs || 0} students`}
+              </Typography>
+              <Typography>Students registered within 24hrs</Typography>
+            </Box>
+          </DashboardDataBox>
+        </ResponsiveContainer>
 
-      {/* enquiries */}
-
-      <DashboardDataBox
-        gridColumn = {`span ${isMobile ? 1 : isTablet ? 2 : 3}`}>
+        {/* Unread Enquiries */}
+        <ResponsiveContainer sm={6} md={3}>
+          <DashboardDataBox>
             <Typography variant="h5" fontWeight="600" textAlign='center'>
               Unread Enquiries
-          </Typography>
-            <Box display="flex" flexDirection="column" alignItems="center" mt="25px" 
-           >
-            <PersonAddIcon  sx={{ fontSize: '70px' }} />
-            <Typography variant="h5" color={colors.blueAccent[500]} sx={{ mt: "15px" }}>
-              {`2 Enquiries unread`}
             </Typography>
-            <Typography>Read enquiries</Typography>
-          </Box>
-      </DashboardDataBox>
+            <Box display="flex" flexDirection="column" alignItems="center" mt="25px">
+              <PersonAddIcon sx={{ fontSize: '70px' }} />
+              <Typography variant="h5" color={colors.blueAccent[500]} sx={{ mt: "15px" }}>
+                {`2 Enquiries unread`}
+              </Typography>
+              <Typography>Read enquiries</Typography>
+            </Box>
+          </DashboardDataBox>
+        </ResponsiveContainer>
 
-        <Box
-          gridColumn="span 3"
-          backgroundColor={colors.primary[400]}
-          display="flex"
-          alignItems="center"
-          justifyContent="center"
-          sx={{ borderRadius: '10px'}}
 
-        >
-          <StatBox
-            figure="2"
-            subtitle="Unread Enquiries"
-            icon={<EmailIcon sx={{ fontSize: '100%' }} />}
-          />
-        </Box>
+      </RowContainer>
 
         {/* ROW 2 */}
         <RowContainer>
-          <Box
-            mt="25px"
-            p="0 30px"
-            display="flex"
-            justifyContent="space-between"
-            alignItems="center"
-            sx={{ borderRadius: '10px'}}
+        <ResponsiveContainer md={8}>
+            <DashboardDataBox noFlex>
+              <Box
+                mt="25px"
+                p="0 30px"
+                display="flex"
+                justifyContent="space-between"
+                alignItems="center"
+                sx={{ borderRadius: '10px'}}
+              >
+                <Box p="10px 0">
+                  <Typography variant="h5" fontWeight="600" color={colors.grey[100]}>
+                    Revenue Generated
+                  </Typography>
+                  <Typography variant="h3" fontWeight="bold">
+                    {`₦${totalRevenue}`}
+                  </Typography>
+                </Box>
+              </Box>
+              <Box height="250px" m="-20px 0 0 0">
+                <LineChart isDashboard={true} />
+              </Box>
+            </DashboardDataBox>
+          </ResponsiveContainer>
 
-          >
-            <Box p="10px 0">
-              <Typography variant="h5" fontWeight="600" color={colors.grey[100]}>
-                Revenue Generated
+          <ResponsiveContainer md={4}>
+            <DashboardDataBox>
+              <Typography variant="h5" fontWeight="600" pb="30px">
+                Outstanding Payments
               </Typography>
-              <Typography variant="h3" fontWeight="bold">
-                {`₦${totalRevenue}`}
-              </Typography>
-            </Box>
-          </Box>
-          <Box height="250px" m="-20px 0 0 0">
-            <LineChart isDashboard={true} />
-          </Box>
+              <Box
+                display="flex"
+                flexDirection="column"
+                alignItems="center"
+                mt="25px"
+                mb="25px"
+              >
+                <ProgressCircle
+                  size="125"
+                  progress={outstandingPayments.totalOutstanding > 0 ? ((outstandingPayments.totalOutstanding / totalRevenue) * 100).toFixed(2) : 0}
+                />
+                <Typography
+                  variant="h5"
+                  color={colors.blueAccent[500]}
+                  sx={{ pt: '20px' }}
+                >
+                  ₦{outstandingPayments.totalOutstanding} outstanding payment
+                </Typography>
+                <Typography>
+                  {outstandingPayments.totalOutstanding > 0 ? ((outstandingPayments.totalOutstanding / totalRevenue) * 100).toFixed(2) : 0}% of total expected payments
+                </Typography>
+              </Box>
+            </DashboardDataBox>
+          </ResponsiveContainer>
 
-
-             {/* Outstanding Payments */}
-        <Box
-          gridColumn="span 4"
-          gridRow="span 2"
-          backgroundColor={colors.primary[400]}
-          p="30px"
-          justifyContent="space-between"
-          alignItems="center"
-          sx={{ borderRadius: '10px'}}
-
-        >
-          <Typography variant="h5" fontWeight="600" pb="30px">
-            Outstanding Payments
-          </Typography>
-          <Box
-            display="flex"
-            flexDirection="column"
-            alignItems="center"
-            mt="25px"
-            mb="25px"
-          >
-            <ProgressCircle
-              size="125"
-              progress={outstandingPayments.totalOutstanding > 0 ? ((outstandingPayments.totalOutstanding / totalRevenue) * 100).toFixed(2) : 0}
-            />
-            <Typography
-              variant="h5"
-              color={colors.blueAccent[500]}
-              sx={{ pt: '20px' }}
-            >
-              ₦{outstandingPayments.totalOutstanding} outstanding payment
-            </Typography>
-            <Typography>
-              {outstandingPayments.totalOutstanding > 0 ? ((outstandingPayments.totalOutstanding / totalRevenue) * 100).toFixed(2) : 0}% of total expected payments
-            </Typography>
-          </Box>
-        </Box>
 
         </RowContainer>
 
 
         {/* ROW 3 - Cohorts, Course Stats, Top Instructors */}
         <RowContainer>
-          <Typography variant="h5" fontWeight="600" gutterBottom>
-            Courses Stats
-          </Typography>
-
-          {sortedProgramStats.map(({ program, studentCount, totalAmount }) => (
-            <Box
-              key={program}
-              display="flex"
-              flexDirection="row"
-              alignItems="center"
-              justifyContent="space-between"
-              p="15px"
-              mb="10px"
-              sx={{backgroundColor: conBg, borderRadius: '10px'}}
-            >
-              {/* Avatar for Program */}
-              <Avatar>{program.charAt(0)}</Avatar>
-
-              {/* Program Details */}
-              <Box display="flex" flexDirection="column" ml="15px">
-                <Typography variant="h6" fontWeight="600">
-                  {program}
-                </Typography>
-                <Typography variant="body1">Students: {studentCount}</Typography>
-                <Typography variant="body1">Total Revenue: ₦{totalAmount}</Typography>
-              </Box>
-            </Box>
-          ))}
-        </RowContainer>
-
-        {/* Top Instructors */}
-        <Box
-          gridColumn="span 4"
-          gridRow="span 2"
-          overflow="auto"
-          p="15px"
-        >
-          <Typography variant="h5" fontWeight="600" gutterBottom>
-            Top Instructors
-          </Typography>
-
-          {topInstructors.map((instructor) => (
-            <Box
-              key={instructor.firstName + instructor.lastName}
-              display="flex"
-              flexDirection="row"
-              alignItems="center"
-              justifyContent="space-between"
-              p="15px"
-              mb="10px"
-              sx={{backgroundColor: conBg, borderRadius: '10px'}}
-            >
-              {/* Avatar for Instructor */}
-              <Avatar src={instructor.profilePictureUrl}>{instructor.firstName.charAt(0)}</Avatar>
-
-              {/* Instructor Details */}
-              <Box display="flex" flexDirection="column" ml="15px">
-                <Typography variant="h6" fontWeight="600">
-                  {instructor.firstName} {instructor.lastName}
-                </Typography>
-                <Typography variant="body1">Rating: {instructor.rating}</Typography>
-                <Typography variant="body1">Program: {instructor.program}</Typography>
-              </Box>
-            </Box>
-          ))}
-        </Box>
-
-        {/* Cohorts Box */}
-        <Box
-          gridColumn="span 4"
-          gridRow="span 2"
-          overflow="auto"
-          p="15px"
-          sx={{ backgroundColor: colors.blueAccent[900], borderRadius: '10px' }}
-
-        >
-          <Typography variant="h5" fontWeight="600" gutterBottom>
-            Cohorts
-          </Typography>
-          {mockCohorts.map((cohort, index) => (
-            <Box
-              key={index}
-              display="flex"
-              flexDirection="column"
-              alignItems="flex-start"
-              p="15px"
-              mb="10px"
-            >
-              <Typography variant="h6" fontWeight="600">
-                {cohort.name}
+        <ResponsiveContainer md={4}>
+            <DashboardDataBox 
+            noFlex 
+            moreStyles={{
+            height: '400px',
+            overflowY: 'auto'
+          }}>
+              <Typography variant="h5" fontWeight="600" gutterBottom>
+                Courses Stats
               </Typography>
-              <Typography variant="body1">Course: {cohort.courseName}</Typography>
-              <Typography variant="body1">Number of Students: {cohort.numStudents}</Typography>
-              <Typography variant="body1">Progress: {cohort.progress}%</Typography>
-            </Box>
-          ))}
-        </Box>
+
+              {sortedProgramStats.map(({ program, studentCount, totalAmount }) => (
+                <Box key={program}>
+                  <Box
+                    display="flex"
+                    flexDirection="row"
+                    alignItems="center"
+                    justifyContent="space-between"
+                    p="15px"
+                    mb="10px"
+                    sx={{ backgroundColor: conBg, borderRadius: '10px' }}
+                  >
+                    {/* Avatar for Program */}
+                    <Avatar>{program.charAt(0)}</Avatar>
+
+                    {/* Program Details */}
+                    <Box display="flex" flexDirection="column" ml="15px">
+                      <Typography variant="h6" fontWeight="600" textAlign='right'>
+                        {program}
+                      </Typography>
+                      <Typography variant="body1" textAlign='right'>Students: {studentCount}</Typography>
+                      <Typography variant="body1" textAlign='right'>Total Revenue: ₦{totalAmount}</Typography>
+                    </Box>
+                  </Box>
+                </Box>
+              ))}
+            </DashboardDataBox>
+          </ResponsiveContainer>
+
+          <ResponsiveContainer md={4}>
+            <DashboardDataBox noFlex
+                moreStyles={{
+                  height: '400px',
+                  overflowY: 'auto'
+                }}>
+              <Typography variant="h5" fontWeight="600" gutterBottom>
+                Top Instructors
+              </Typography>
+
+              {topInstructors.map((instructor) => (
+                <Box key={instructor.firstName + instructor.lastName}>
+                  <Box
+                    display="flex"
+                    flexDirection="row"
+                    alignItems="center"
+                    justifyContent="space-between"
+                    p="15px"
+                    mb="10px"
+                    sx={{ backgroundColor: conBg, borderRadius: '10px' }}
+                  >
+                    {/* Avatar for Instructor */}
+                    <Avatar src={instructor.profilePictureUrl}>{instructor.firstName.charAt(0)}</Avatar>
+
+                    {/* Instructor Details */}
+                    <Box display="flex" flexDirection="column" ml="15px" >
+                      <Typography variant="h6" fontWeight="600" textAlign='right'>
+                        {instructor.firstName} {instructor.lastName}
+                      </Typography>
+                      <Typography variant="body1" textAlign='right'>Rating: {instructor.rating}</Typography>
+                      <Typography variant="body1" textAlign='right'>Program: {instructor.program}</Typography>
+                    </Box>
+                  </Box>
+                </Box>
+              ))}
+            </DashboardDataBox>
+          </ResponsiveContainer>
+
+          <ResponsiveContainer md={4}>
+            <DashboardDataBox noFlex
+                moreStyles={{
+                  height: '400px',
+                  overflowY: 'auto'
+                }}>
+              <Typography variant="h5" fontWeight="600" gutterBottom>
+                Cohorts
+              </Typography>
+
+              {mockCohorts.map((cohort, index) => (
+                <Box key={index}>
+                  <Box
+                    display="flex"
+                    flexDirection="column"
+                    alignItems="flex-start"
+                    p="15px"
+                    mb="10px"
+                    sx={{ backgroundColor: conBg, borderRadius: '10px' }}
+
+                  >
+                    <Typography variant="h6" fontWeight="600">
+                      {cohort.name}
+                    </Typography>
+                    <Typography variant="body1">Course: {cohort.courseName}</Typography>
+                    <Typography variant="body1">Number of Students: {cohort.numStudents}</Typography>
+                    <Typography variant="body1">Progress: {cohort.progress}%</Typography>
+                  </Box>
+                </Box>
+              ))}
+            </DashboardDataBox>
+          </ResponsiveContainer>
+
       </RowContainer>
+
   </RowGrid>
  </Box>
 

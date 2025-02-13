@@ -23,7 +23,6 @@ const Line = lazy(() => import("./scenes/line"));
 const Pie = lazy(() => import("./scenes/pie"));
 const Enquiries = lazy(() => import("./scenes/enquiries"));
 const UserManagement = lazy(() => import("./scenes/userManagement"));
-const ContentManagement = lazy(() => import("./scenes/contentManagement"));
 const CourseManagement = lazy(() => import("./scenes/courseManagement"));
 const Feedbacks = lazy(() => import("./scenes/feebacks"));
 const Support = lazy(() => import("./scenes/support"));
@@ -67,7 +66,6 @@ function DashboardHome() {
             <Route path="/line" element={<Line />} />
             <Route path="/enquiries" element={<Enquiries />} />
             <Route path="/userManagement" element={<UserManagement />} />
-            <Route path="/contentManagement" element={<ContentManagement />} />
             <Route path="/courseManagement" element={<CourseManagement />} />
             <Route path="/feedbacks" element={<Feedbacks />} />
             <Route path="/support" element={<Support />} />

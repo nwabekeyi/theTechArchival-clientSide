@@ -19,34 +19,24 @@ import {
   ResponsiveContainer,
   DashboardDataBox
 } from '../../../components/dashbaordDataBox'
+import { endpoints } from "../../../../../utils/constants";
+import useApi from "../../../../../hooks/useApi";
 
-const Student = ({ user }) => {
+const Student = () => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
-
+  const { data, loading, callApi } = useApi();
   const [resources, setResources] = useState([]);
   const { progressPercentage, attendanceRate, outstandings, nextClass, timeTableData, formatDateToDDMMYYYY } = useStudentData();
+  const [announcements, setAnnouncements] = useState(null);
 
-  const mockAnnouncements = [
-    {
-      id: 1,
-      title: "New Semester Starts",
-      message: "The new semester starts on January 15th. Please review your schedule.",
-      date: "2024-12-22",
-    },
-    {
-      id: 2,
-      title: "Maintenance Window",
-      message: "Scheduled maintenance will occur on December 24th. Plan accordingly.",
-      date: "2024-12-22",
-    },
-    {
-      id: 3,
-      title: "Holiday Break",
-      message: "Holiday break starts on December 23rd. Classes resume January 10th.",
-      date: "2024-12-22",
-    },
-  ];
+  useEffect(async() => {
+    const response = await callApi(endpoints.ANNOUNCEMENT, "GET");
+    if(response){
+      console.log(response)
+      setAnnouncements(response);
+    }
+  }, []);
 
   useEffect(() => {
     let isMounted = true;
@@ -158,29 +148,36 @@ const Student = ({ user }) => {
 
         {/* THIRD ROW */}
         <RowContainer>
-          <ResponsiveContainer md={6}>
-            <DashboardDataBox noFlex
-                moreStyles={{
-                  height: '400px',
-                  overflowY: 'auto'
-                }}
-                >
+        <ResponsiveContainer md={6}>
+            <DashboardDataBox
+              noFlex
+              moreStyles={{
+                height: '400px',
+                overflowY: 'auto'
+              }}
+            >
               <Typography variant="h5" fontWeight="600" mb="15px">
                 Announcements
               </Typography>
-              {mockAnnouncements.map((announcement) => (
-                <Card key={announcement.id} sx={{ mb: 2 }}>
-                  <CardContent sx={{ backgroundColor: conBg }}>
-                    <Typography variant="h6">{announcement.title}</Typography>
-                    <Typography variant="body2">{announcement.message}</Typography>
-                    <Typography variant="caption" color="gray">
-                      {announcement.date}
-                    </Typography>
-                  </CardContent>
-                </Card>
-              ))}
+              {announcements && announcements.length > 0 ? (
+                announcements.map((announcement) => (
+                  <Card key={announcement.id} sx={{ mb: 2 }}>
+                    <CardContent sx={{ backgroundColor: conBg }}>
+                      <Typography variant="h6">{announcement.title}</Typography>
+                      <Typography variant="body2">{announcement.message}</Typography>
+                      <Typography variant="caption" color="gray">
+                        {announcement.date}
+                      </Typography>
+                    </CardContent>
+                  </Card>
+                ))
+              ) : (
+                <Typography>No announcements available</Typography>
+              )}
             </DashboardDataBox>
           </ResponsiveContainer>
+
+
           <ResponsiveContainer md={6} >
             <DashboardDataBox noFlex   moreStyles={{
             height: '400px',

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { TextField, Box } from '@mui/material';
+import { TextField, Box, FormControl, InputLabel, Select, MenuItem } from '@mui/material';
 import Modal from '../../components/modal';
 import useApi from '../../../../hooks/useApi';
 import { endpoints } from '../../../../utils/constants';
@@ -92,4 +92,93 @@ const MakeAnnouncement = ({ openAnnoucementModal, setModalOpen }) => {
   );
 };
 
-export { MakeAnnouncement };
+
+const SubmitFeedback = ({ openFeedbackModal, setModalOpen }) => {
+  const [name, setName] = useState('');
+  const [role, setRole] = useState('');
+  const [date, setDate] = useState('');
+  const [comments, setComments] = useState('');
+
+  const {
+    data,
+    loading: submitLoading,
+    error: submitError,
+    callApi: submitFeedback,
+  } = useApi();
+
+  const [confirmModal, setConfirmModal] = useState(false);
+
+// Handle form submission to save feedback to the server
+const handleSubmit = async () => {
+  const newFeedback = { name, role, date, comments };
+
+  await submitFeedback(endpoints.FEEDBACKS, 'POST', newFeedback);
+
+  if (!submitError) {
+    setConfirmModal(true);
+    // Update feedback list with the newly added feedback
+    setName('');
+    setRole('');
+    setDate('');
+    setComments('');
+  }
+};
+
+
+  return (
+    <>
+      <Modal
+        open={openFeedbackModal}
+        onClose={() => setModalOpen(false)}
+        title="Send Feedbacks"
+        onConfirm={handleSubmit}
+      >
+        <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+          <TextField
+          label="Name"
+          value={name}
+          onChange={(e) => setName(e.target.value)}
+          fullWidth
+          margin="normal"
+        />
+        <FormControl fullWidth margin="normal">
+          <InputLabel>Role</InputLabel>
+          <Select value={role} onChange={(e) => setRole(e.target.value)}>
+            <MenuItem value="student">Student</MenuItem>
+            <MenuItem value="instructor">Instructor</MenuItem>
+            <MenuItem value="worker">Worker</MenuItem>
+          </Select>
+        </FormControl>
+        <TextField
+          label="Date"
+          type="date"
+          value={date}
+          onChange={(e) => setDate(e.target.value)}
+          fullWidth
+          margin="normal"
+          InputLabelProps={{ shrink: true }}
+        />
+        <TextField
+          label="Comments"
+          value={comments}
+          onChange={(e) => setComments(e.target.value)}
+          fullWidth
+          margin="normal"
+          multiline
+          rows={4}
+        />
+        </Box>
+      </Modal>
+
+      {/* Confirmation modal for success or error */}
+      <ConfirmationModal
+        open={confirmModal}
+        isLoading={submitLoading}
+        onClose={() => setConfirmModal(false)}
+        title="Feedback confirmantion"
+        message={ data ? 'Feeback submitted successfully!' : 'Could not submit announcement.'}
+      />
+    </>
+  );
+};
+export { MakeAnnouncement, SubmitFeedback };
