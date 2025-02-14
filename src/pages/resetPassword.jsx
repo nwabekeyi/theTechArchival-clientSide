@@ -4,36 +4,56 @@ import { Container, Typography, TextField, Button, Box, CircularProgress, Alert 
 import Footer from './homePage/components/Footer';
 import Navbar from './homePage/components/Header';
 import LoadingButton from "../components/loadingButton";
+import useApi from '../hooks/useApi';
+import { endpoints } from '../utils/constants';
+import Modal from '../pages/dashboard/components/modal'
+import BackgroundWithHOme from "../components/backgroundWithHome";
 
-const ConfirmPassword = () => {
+
+const SmapleComponent = () => {
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
+  const [error, setError] = useState('');
+  const [successModal, setSuccessModal] = useState(false);
 
-  // Get the email and token from the URL query parameters
+
   const [searchParams] = useSearchParams();
   const email = searchParams.get('email');
   const token = searchParams.get('token');
+  console.log(endpoints.RESET_PASSWORD)
 
+  const { loading, data, error: apiError, callApi } = useApi();
   const navigate = useNavigate();
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
+  const handleSucessModalClose = () => {
+    setSuccessModal(false);
+    navigate('/');
+
+  };
+
+  const handleSucessModalConfrim = () => {
+      navigate('/signin');
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();  // Prevent page reload
 
     if (newPassword !== confirmPassword) {
       setError('Passwords do not match.');
       return;
     }
+    const body = {
+      email,
+      token,
+      newPassword
+    };
 
-    setLoading(true);
-    setError('');
-    // Simulate a request for password reset
-    setTimeout(() => {
-      setLoading(false);
-      setSuccess('Password reset successful!');
-    }, 2000);
+    const response = await callApi(endpoints.RESET_PASSWORD, 'PATCH', body);
+    if(response && response.message === 'Password reset successful'){
+      setSuccessModal(true);
+      setSuccess(data.message);
+    }
   };
 
   return (
@@ -44,23 +64,21 @@ const ConfirmPassword = () => {
       {/* Main Content */}
       <Box
         sx={{
-          minHeight: '100vh',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          background: 'linear-gradient(135deg, #f5f7fa, #c3cfe2)', // Gradient background
-          p: 3,
+          minHeight: "100vh",
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          flexDirection: "column",
+          gap: "30px",
         }}
       >
-        <Container
-          maxWidth="sm"
+        <Box
           sx={{
-            p: 4,
-            background: 'linear-gradient(135deg, rgba(255,255,255,0.2), rgba(255,255,255,0.1))',
-            backdropFilter: 'blur(80px)',
+            p: 3,
+            textAlign: "start",
+            backgroundColor: "white",
+            boxShadow: 10,
             borderRadius: 2,
-            boxShadow: 3, // Add shadow for depth
-            textAlign: 'start',
           }}
         >
           <Typography variant="h4" gutterBottom sx={{ fontWeight: 'bold', color: 'black' }}>
@@ -104,8 +122,7 @@ const ConfirmPassword = () => {
               color="primary"
               fullWidth
               size="large"
-              loading={loading}
-              disabled={loading}
+              isLoading={loading}
               sx={{
                 py: 1.5,
                 fontSize: '1rem',
@@ -128,13 +145,29 @@ const ConfirmPassword = () => {
               {success}
             </Alert>
           )}
-        </Container>
+        </Box>
       </Box>
 
       {/* Footer */}
       <Footer />
+
+       {/* Confirmation Modal for Deleting Assignment */}
+       <Modal
+        open={successModal}
+        onClose={handleSucessModalClose}
+        title="Confirm Deletion"
+        onConfirm={handleSucessModalConfrim }
+      >
+        <Box>
+          <p>Password reset successful. Do you want to login?</p>
+        </Box>
+      </Modal>
     </div>
   );
 };
 
-export default ConfirmPassword;
+
+const ForgotPassword = BackgroundWithHOme(SmapleComponent);
+
+
+export default ForgotPassword;
