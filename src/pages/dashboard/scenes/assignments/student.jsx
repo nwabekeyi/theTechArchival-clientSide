@@ -184,6 +184,7 @@ const Assignment = () => {
             onPageChange={handlePageChange}
             onRowsPerPageChange={handleRowsPerPageChange}
             onRowClick={handleRowClick}
+            hiddenColumnsSmallScreen={['dueDate', 'description']}
           />
         </Box>
       )}

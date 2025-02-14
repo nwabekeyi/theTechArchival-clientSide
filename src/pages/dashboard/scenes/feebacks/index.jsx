@@ -23,10 +23,7 @@ const Feedbacks = () => {
   const colors = tokens(theme.palette.mode);
 
   const [feedbacks, setFeedbacks] = useState([]);
-  const [name, setName] = useState('');
-  const [role, setRole] = useState('');
-  const [date, setDate] = useState('');
-  const [comments, setComments] = useState('');
+
 
   // Using useApi for fetching feedbacks and submitting new feedback
   const {
@@ -36,11 +33,6 @@ const Feedbacks = () => {
     callApi: fetchFeedbacks,
   } = useApi();
 
-  const {
-    loading: submitLoading,
-    error: submitError,
-    callApi: submitFeedback,
-  } = useApi();
 
   // Fetch feedbacks when the component mounts
   useEffect(() => {
@@ -54,25 +46,9 @@ const Feedbacks = () => {
     }
   }, [fetchData]);
 
-  // Handle form submission to save feedback to the server
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    const newFeedback = { name, role, date, comments };
-
-    await submitFeedback(endpoints.FEEDBACKS, 'POST', newFeedback);
-
-    if (!submitError) {
-      // Update feedback list with the newly added feedback
-      setFeedbacks((prevFeedbacks) => [...prevFeedbacks, newFeedback]);
-      setName('');
-      setRole('');
-      setDate('');
-      setComments('');
-    }
-  };
 
   const columns = [
-    { id: 'id', label: 'ID', flex: 0.5 },
+    { id: 'id', label: 'S/N', flex: 0.5 },
     { id: 'name', label: 'Name', flex: 1 },
     { id: 'role', label: 'Role', flex: 1 },
     { id: 'date', label: 'Date', flex: 1 },
@@ -115,53 +91,7 @@ const Feedbacks = () => {
 
       {fetchLoading && <Typography>Loading feedbacks...</Typography>}
       {fetchError && <Typography color="error">{fetchError}</Typography>}
-
-      <Box component="form" onSubmit={handleSubmit} sx={{ mt: 3, mb: 3 }}>
-        <TextField
-          label="Name"
-          value={name}
-          onChange={(e) => setName(e.target.value)}
-          fullWidth
-          margin="normal"
-        />
-        <FormControl fullWidth margin="normal">
-          <InputLabel>Role</InputLabel>
-          <Select value={role} onChange={(e) => setRole(e.target.value)}>
-            <MenuItem value="student">Student</MenuItem>
-            <MenuItem value="instructor">Instructor</MenuItem>
-            <MenuItem value="worker">Worker</MenuItem>
-          </Select>
-        </FormControl>
-        <TextField
-          label="Date"
-          type="date"
-          value={date}
-          onChange={(e) => setDate(e.target.value)}
-          fullWidth
-          margin="normal"
-          InputLabelProps={{ shrink: true }}
-        />
-        <TextField
-          label="Comments"
-          value={comments}
-          onChange={(e) => setComments(e.target.value)}
-          fullWidth
-          margin="normal"
-          multiline
-          rows={4}
-        />
-        <Button
-          type="submit"
-          variant="contained"
-          color="primary"
-          sx={{ mt: 2 }}
-          disabled={submitLoading}
-        >
-          {submitLoading ? 'Submitting...' : 'Submit Feedback'}
-        </Button>
-        {submitError && <Typography color="error">{submitError}</Typography>}
-      </Box>
-
+      
       <Box
         height="75vh"
         sx={{

@@ -1,11 +1,12 @@
 import React, { useEffect, useState } from 'react';
-import { Box, Typography } from '@mui/material';
+import { Box, Typography, Grid, useMediaQuery } from '@mui/material';
 import { useTheme } from '@mui/material';
 import { tokens } from '../../theme';
 import { useSelector } from 'react-redux';
 import useApi from '../../../../hooks/useApi';
 import { endpoints } from '../../../../utils/constants';
 import withDashboardWrapper from '../../../../components/dasboardPagesContainer';
+import Header from '../../components/Header';
 
 const InstructorReviews = () => {
   const theme = useTheme();
@@ -14,8 +15,11 @@ const InstructorReviews = () => {
   
   // Accessing the instructorId from the Redux store
   const instructorId = useSelector((state) => state.users.user._id); // Make sure this is correctly set in the Redux store
-
+  
   const [reviews, setReviews] = useState([]);
+  
+  // Check if the screen size is small
+  const isSmallScreen = useMediaQuery(theme.breakpoints.down('sm'));
 
   useEffect(() => {
     if (instructorId) {
@@ -43,28 +47,55 @@ const InstructorReviews = () => {
 
   return (
     <Box>
-      <Typography variant="h4" fontWeight="600" mb="20px" color={colors.greenAccent[500]}>
-        Instructor Reviews
-      </Typography>
+      <Grid item xs={12}>
+        <Header title="Instructor's reviews" subtitle="Student reviews" />
+      </Grid>
+
       {reviews.length > 0 ? (
-        reviews.map((review, index) => (
-          <Box
-            key={index}
-            mb={2}
-            p={2}
-            borderRadius="8px"
-            boxShadow={2}
-            bgcolor={colors.primary[400]}
-            sx={{ display: 'flex', flexDirection: 'column' }}
-          >
-            <Typography variant="body1" sx={{ mt: 1 }}>
-              Rating: {review.rating} / 5
-            </Typography>
-            <Typography variant="body2" sx={{ mt: 1 }}>
-              {review.reviewText || 'No review text provided.'}
-            </Typography>
+        // Conditionally render Grid or simple layout based on screen size
+        isSmallScreen ? (
+          // Simple layout without Grid on small screens
+          <Box>
+            {reviews.map((review, index) => (
+              <Box
+                key={index}
+                p={2}
+                mb={2}
+                borderRadius="8px"
+                boxShadow={2}
+                bgcolor={colors.primary[400]}
+              >
+                <Typography variant="body1" sx={{ mt: 1 }}>
+                  Rating: {review.rating} / 5
+                </Typography>
+                <Typography variant="body2" sx={{ mt: 1 }}>
+                  {review.reviewText || 'No review text provided.'}
+                </Typography>
+              </Box>
+            ))}
           </Box>
-        ))
+        ) : (
+          // Grid layout for larger screens
+          <Grid container spacing={2}>
+            {reviews.map((review, index) => (
+              <Grid item xs={12} sm={6} key={index}>
+                <Box
+                  p={2}
+                  borderRadius="8px"
+                  boxShadow={2}
+                  bgcolor={colors.primary[400]}
+                >
+                  <Typography variant="body1" sx={{ mt: 1 }}>
+                    Rating: {review.rating} / 5
+                  </Typography>
+                  <Typography variant="body2" sx={{ mt: 1 }}>
+                    {review.reviewText || 'No review text provided.'}
+                  </Typography>
+                </Box>
+              </Grid>
+            ))}
+          </Grid>
+        )
       ) : (
         <Typography>No reviews available for this instructor.</Typography>
       )}

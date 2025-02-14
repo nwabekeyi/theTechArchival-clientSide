@@ -1,83 +1,3 @@
-
-
-// import { useState, useEffect } from 'react';
-// import useApi from '../../../../hooks/useApi';
-
-// export const useEnquiries = () => {
-//   const [enquiries, setEnquiries] = useState([]);
-//   const [error, setError] = useState(null);
-//   const [confirmDeleteModal, setConfirmDeleteModal] = useState(false);
-//   const { callApi, loading } = useApi();
-
-//   // Open/close delete modal
-//   const openDeleteModal = () => setConfirmDeleteModal(true);
-//   const closeDeleteModal = () => setConfirmDeleteModal(false);
-
-//   // Fetch all enquiries
-//   useEffect(() => {
-//     const fetchEnquiries = async () => {
-//       setError(null);
-//       try {
-//         const data = await callApi(
-//           `${import.meta.env.VITE_API_BASE_URL}${import.meta.env.VITE_ENQUIRIES_ENDPOINT}`,
-//           'GET'
-//         );
-//         setEnquiries(Array.isArray(data) ? data : []);
-//       } catch (err) {
-//         console.error('Error fetching enquiries:', err);
-//         setError('Failed to fetch enquiries');
-//       }
-//     };
-
-//     fetchEnquiries();
-//   }, [callApi]);
-
-//   // Mark an enquiry as read
-//   const markAsRead = async (id) => {
-//     try {
-//       const updatedEnquiry = await callApi(
-//         `${import.meta.env.VITE_API_BASE_URL}${import.meta.env.VITE_ENQUIRIES_ENDPOINT}/${id}`,
-//         'PATCH'
-//       );
-//       setEnquiries((prev) =>
-//         prev.map((enquiry) =>
-//           enquiry._id === id ? { ...enquiry, read: updatedEnquiry.read } : enquiry
-//         )
-//       );
-//     } catch (err) {
-//       console.error('Error updating enquiry:', err);
-//       setError('Failed to update enquiry');
-//     }
-//   };
-
-//   // Remove an enquiry
-//   const removeEnquiry = async (id) => {
-//     try {
-//       await callApi(
-//         `${import.meta.env.VITE_API_BASE_URL}${import.meta.env.VITE_ENQUIRIES_ENDPOINT}/${id}`,
-//         'DELETE'
-//       );
-//       setEnquiries((prev) => prev.filter((enquiry) => enquiry._id !== id));
-//     } catch (err) {
-//       console.error('Error deleting enquiry:', err);
-//       setError('Failed to delete enquiry');
-//     }
-//   };
-
-//   return {
-//     enquiries,
-//     loading,
-//     error,
-//     markAsRead,
-//     removeEnquiry,
-//     openDeleteModal,
-//     closeDeleteModal,
-//     confirmDeleteModal,
-//   };
-// };
-
-
-
 import { useState, useEffect } from 'react';
 import useApi from '../../../../hooks/useApi';
 
@@ -87,28 +7,34 @@ export const useEnquiries = () => {
   const [error, setError] = useState(null);
   const [confirmDeleteModal, setConfirmDeleteModal] = useState(false);
 
-  const { callApi, loading } = useApi();
+  // Create separate instances of useApi for each API operation
+  const { callApi: fetchEnquiriesApi, loading: fetchingEnquiries } = useApi();
+  const { callApi: markAsReadApi, loading: markingAsRead } = useApi();
+  const { callApi: removeEnquiryApi, loading: removingEnquiry } = useApi();
 
   // Fetch all enquiries
-  useEffect(() => {
-    const fetchEnquiries = async () => {
-      setError(null);
-      try {
-        const data = await callApi(`${import.meta.env.VITE_API_BASE_URL}${import.meta.env.VITE_ENQUIRIES_ENDPOINT}`, 'GET');
-        setEnquiries(Array.isArray(data) ? data : []);
-      } catch (err) {
-        console.error('Error fetching enquiries:', err);
-        setError('Failed to fetch enquiries');
-      }
-    };
-
-    fetchEnquiries();
-  }, [callApi]);
+  const fetchEnquiries = async () => {
+    setError(null);
+    try {
+      console.log('hey')
+      const data = await fetchEnquiriesApi(
+        `${import.meta.env.VITE_API_BASE_URL}${import.meta.env.VITE_ENQUIRY_ENDPOINT}`,
+        'GET'
+      );
+      setEnquiries(Array.isArray(data) ? data : []);
+    } catch (err) {
+      console.error('Error fetching enquiries:', err);
+      setError('Failed to fetch enquiries');
+    }
+  };
 
   // Mark an enquiry as read
   const markAsRead = async (id) => {
     try {
-      const updatedEnquiry = await callApi(`${import.meta.env.VITE_API_BASE_URL}${import.meta.env.VITE_ENQUIRIES_ENDPOINT}/${id}`, 'PATCH');
+      const updatedEnquiry = await markAsReadApi(
+        `${import.meta.env.VITE_API_BASE_URL}${import.meta.env.VITE_ENQUIRY_ENDPOINT}/${id}`,
+        'PATCH'
+      );
       setEnquiries((prev) =>
         prev.map((enquiry) =>
           enquiry._id === id ? { ...enquiry, read: updatedEnquiry.read } : enquiry
@@ -123,13 +49,21 @@ export const useEnquiries = () => {
   // Remove an enquiry
   const removeEnquiry = async (id) => {
     try {
-      await callApi(`${import.meta.env.VITE_API_BASE_URL}${import.meta.env.VITE_ENQUIRIES_ENDPOINT}/${id}`, 'DELETE');
+      await removeEnquiryApi(
+        `${import.meta.env.VITE_API_BASE_URL}${import.meta.env.VITE_ENQUIRY_ENDPOINT}/${id}`,
+        'DELETE'
+      );
       setEnquiries((prev) => prev.filter((enquiry) => enquiry._id !== id));
     } catch (err) {
       console.error('Error deleting enquiry:', err);
       setError('Failed to delete enquiry');
     }
   };
+
+  // Fetch enquiries on component mount
+  useEffect(() => {
+    fetchEnquiries();
+  }, []);
 
   // Open modal for selected enquiry
   const openModal = (enquiry) => {
@@ -146,11 +80,13 @@ export const useEnquiries = () => {
   return {
     enquiries,
     selectedEnquiry,
-    loading,
+    loading: fetchingEnquiries || markingAsRead || removingEnquiry, // Combine all loading states
     error,
+    fetchEnquiries,
+    markAsRead,
+    removeEnquiry,
     openModal,
     closeModal,
     confirmDeleteModal,
-    removeEnquiry,
   };
 };

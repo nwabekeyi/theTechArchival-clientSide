@@ -30,9 +30,18 @@ const SettingsPopover = ({ anchorEl, handleClose, userDetails }) => {
   const colors = tokens(theme.palette.mode);
   const open = Boolean(anchorEl);
   const navigate = useNavigate();
-  const dispatch = useDispatch();
   const { logout } = useAuth();
-  const { firstName, lastName, email, profilePictureUrl, role, userId } = userDetails;
+  const {
+    program,
+    cohort,
+    phoneNumber,
+    studentId,
+    firstName,
+    lastName,
+    email,
+    profilePictureUrl,
+    role,
+    userId } = userDetails;
   const colorMode = useContext(ColorModeContext);
   const [submissionMessageModal, SetSubmissionMessageModal] = useState(false);
   const { loading, error, data, callApi } = useApi();
@@ -62,6 +71,7 @@ const SettingsPopover = ({ anchorEl, handleClose, userDetails }) => {
 
   const handleProfileClick = () => {
     setProfileOpen(true);
+    handleClose();
   };
 
   const handleProfileClose = () => {
@@ -110,7 +120,6 @@ const SettingsPopover = ({ anchorEl, handleClose, userDetails }) => {
     }
   };
 
-  console.log(submissionMessageModal)
 
   return (
     <>
@@ -132,7 +141,7 @@ const SettingsPopover = ({ anchorEl, handleClose, userDetails }) => {
             width: '50%', // Width for medium screens
           },
           [theme.breakpoints.up('lg')]: {
-            width: '20%', // Width for large screens
+            width: '50%', // Width for large screens
           },
         }}
       >
@@ -248,19 +257,30 @@ const SettingsPopover = ({ anchorEl, handleClose, userDetails }) => {
         }}
         PaperProps={{
           style: {
-            padding: '24px',
-            maxWidth: '400px',
-            borderRadius: '8px',
+            maxWidth: '500px',
+            borderRadius: '4px',
             boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1)',
           },
         }}
       >
-        <Card sx={{ textAlign: 'center', p: 2 }}>
+        <Card sx={{ textAlign: 'center', p: 2}}>
           <Avatar src={profilePictureUrl} sx={{ width: 100, height: 100, mx: 'auto', mb: 2 }} />
           <CardContent>
             <Typography variant="h5">{`${firstName} ${lastName}`}</Typography>
             <Typography variant="body1" color="textSecondary">{email}</Typography>
+            <Typography variant="body1" color="textSecondary">{phoneNumber}</Typography>
             <Typography variant="body1" color="textSecondary">{role}</Typography>
+          {role === 'student' || role === 'instructor' &&
+              <Box>
+                <Typography variant="body1" color="textSecondary">{program}</Typography>
+                <Typography variant="body1" color="textSecondary">{cohort}</Typography>
+
+            </Box>
+            }
+               {role === 'student' &&
+                <Typography variant="body1" color="textSecondary">{studentId}</Typography>
+
+            }
           </CardContent>
            {/* The Download Button is now here */}
            <DownloadIdButton userId={userDetails.id} /> 

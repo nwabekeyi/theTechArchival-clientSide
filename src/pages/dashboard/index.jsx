@@ -1,15 +1,15 @@
-import React, { useState, useEffect, lazy, Suspense } from "react";
+import React, { useState,lazy, Suspense } from "react";
 import { Routes, Route } from "react-router-dom";
 import Topbar from "./scenes/global/Topbar";
 import Sidebar from "./scenes/global/Sidebar";
 import { CssBaseline, ThemeProvider, Box } from "@mui/material";
 import { ColorModeContext, useMode } from "./theme";
 import "./index.css";
-import { useSelector, useDispatch } from "react-redux";
-import { useNavigate } from "react-router-dom";
+import { useSelector } from "react-redux";
 import FloatingMessageIcon from "./components/floatingMessageIcon";
 import { tokens } from "./theme";
 import SignIn from "../../components/Signin";
+import Loader from "../../utils/loader";
 
 
 
@@ -23,7 +23,6 @@ const Line = lazy(() => import("./scenes/line"));
 const Pie = lazy(() => import("./scenes/pie"));
 const Enquiries = lazy(() => import("./scenes/enquiries"));
 const UserManagement = lazy(() => import("./scenes/userManagement"));
-const ContentManagement = lazy(() => import("./scenes/contentManagement"));
 const CourseManagement = lazy(() => import("./scenes/courseManagement"));
 const Feedbacks = lazy(() => import("./scenes/feebacks"));
 const Support = lazy(() => import("./scenes/support"));
@@ -49,7 +48,6 @@ function DashboardHome() {
   const user = useSelector((state) => state.users.user);
   console.log(user)
   const userRole = user ? user.role : 'not logged in';
-  const navigate = useNavigate();
   const { emit, isConnected, listen} = useWebSocket();
 
 
@@ -68,7 +66,6 @@ function DashboardHome() {
             <Route path="/line" element={<Line />} />
             <Route path="/enquiries" element={<Enquiries />} />
             <Route path="/userManagement" element={<UserManagement />} />
-            <Route path="/contentManagement" element={<ContentManagement />} />
             <Route path="/courseManagement" element={<CourseManagement />} />
             <Route path="/feedbacks" element={<Feedbacks />} />
             <Route path="/support" element={<Support />} />
@@ -123,7 +120,7 @@ function DashboardHome() {
       <FloatingMessageIcon />
       <ThemeProvider theme={theme}>
         <CssBaseline />
-        <div style={{ display: "flex", height: "100%"}}>
+        <div style={{ display: "flex", height: "100%", gap: '0'}}>
           {/* Sidebar */}
           <Sidebar isSidebar={isSidebar} />
 
@@ -132,6 +129,8 @@ function DashboardHome() {
             id="dashboard"
             className="content"
             sx={{
+               px:{xs:0, md: 2, lg:0},
+              marginX: "0",
               width: '100%',
               backgroundColor:
                 theme.palette.mode === "light"
@@ -140,16 +139,24 @@ function DashboardHome() {
               height: "100vh", // Make the content area take full height
               display: "flex",
               flexDirection: "column",
-              overflowY: "auto", // Enable vertical scrolling
+              overflowY: "auto", // Enable vertical scrolling,
+              justifyContent: 'center',
+              alignItems: 'center'
             }}
             >
-            <Box sx={{ height: "auto"}}>
+            <Box 
+            sx={{ 
+              height: "auto", 
+              width:'100%', 
+              display: 'flex', 
+              justifyContent:'center',
+              backgroundColor:'none'}}>
               <Topbar userData={userData} />
             </Box>
 
             {/* Routes */}
-            <Box sx={{ flexGrow: 1, overflowY: "auto", height: "calc(100vh - 64px)" }}>
-              <Suspense fallback={<div>Loading...</div>}>
+            <Box sx={{ flexGrow: 1, overflowY: "auto", minWidth: '100%'}}>
+              <Suspense fallback={<Loader />}>
                 <Routes>
                   <Route path={userRole === 'not logged in' ? "/signin" : "/"} element={<Dashboard userData={userData} />} />
                   {userRole && renderRoutesBasedOnRole(userRole)}

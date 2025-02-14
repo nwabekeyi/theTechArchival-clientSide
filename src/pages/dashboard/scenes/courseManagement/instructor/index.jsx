@@ -16,7 +16,7 @@ const Instructors = () => {
   } = useInstructorCourse();
 
   return (
-    <Box sx={{ px: 4 }}>
+    <Box >
       <Header
         title={courseName || "Course Name"} // Fallback to default text if courseName is undefined
         subtitle={`${courseDuration || 0} months`} // Fallback for courseDuration

@@ -9,6 +9,7 @@ import Modal from '../../components/modal';
 import CustomAccordion from '../../components/accordion';
 import Header from "../../components/Header";
 import ConfirmationModal from '../../components/confirmationModal';
+import Loader from '../../../../utils/loader';
 
 function StudentInstructors() {
     const theme = useTheme();
@@ -71,16 +72,20 @@ function StudentInstructors() {
     };
 
     if (loading) {
-        return <Typography>Loading instructors...</Typography>;
+        return <Loader />;
     }
 
-    if (error) {
-        return <Typography>Error fetching instructors: {error.message}</Typography>;
-    }
 
     return (
         <Box m="30px">
         <Header title="YOUR INSTRUCTORS" subtitle="" />
+            {
+                error && <Typography>Error fetching instructors: This might be due to network issues</Typography>
+            }
+
+{
+                instructors.length < 1 && <Typography>You have not been assigned an instrcutor yet</Typography>
+            }
 
             {instructors.map((instructor, index) => (
                 <CustomAccordion

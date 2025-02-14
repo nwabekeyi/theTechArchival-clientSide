@@ -4,12 +4,12 @@ import { styled } from '@mui/material/styles';
 
 // Create a styled version of the Button component
 const StyledButton = styled(Button)(({ theme }) => ({
-  backgroundColor: 'black',
+  backgroundColor: '#15131D',
   padding: '2% 0',
   border: 'none',
   borderRadius: '4px',
   color: '#fff',
-  fontSize: '20px',
+  fontSize: '1em',
   cursor: 'pointer',
   marginTop: '15px',
   transition: 'background 0.3s',
@@ -18,8 +18,7 @@ const StyledButton = styled(Button)(({ theme }) => ({
   '&:hover': {
     backgroundColor: '#fff',
     color: 'black',
-    border: 'solid 2px black',
-  },
+    },
 }));
 
 const LoadingButton = ({ isLoading, children, ...props }) => {
@@ -33,6 +32,7 @@ const LoadingButton = ({ isLoading, children, ...props }) => {
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
+            fontSize: '0.5em'
           }}
         >
           <CircularProgress size={20} />

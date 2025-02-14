@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Box, IconButton, Typography, Button, LinearProgress,
-  useTheme} from '@mui/material';
+import { Box, IconButton, Typography, Button, LinearProgress, useTheme} from '@mui/material';
 import { Visibility, Delete } from '@mui/icons-material';
 import TableComponent from '../../../../components/table';
 import useApi from '../../../../hooks/useApi';
@@ -12,6 +11,7 @@ import Header from "../../components/Header";
 import { tokens } from "../../theme";
 import useStudentData from "../dashboard/student/useStudentData";
 import withDashboardWrapper from '../../../../components/dasboardPagesContainer';
+import PaystackButton from './PaystcakButton';
 
 const PaymentHistory = () => {
   const user = useSelector((state) => state.users.user);
@@ -37,6 +37,7 @@ const PaymentHistory = () => {
  
    // Calculate payment percentage
    const paymentPercentage = totalAmount > 0 ? (amountPaid / totalAmount) * 100 : 0;
+
 
   // Fetch Receipts Data
   useEffect(() => {
@@ -73,40 +74,50 @@ const PaymentHistory = () => {
     setOpenReceiptModal(true);
   };
 
-  const handleDeletePayment = (receipt) => {
-    setSelectedReceipt(receipt);
-    setOpenDeleteModal(true);
-  };
+   // Fetch and update payment data after successful payment
+  // Fetch and update payment data after successful payment
+const handlePaymentSuccess = async () => {
+  if (user?.userId) {
+    try {
+      const response = await callApi(`${endpoints.PAYMENT}/student/${user.userId}`, 'GET');
+      
+      if (response) {
+        // Map and transform new payment receipts data
+        const newReceipts = response.receipts.map((receipt, index) => ({
+          id: index + 1,
+          transactionId: receipt.paymentDetails.transactionId,
+          amount: receipt.paymentDetails.amount,
+          status: receipt.paymentDetails.status,
+          date: new Date(receipt.paymentDetails.timestamp).toLocaleDateString(),
+          userName: `${receipt.userDetails.firstName} ${receipt.userDetails.lastName}`,
+          program: receipt.userDetails.program,
+        }));
 
-  const confirmDeletePayment = async () => {
-    if (selectedReceipt) {
-      try {
-        const response = await callApi(
-          `${endpoints.PAYMENT}/delete/${selectedReceipt.transactionId}`,
-          'DELETE'
-        );
-        if (response) {
-          setReceipts((prev) =>
-            prev.filter((r) => r.transactionId !== selectedReceipt.transactionId)
-          );
-        }
-      } catch (error) {
-        console.error('Error deleting payment:', error);
-      } finally {
-        setOpenDeleteModal(false);
+        // Update receipts state by merging old receipts with new ones
+        setReceipts((prevReceipts) => [...newReceipts, ...prevReceipts]);
+
+        // Optionally, you can recalculate outstandings if necessary
+        const totalPaid = newReceipts.reduce((sum, receipt) => sum + receipt.amount, amountPaid);
+        const updatedOutstanding = totalOutstanding - totalPaid;
+
+        // Update outstandings if needed
+        // Assuming you have a function or method to update these
+        // updateOutstandingAmounts(updatedOutstanding, totalPaid);
       }
+    } catch (error) {
+      console.error('Error fetching payment data:', error);
     }
-  };
+  }
+};
+
 
   // Table Columns
   const columns = [
     { id: 'transactionId', label: 'Transaction ID' },
-    { id: 'userName', label: 'Student Name' },
-    { id: 'program', label: 'Program' },
     {
       id: 'amount',
       label: 'Amount (₦)',
-      renderCell: (row) => `₦${(row.amount / 100).toFixed(2)}`, // Assuming amount is in kobo
+      renderCell: (row) => `₦${(row.amount).toFixed(2)}`, // Assuming amount is in kobo
     },
     {
       id: 'status',
@@ -158,13 +169,9 @@ const PaymentHistory = () => {
             </Typography>
             </Box>
             <Box>
-            <Button
-              // onClick={() => handleOpenSubmitModal(row)}
-              variant="contained"
-              color="primary"
-            >
-              Make payment
-            </Button>
+            <Box>
+              <PaystackButton onSuccess={handlePaymentSuccess} /> {/* Pass success callback */}
+            </Box>
             </Box>
           </Box>
           
@@ -192,6 +199,7 @@ const PaymentHistory = () => {
         page={page}
         rowsPerPage={rowsPerPage}
         onPageChange={(e, newPage) => setPage(newPage)}
+        hiddenColumnsSmallScreen={[ 'status', 'transactionId']}
         onRowsPerPageChange={(e) =>
           setRowsPerPage(parseInt(e.target.value, 10))
         }

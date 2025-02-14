@@ -28,9 +28,6 @@ const Topbar = () => {
   const searchData = [
     { name: 'Dashboard', path: '/dashboard' },
     { name: 'User Management', path: '/dashboard/userManagement' },
-    { name: 'Settings', path: '/settings' },
-    { name: 'Profile', path: '/profile' },
-    { name: 'Notifications', path: '/notifications' },
     { name: 'Timetable', path: '/dashboard/timeTable' },
     // Add more pages or sections as required
   ];
@@ -75,21 +72,26 @@ const Topbar = () => {
   const isSettingsOpen = Boolean(settingsAnchorEl);
 
   return (
-    <Box 
+    <Box
+      mt={3}
       display="flex"
-      justifyContent="space-between"
+      justifyContent="stretch"
       py={2}
       px={4}
       sx={{
+        borderRadius:"25px",
+        boxShadow: theme.palette.mode === 'light'
+          ? '0px 4px 12px rgba(0, 0, 0, 0.3)' // Lighter shadow for light mode
+          : '0px 4px 12px rgba(0, 0, 0, 0.5)', // Darker shadow for dark mode
         position: 'sticky',
         top: 0,
         zIndex: 1000,
-        backgroundColor: theme.palette.mode === "light" ? colors.blueAccent[200] : "none",
-        width: "100%",
+        backgroundColor: colors.primary[400],
+        width: "95%",
       }}
     >
       {/* SEARCH BAR */}
-      <Box display="flex" alignItems='center'>
+      <Box display="flex" alignItems='center' sx={{flex:'2'}}>
         <Box
           display="flex"
           backgroundColor={theme.palette.mode === "dark" ? colors.grey[400] : colors.primary[700]}  // Grey background in dark mode
@@ -149,13 +151,23 @@ const Topbar = () => {
       )}
 
       {/* ICONS */}
-      <Box display="flex">
-        <IconButton onClick={handleOpenNotifications} sx={{ color: 'white' }}>
+      <Box display="flex" sx={{justifyContent:'end', marginLeft: '10px'}}>
+        <IconButton onClick={handleOpenNotifications} sx={{ color:theme.palette.mode === "light"
+            ? colors.grey[100]
+            : colors.primary[200], 
+          padding: '4px'
+        }}
+            >
           <Badge badgeContent={unreadCount} color="error">
             <NotificationsOutlinedIcon />
           </Badge>
         </IconButton>
-        <IconButton onClick={handleOpenSettings} sx={{ color: 'white' }}>
+        <IconButton onClick={handleOpenSettings} sx={{ color:theme.palette.mode === "light"
+            ? colors.grey[100]
+            : colors.primary[200], 
+            padding: '4px'
+          }}
+            >
           <SettingsOutlinedIcon />
         </IconButton>
       </Box>

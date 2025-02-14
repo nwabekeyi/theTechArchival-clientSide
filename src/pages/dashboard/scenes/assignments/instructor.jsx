@@ -11,6 +11,8 @@ import VisibilityIcon from '@mui/icons-material/Visibility'; // For view submiss
 import { useSelector } from 'react-redux';
 import useApi from '../../../../hooks/useApi';
 import { endpoints } from '../../../../utils/constants';
+import ConfirmationModal from '../../components/confirmationModal';
+
 
 const Assignment = () => {
   const theme = useTheme();
@@ -28,6 +30,19 @@ const Assignment = () => {
   const [submissions, setSubmissions] = useState([]); // Store submissions for the selected assignment
   const [openDeleteModal, setOpenDeleteModal] = useState(false); // Modal for confirmation before delete
   const [assignmentToDelete, setAssignmentToDelete] = useState(null); // Store assignment to delete
+  const [deleteConfirm, setDeleteConfrim] = useState(false);
+  const [updateConfirm, setUpdateConfrim] = useState(false)
+
+    //handle confirm modal close
+    const handleConfirmModalClose = () => {
+      if(deleteConfirm === true){
+        setDeleteConfrim(false);
+      };
+  
+      if(updateConfirm === true){
+        setUpdateConfrim(false);
+      }
+    };
 
   const userDetails = useSelector((state) => state.users.user);
   const cohortName = userDetails.cohort;
@@ -89,6 +104,9 @@ const Assignment = () => {
             a.id === selectedAssignment.id ? { ...a, ...newAssignment } : a
           );
           setAssignments(sortAssignments(updatedAssignments)); // Sort after update
+          setUpdateConfrim(true);
+        }else{
+          setUpdateConfrim(true);
         }
       } else {
         // Add new assignment via the API using POST request
@@ -124,6 +142,12 @@ const Assignment = () => {
       if (response) {
         const updatedAssignments = assignments.filter(a => a.id !== assignmentToDelete.id);
         setAssignments(sortAssignments(updatedAssignments)); // Sort after deletion
+        setDeleteConfrim(true);
+        setDeleteConfrim(true);
+
+      }else{
+        setDeleteConfrim(true);
+
       }
       setOpenDeleteModal(false); // Close confirmation modal after delete
     } catch (error) {
@@ -181,20 +205,37 @@ const Assignment = () => {
       label: 'Actions',
       minWidth: 150,
       renderCell: (row) => (
-        <Box display="flex" justifyContent="space-between">
-          <IconButton onClick={() => handleOpenModal(row)}>
-            <EditIcon />
-          </IconButton>
-          <IconButton onClick={() => handleDeleteAssignment(row)}>
-            <DeleteIcon />
-          </IconButton>
-          <IconButton onClick={() =>{
-             handleViewSubmissions(row)
-            }
-             }>
-            <VisibilityIcon />
-          </IconButton>
-        </Box>
+        <Box display="flex" justifyContent="start">
+      <IconButton
+        onClick={() => handleOpenModal(row)}
+        title="Edit assignment"
+        sx={{
+          fontSize: { xs: '1rem', sm: '1.5rem' }, // Smaller icon size on small screens
+        }}
+      >
+        <EditIcon sx={{ fontSize: { xs: '1rem', sm: '1.5rem' } }} /> {/* Adjust icon size inline */}
+      </IconButton>
+
+      <IconButton
+        onClick={() => handleDeleteAssignment(row)}
+        title="Delete assignment"
+        sx={{
+          fontSize: { xs: '1rem', sm: '1.5rem' }, // Smaller icon size on small screens
+        }}
+      >
+        <DeleteIcon sx={{ fontSize: { xs: '1rem', sm: '1.5rem' } }} />
+      </IconButton>
+
+      <IconButton
+        onClick={() => handleViewSubmissions(row)}
+        title="View submissions"
+        sx={{
+          fontSize: { xs: '1rem', sm: '1.5rem' }, // Smaller icon size on small screens
+        }}
+      >
+        <VisibilityIcon sx={{ fontSize: { xs: '1rem', sm: '1.5rem' } }} />
+      </IconButton>
+    </Box>
       ),
     },
   ];
@@ -208,7 +249,7 @@ const Assignment = () => {
     
       <Button
         variant="contained"
-        color="primary"
+        color="secondary"
         onClick={() => handleOpenModal()}
         sx={{ mb: '15px' }}
       >
@@ -229,6 +270,7 @@ const Assignment = () => {
         onPageChange={handlePageChange}
         onRowsPerPageChange={handleRowsPerPageChange}
         onRowClick={handleRowClick}
+        hiddenColumnsSmallScreen={['dueDate', 'description']}
       />
 
       <Modal
@@ -296,17 +338,18 @@ const Assignment = () => {
   ) : (
     <Box>
       {submissions.map((submission, index) => (
-        <Box 
-          key={index} 
-          sx={{ 
-            display: 'flex', 
-            alignItems: 'center', 
-            marginBottom: '1rem', 
-            padding: '1rem', 
-            border: '1px solid #ddd', 
-            borderRadius: '8px' 
-          }}
-        >
+       <Box
+       key={index}
+       sx={{
+         display: 'flex',
+         alignItems: 'center',
+         marginBottom: '1rem',
+         padding: '1rem',
+         border: '1px solid #ddd',
+         borderRadius: '8px',
+         boxShadow: '0px 4px 12px rgba(0, 0, 0, 0.5)', // Adding a box shadow
+       }}
+     >
           {/* Display Profile Picture using MUI Avatar */}
           <Avatar 
             alt={`${submission.firstName} ${submission.lastName}`} 
@@ -345,6 +388,31 @@ const Assignment = () => {
   )}
 </Box>
       </Modal>
+
+       {/* delete and update confrim modal */}
+      <ConfirmationModal
+        open={deleteConfirm || updateConfirm}
+        onClose={handleConfirmModalClose}
+        title= {deleteConfirm ? "Delete Confirmation" : 'Update confirmation'}
+        isLoading= {deleteConfirm ? deleteLoading : putLoading}
+        message= {deleteConfirm ?
+          "Assignment successfully deleted" :
+          updateConfirm ? 'Assignment successfully updated' :
+          deleteConfirm && deleteError ? "Could not update assignemnt, something went wrong" :
+          updateConfirm && putError ? "Could not update assignemnt, something went wrong" :
+           "something went wrong"
+          }
+
+      >
+
+       {deleteConfirm ?
+       "Assignment successfully deleted" :
+       updateConfirm ? 'Assignment successfully updated' :
+       deleteConfirm && deleteError ? "Could not update assignemnt, something went wrong" :
+       updateConfirm && putError ? "Could not update assignemnt, something went wrong" :
+        "something went wrong"
+       }
+      </ConfirmationModal>
     </Box>
   );
 };

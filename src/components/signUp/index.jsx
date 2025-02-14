@@ -1,7 +1,11 @@
-import { Box, Button, TextField, Typography, Alert, MenuItem, FormControl, InputLabel, Select, CircularProgress, Modal, Backdrop, Fade } from '@mui/material';
+import { Box, Button, TextField, Typography, Alert, MenuItem, FormControl, InputLabel, Select, CircularProgress, Modal, Backdrop, Fade, useTheme  } from '@mui/material';
 import useSignUp from './useSignUp';
+import ConfirmationModal from "../../pages/dashboard/components/confirmationModal";
+import { tokens } from '../../pages/dashboard/theme';
 
 const SignUpForm = ({ role, offline, selectedUser }) => {
+    const theme = useTheme();
+    const colors = tokens(theme.palette.mode);
     const {
         roleFields,
         error,
@@ -15,7 +19,9 @@ const SignUpForm = ({ role, offline, selectedUser }) => {
         assignedInstructor,
         modalOpen,
         modalMessage,
-        setModalOpen
+        setModalOpen,
+        confirmationModal,
+        setConfirmationModal
     } = useSignUp({ offline, role, selectedUser });
 
     const handleCloseModal = () => {
@@ -99,7 +105,7 @@ const SignUpForm = ({ role, offline, selectedUser }) => {
                     </Box>
                 ))}
                 {error && <Alert severity="error">{error}</Alert>}
-                <Button variant="contained" type="submit">
+                <Button variant="contained" type="submit" >
                     {selectedUser ? 'Update' : 'Sign Up'}
                 </Button>
             </form>
@@ -115,7 +121,7 @@ const SignUpForm = ({ role, offline, selectedUser }) => {
                 }}
             >
                 <Fade in={modalOpen}>
-                    <Box sx={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', bgcolor: 'background.paper', padding: 4 }}>
+                    <Box sx={{display:'grid', placeContent:"center", position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', bgcolor: colors.primary[100], padding: 4, width: '400px', height: '40%'}}>
                         <Typography variant="h6" component="h2">
                             {modalMessage}
                         </Typography>
@@ -123,6 +129,16 @@ const SignUpForm = ({ role, offline, selectedUser }) => {
                     </Box>
                 </Fade>
             </Modal>
+
+            {/* <ConfirmationModal
+                open={confirmationModal}
+                message= "User successfully created"
+                title= 'User registration confrimation'
+                onClose={()=>{setConfirmationModal(false)}}
+                onConfirm={()=>{setConfirmationModal(false)}}
+
+               /> */}
+
         </Box>
     );
 };

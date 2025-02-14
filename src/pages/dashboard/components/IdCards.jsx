@@ -30,7 +30,7 @@ const IDCard = ({ idCardRef }) => {
     firstName,
     lastName,
     email,
-    phone,
+    phoneNumber,
     role,
     studentId,
     instructorId,
@@ -111,9 +111,9 @@ const IDCard = ({ idCardRef }) => {
           </Typography>
 
           {/* User Details */}
-          <Grid container spacing={2} justifyContent="center" color="#1F3A93">
+          <Grid container spacing={2} justifyContent="left" color="#1F3A93">
             <DetailItem label="Email" value={email} />
-            <DetailItem label="Phone" value={phone} />
+            <DetailItem label="Phone" value={phoneNumber} />
             <DetailItem label="Program" value={program} />
             {role === 'student' && <DetailItem label="Student ID" value={studentId} />}
             {role === 'instructor' && <DetailItem label="Instructor ID" value={instructorId} />}
@@ -133,7 +133,6 @@ const IDCard = ({ idCardRef }) => {
       <Card sx={{
         width: 300,
         height: 450,
-        margin: 'auto',
         boxShadow: 3,
         borderRadius: 2,
         backgroundImage: `linear-gradient(rgba(255, 255, 255, 0.9), rgba(255, 255, 255, 0.9)), url(${backendDevImg})`,

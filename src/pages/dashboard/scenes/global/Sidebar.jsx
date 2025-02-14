@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { ProSidebar, Menu, MenuItem } from "react-pro-sidebar";
-import { Box, IconButton, Typography, Avatar, useTheme } from "@mui/material";
+import { Box, Typography, Avatar, useTheme } from "@mui/material";
 import { Link } from "react-router-dom";
 import "react-pro-sidebar/dist/css/styles.css";
 import { tokens } from "../../theme";
@@ -23,9 +23,8 @@ import LibraryBooksIcon from "@mui/icons-material/LibraryBooks";
 import SettingsOutlinedIcon from "@mui/icons-material/SettingsOutlined";
 import profileImg from "../../../../images/profile-placeholder.png";
 import EmailIcon from "@mui/icons-material/Email";
-import { useNavigate } from "react-router-dom";
 import { useSelector } from "react-redux";
-import useAuth from "../../../../hooks/useAuth";
+import CloseIcon from '@mui/icons-material/Close';
 
 const Item = ({ title, to, icon, selected, setSelected, isCollapsed }) => {
   const theme = useTheme();
@@ -35,11 +34,15 @@ const Item = ({ title, to, icon, selected, setSelected, isCollapsed }) => {
     <MenuItem
       active={selected === title}
       style={{
-        color: colors.grey[100],
+        display: 'flex',
+        color: selected === title ? "#6870fa" : colors.grey[100], // Matching title color with icon
+        boxShadow: selected === title ? "0 4px 12px rgba(0, 0, 0, 0.3)" : "none", // Adding box shadow for active menu
+        borderRadius: selected === title ? "15px" : "none", // Adding box shadow for active menu
+
       }}
       onClick={() => setSelected(title)}
       icon={icon}
-      title={title} // Tooltip for icon when sidebar is collapsed
+      title={title}
     >
       {!isCollapsed && <Typography>{title}</Typography>}
       <Link to={to} />
@@ -50,19 +53,15 @@ const Item = ({ title, to, icon, selected, setSelected, isCollapsed }) => {
 const Sidebar = () => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
-  const [isCollapsed, setIsCollapsed] = useState(true); // Default state is collapsed
+  const [isCollapsed, setIsCollapsed] = useState(true);
   const [selected, setSelected] = useState("Dashboard");
-  const navigate = useNavigate();
   const user = useSelector((state) => state.users.user);
 
-  // Detect if the user is on a mobile or tablet device
   const [isMobileOrTablet, setIsMobileOrTablet] = useState(false);
 
   useEffect(() => {
     const userAgent = navigator.userAgent.toLowerCase();
-    const isMobileOrTabletDevice =
-      /iphone|ipod|ipad|android|windows phone|blackberry|opera mini|mobile|tablet/i.test(userAgent);
-
+    const isMobileOrTabletDevice = /iphone|ipod|ipad|android|windows phone|blackberry|opera mini|mobile|tablet/i.test(userAgent);
     setIsMobileOrTablet(isMobileOrTabletDevice);
   }, []);
 
@@ -76,7 +75,6 @@ const Sidebar = () => {
     { title: "Dashboard", to: "/dashboard", icon: <HomeOutlinedIcon /> },
     { title: "User Management", to: "/dashboard/userManagement", icon: <PeopleOutlinedIcon /> },
     { title: "Course Management", to: "/dashboard/courseManagement", icon: <ReceiptOutlinedIcon /> },
-    { title: "Content Management", to: "/dashboard/contentManagement", icon: <AssignmentIcon /> },
     { title: "Financial Management", to: "/dashboard/financialManagement", icon: <ContactsOutlinedIcon /> },
     { title: "Team", to: "/dashboard/team", icon: <PersonOutlinedIcon /> },
     { title: "Analytics and Reporting", to: "/dashboard/analytics", icon: <MapOutlinedIcon /> },
@@ -92,7 +90,6 @@ const Sidebar = () => {
     { title: "Dashboard", to: "/dashboard", icon: <HomeOutlinedIcon /> },
     { title: "User Management", to: "/dashboard/userManagement", icon: <PeopleOutlinedIcon /> },
     { title: "Course Management", to: "/dashboard/courseManagement", icon: <ReceiptOutlinedIcon /> },
-    { title: "Content Management", to: "/dashboard/contentManagement", icon: <AssignmentIcon /> },
     { title: "Analytics and Reporting", to: "/dashboard/analytics", icon: <MapOutlinedIcon /> },
     { title: "Contacts", to: "/dashboard/contacts", icon: <SettingsOutlinedIcon /> },
     { title: "Support", to: "/dashboard/support", icon: <SupportAgentIcon /> },
@@ -140,97 +137,133 @@ const Sidebar = () => {
   return (
     <Box
       sx={{
-        "& .pro-sidebar-inner": {
-          background: `${theme.palette.mode === "light" ? colors.blueAccent[200] : colors.primary[400]} !important`,
-          position: "fixed",
-          overflow: "hidden",
-          margin: 0,
-          width: "auto",
+        "& .pro-sidebar .pro-menu": {
+          padding: `${isCollapsed ? '8px 0 0 0' : '20px'}`,
+          display: !isCollapsed && 'flex'
         },
-        "& .pro-sidebar-layout": {
-         alignItems: 'center'
+        "& .pro-sidebar-inner": {
+          backgroundColor: colors.primary[400],
+          position: "fixed",
+          width: 'fit-content',
+          height: '95%',
+          borderRadius: `${isCollapsed ? '20px' : '10px'}`,
+          boxShadow: theme.palette.mode === 'light'
+            ? '0px 4px 12px rgba(0, 0, 0, 0.3)'
+            : '0px 4px 12px rgba(0, 0, 0, 0.5)',
         },
         "& .pro-sidebar": {
-          width: "auto",
-          minWidth: isCollapsed ? "80px" : "250px",
+          paddingLeft: "4%",
+          minWidth: isCollapsed ? "50px" : "220px",
+          width: 'fit-content',
+          maxWidth: isCollapsed ? "50px" : "220px",
+          display: 'flex',
+          alignItems: 'center',
+          backgroundColor:
+            theme.palette.mode === "light"
+              ? colors.primary[900]
+              : colors.primary[500],
+          justifyContent: "center",
         },
-        "& .pro-icon-wrapper": {
-          backgroundColor: "transparent !important",
+        "& .pro-sidebar.collapsed": {
+          minWidth: '60px'
         },
+        "& .pro-sidebar .pro-menu.square .pro-menu-item > .pro-inner-item > .pro-icon-wrapper":{
+          backgroundColor: "transparent",
+          margin: "1vh 0",
+          display: "flex",
+          justifyContent: 'center',
+          height: 'auto'
+        },
+        "& .pro-icon": {
+          justifyContent: "flex-start !important",
+        },
+        "& .pro-menu-item.active ": {
+          justifyContent: "start !important",
+        },
+
+        
         "& .pro-inner-item": {
           padding: "10px 5px 5px 5px !important",
-          color: "#fff !important",
+          color: theme.palette.mode === "light"
+            ? colors.grey[100]
+            : colors.primary[200],
         },
         "& .pro-inner-item:hover": {
           color: "#868dfb !important",
         },
         "& .pro-menu-item.active": {
+          display: 'flex',
+          justifyContent: "center",
           color: "#6870fa !important",
+
         },
-        "&::-webkit-scrollbar": {
-          display: "none", // Hide scrollbar
+        "& .css-1l8icbj": {
+          padding: 0,
         },
-        "&::-webkit-scrollbar-thumb": {
-          background: "transparent",
+        "& .pro-sidebar > .pro-sidebar-inner > .pro-sidebar-layout": {
+          padding: '5px',
         },
-        "&::-webkit-scrollbar-track": {
-          background: "transparent",
-        },
+
       }}
     >
       <ProSidebar collapsed={isCollapsed}>
         <Menu iconShape="square">
-          {/* LOGO AND MENU ICON */}
-          {!isMobileOrTablet && (
-            <MenuItem
-              onClick={() => setIsCollapsed(!isCollapsed)}
-              icon={isCollapsed ? <MenuOutlinedIcon title="Menu" /> : undefined}
-              style={{
-                margin: "10px 0 0px 0",
-                color: "#fff",
-              }}
-            >
-              {!isCollapsed && (
-                <Box display="flex" justifyContent="space-between" alignItems="center" ml="15px">
-                  <Typography variant="h4">Babtech E-learning</Typography>
-                  <IconButton onClick={() => setIsCollapsed(!isCollapsed)} sx={{ color: "#fff" }}>
-                    <MenuOutlinedIcon />
-                  </IconButton>
-                </Box>
-              )}
-            </MenuItem>
-          )}
+
+           {/* Only show the MenuOutlinedIcon on non-mobile devices */}
+           {
+             !isMobileOrTablet && 
+              <MenuItem
+                onClick={() => setIsCollapsed(!isCollapsed)}
+                // Toggle between MenuOutlinedIcon (when expanded) and CloseIcon (when collapsed)
+                style={{
+                  margin: "10px 0 20px 0",
+                  color: isCollapsed && colors.grey[100],
+                }}
+              >
+            {!isCollapsed ? 
+              <Box display="flex"  color={colors.grey[100]} justifyContent="space-between" alignItems="center" ml="15px">
+                <Typography variant="h3" >
+                  {user?.role}
+                </Typography>
+                <CloseIcon sx={{color:colors.grey[100]}}
+                 onClick={() => setIsCollapsed(!isCollapsed)} />
+              </Box>
+              :
+              <Box display="flex"  color={colors.grey[100]} justifyContent="center" alignItems="center">
+              <MenuOutlinedIcon sx={{color:colors.grey[100]}}
+               onClick={() => setIsCollapsed(!isCollapsed)} />
+            </Box>
+            }
+          </MenuItem>
+           }
 
           {!isCollapsed && (
-            <Box mb="25px">
-              <Box display="flex" justifyContent="center" alignItems="center">
-                <Avatar
-                  src={profileImage}
-                  alt={`${user.firstName} ${user.lastName}`}
-                  sx={{ width: 100, height: 100, cursor: "pointer" }}
-                />
-              </Box>
-              <Box textAlign="center">
-                <Typography variant="h2" fontWeight="bold" fontSize="medium" sx={{ p: "10px 0 0 0" }}>
-                  {`${user.firstName} ${user.lastName}`}
-                </Typography>
-                <Typography variant="h5" sx={{ color: colors.grey[300] }}>
-                  {user.role.charAt(0).toUpperCase() + user.role.slice(1)}
-                </Typography>
-              </Box>
+            <Box mb="25px" display="flex" justifyContent="center" alignItems="center">
+              <Avatar
+                src={profileImage}
+                alt="user-profile"
+                sx={{
+                  width: "120px",
+                  height: "120px",
+                  cursor: "pointer",
+                }}
+              />
             </Box>
           )}
-          {menuItems.map((item) => (
-            <Item
-              key={item.title}
-              title={item.title}
-              to={item.to}
-              icon={item.icon}
-              selected={selected}
-              setSelected={setSelected}
-              isCollapsed={isCollapsed}
-            />
-          ))}
+
+          <Box paddingLeft={isCollapsed ? undefined : "10%"}>
+            {menuItems.map(({ title, to, icon }) => (
+              <Item
+                key={title}
+                title={title}
+                to={to}
+                icon={icon}
+                selected={selected}
+                setSelected={setSelected}
+                isCollapsed={isCollapsed}
+              />
+            ))}
+          </Box>
         </Menu>
       </ProSidebar>
     </Box>

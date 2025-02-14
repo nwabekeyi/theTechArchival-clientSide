@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from "react";
-import { useSelector } from "react-redux";
+import { useSelector, useDispatch} from "react-redux";
+import {setAllCourses} from '../../reduxStore/slices/adminDataSlice'
 import useApi from "../../hooks/useApi";
 import { endpoints } from "../../utils/constants";
 
@@ -13,8 +14,25 @@ const useSignUp = ({ offline, role, selectedUser }) => {
     const { data, loading, error: submitError, callApi } = useApi();
     const [modalOpen, setModalOpen] = useState(false);
     const [modalMessage, setModalMessage] = useState('');
+    const [confirmationModal, setConfirmationModal] = useState(false);
+    const { data: courseData, loading: courseLoading, error: courseError, callApi: courseApi } = useApi();
+    const [courses, setCourses] = useState([]);
 
-    const courses = useSelector((state) => state.adminData.courses.courses);
+    const dispatch = useDispatch();
+    //get courses
+
+    
+      useEffect(async () => {
+        const getCourses = await courseApi(endpoints.COURSES, 'GET');
+
+        if (getCourses && getCourses.courses) {
+          console.log('Data received:', data);
+          dispatch(setAllCourses(getCourses.courses));
+          setCourses(getCourses.courses)
+        }
+      }, []); 
+
+
     const users = useSelector((state) => state.adminData.usersData);
 
     const instructors = users.instructors || [];
@@ -256,9 +274,9 @@ const useSignUp = ({ offline, role, selectedUser }) => {
     
             // Check if the response contains user data, and handle success/failure
             if (data?.user) {
-                
                 setModalMessage(`${data.user.firstName} ${response.data.user.lastName} has been successfully registered as ${response.data.user.role}`);
                 setFormData(getInitialFormData(role));  // Clear form on success
+                setConfirmationModal(true);
             } else {
                 console.log(data);
                 setModalMessage(`${response?.message}`);
@@ -289,6 +307,8 @@ const useSignUp = ({ offline, role, selectedUser }) => {
         modalOpen,
         modalMessage,
         setModalOpen,
+        confirmationModal,
+        setConfirmationModal
     };
 };
 
