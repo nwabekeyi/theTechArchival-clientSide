@@ -6,7 +6,7 @@ const Header = ({ title, subtitle }) => {
   const colors = tokens(theme.palette.mode);
   return (
     <Box pt="30px" pb='10px'
-    sx={{color: theme.palette.mode === "light" ? colors.blueAccent[200]: colors.primary[100],
+    sx={{color: theme.palette.mode === "light" ? "#514b82": colors.primary[100],
     }}
     >
    <Typography

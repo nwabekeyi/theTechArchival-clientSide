@@ -6,7 +6,7 @@ import {IconButton,Typography} from "@mui/material";
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import useApi from '../../../../hooks/useApi';
 import { endpoints } from '../../../../utils/constants';
-import { updateUser, deleteUser } from '../../../../reduxStore/slices/adminDataSlice'; 
+import { deleteUser } from '../../../../reduxStore/slices/adminDataSlice'; 
 
 const useUserManagement = () => {
   const students = useSelector((state) => state.adminData.usersData.students);

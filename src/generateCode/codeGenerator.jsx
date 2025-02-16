@@ -1,7 +1,6 @@
 import React, { useState } from "react";
 import {
   Box,
-  Button,
   TextField,
   Dialog,
   DialogTitle,
@@ -11,6 +10,7 @@ import {
 import Modal from "../pages/dashboard/components/modal";
 import useApi from "../hooks/useApi";
 import { endpoints } from "../utils/constants";
+import ActionButton from "../pages/dashboard/components/actionButton";
 
 const CodeGenerator = () => {
   const [codes, setCodes] = useState(""); // Local state for handling codes
@@ -100,34 +100,26 @@ const CodeGenerator = () => {
       }}
     >
       <Box sx={{ display: "flex", gap: "20px" }}>
-        <Button
-          variant="contained"
-          color="secondary"
+      <ActionButton 
           onClick={() => setDialogOpen(true)}
-          disabled={loading}
-        >
-          {loading ? "Generating..." : "Generate Code"}
-        </Button>
+          content= {loading ? "Generating..." : "Generate Code"}
+      />
+        
 
         {/* Dialog to select student type */}
         <Dialog open={dialogOpen} onClose={() => setDialogOpen(false)}>
           <DialogTitle>Select Student Type</DialogTitle>
           <DialogContent>
             <Box sx={{ display: "flex", flexDirection: "column", gap: "15px" }}>
-              <Button
-                variant="contained"
-                color="primary"
+            <ActionButton 
                 onClick={() => setStudentType("offline")}
-              >
-                Offline Student
-              </Button>
-              <Button
-                variant="contained"
-                color="primary"
+                content= 'Oflline Students'
+              />
+
+              <ActionButton 
                 onClick={() => setStudentType("online")}
-              >
-                Online Student
-              </Button>
+                content= 'Online Students'
+              />
               {studentType === "online" && (
                 <TextField
                   label="Amount Paid"
@@ -140,10 +132,15 @@ const CodeGenerator = () => {
             </Box>
           </DialogContent>
           <DialogActions>
-            <Button onClick={() => setDialogOpen(false)}>Cancel</Button>
-            <Button onClick={handleDialogSubmit} color="primary">
-              Confirm
-            </Button>
+          <ActionButton 
+                onClick={() => setDialogOpen(false)}
+                content= 'Cancel'
+              />
+
+              <ActionButton 
+                onClick={handleDialogSubmit}
+                content= 'Confirm'
+              />
           </DialogActions>
         </Dialog>
 

@@ -1,4 +1,5 @@
 import { IconButton } from '@mui/material';
+import React from 'react';
 
 const CustomIconButton = ({ onClick, icon, ...props }) => {
   return (
@@ -16,7 +17,7 @@ const CustomIconButton = ({ onClick, icon, ...props }) => {
       }}
       {...props}
     >
-      {icon}
+      {React.cloneElement(icon, { fontSize: "inherit" })}
     </IconButton>
   );
 };
