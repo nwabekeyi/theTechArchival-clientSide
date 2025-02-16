@@ -74,7 +74,7 @@ const Component = ({home}) => {
       
           )}
           {/* student feedbacks button */}
-          {user.role === 'student' && (
+          {user.role === ('student' || 'admin' || 'instructor') && (
         <Box
         sx={{
           display: 'flex',

@@ -32,12 +32,14 @@ const TableComponent = ({
   onRowsPerPageChange,
   onRowClick,
   hiddenColumnsSmallScreen = [],
+  hiddenColumnsTabScreen = [], // New prop for hiding columns on tab screens
 }) => {
   const [searchQuery, setSearchQuery] = useState('');
   const [filteredData, setFilteredData] = useState(data);
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
-  const isSmallScreen = useMediaQuery(theme.breakpoints.down('sm')); // Detect screen size
+  const isSmallScreen = useMediaQuery(theme.breakpoints.down('sm')); // Detect small screens
+  const isTabScreen = useMediaQuery(theme.breakpoints.between('sm', 'md')); // Detect tab screens
 
   useEffect(() => {
     if (data) {
@@ -68,7 +70,7 @@ const TableComponent = ({
             overflow: 'auto',
             backgroundColor: colors.primary[400],
             marginTop: '10px',
-            overflowX: 'auto', 
+            overflowX: 'auto',
           }}
         >
           <Box
@@ -95,7 +97,10 @@ const TableComponent = ({
             <TableHead>
               <TableRow>
                 {columns
-                  .filter((column) => !isSmallScreen || !hiddenColumnsSmallScreen.includes(column.id))
+                  .filter((column) =>
+                    (!isSmallScreen || !hiddenColumnsSmallScreen.includes(column.id)) && // Hide columns on small screens
+                    (!isTabScreen || !hiddenColumnsTabScreen.includes(column.id)) // Hide columns on tab screens
+                  )
                   .map((column) => (
                     <TableCell
                       key={column.id}
@@ -133,7 +138,10 @@ const TableComponent = ({
                   }}
                 >
                   {columns
-                    .filter((column) => !isSmallScreen || !hiddenColumnsSmallScreen.includes(column.id))
+                    .filter((column) =>
+                      (!isSmallScreen || !hiddenColumnsSmallScreen.includes(column.id)) &&
+                      (!isTabScreen || !hiddenColumnsTabScreen.includes(column.id))
+                    )
                     .map((column) => (
                       <TableCell
                         key={column.id}

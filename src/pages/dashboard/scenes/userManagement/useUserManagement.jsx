@@ -1,12 +1,12 @@
 import { useState, useEffect } from 'react';
 import DeleteIcon from '@mui/icons-material/Delete';
-import { useSelector } from 'react-redux';
+import { useSelector,  useDispatch } from 'react-redux';
 import EditIcon from '@mui/icons-material/Edit';
 import {IconButton,Typography} from "@mui/material";
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import useApi from '../../../../hooks/useApi';
 import { endpoints } from '../../../../utils/constants';
-
+import { updateUser, deleteUser } from '../../../../reduxStore/slices/adminDataSlice'; 
 
 const useUserManagement = () => {
   const students = useSelector((state) => state.adminData.usersData.students);
@@ -17,8 +17,8 @@ const useUserManagement = () => {
     let user = {};
     if(userId.startsWith('instructor')){
       user = instructors.find(instructor => userId === instructor.instructorId)
-    }else if(userId.startsWith('student')){
-      user = students.find(student => userId === student.studentId)
+    }else if(userId.startsWith( 'student')){
+      user = students.find(student => userId === student.studentId);
     }else{
       user = admins.find(admin => userId === admin.userId)
 
@@ -28,14 +28,13 @@ const useUserManagement = () => {
 
 
   const [selectedRole, setSelectedRole] = useState("");
-  const [userData, setUserData] = useState([]);
   const [sortBy, setSortBy] = useState("id");
   const [sortDirection, setSortDirection] = useState("asc");
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(20);
   const [selectedUser, setSelectedUser] = useState(null);
   const [editUserDetailsState, setEditUserDetailsState] = useState({});
-  const [confirmDialogOpen, setConfirmDialogOpen] = useState(false);
+  const [openDeleteModal, setOpenDeleteModal] = useState(false);
   const [editDialogOpen, setEditDialogOpen] = useState(false);
   const [signUpDialogOpen, setSignUpDialogOpen] = useState(false);
   const [selectedInstructor, setSelectedInstructor] = useState("");
@@ -45,30 +44,21 @@ const useUserManagement = () => {
   const [tabIndex, setTabIndex] = useState(0);
   const [offlineStudents, setOfflineStudents] = useState([]);
   const [viewUserDetails, setViewUserDetails] = useState(false);
-  const {callApi } = useApi();
-
-  // Mock data for offline students
-
-  const handleImageUpload = async (file) => {
-    if (!file) return;
-
-    // try {
-    //   const storage = getStorage();
-    //   const storageRef = ref(storage, `profile_pictures/${file.name}`);
-    //   await uploadBytes(storageRef, file);
-    //   const downloadURL = await getDownloadURL(storageRef);
-    //   return downloadURL;
-    // } catch (error) {
-    //   console.error("Error uploading profile image:", error);
-    // }
-  };
-
-
+  const {callApi: callDeleteApi, loading: deleteLoading, data: deleteData, error: deleteError} = useApi();
+  const {callApi: callUpdateApi, loading: updateLoading, data: updateData, error: updaterror} = useApi();
+  const [confirmModalOpen, setConfirmModalOpen] = useState(false);
+  const [rerender, setRerender]= useState(false);
+//role selesct
   const handleRoleSelect = (role) => {
     setSelectedRole(role);
     setSignUpDialogOpen(true);
   };
+  useEffect(() => {
+    setRerender(!rerender);
+  }, [editDialogOpen, signUpDialogOpen]);
 
+
+  //sort table columns change
   const handleSortChange = (columnId) => {
     const isAsc = sortBy === columnId && sortDirection === "asc";
     setSortDirection(isAsc ? "desc" : "asc");
@@ -84,25 +74,37 @@ const useUserManagement = () => {
     setPage(0);
   };
 
-  const handleRowClick = () => {
+  //open delete confirmation modal
+  const handleDeleteOpen = (user) => {
+    const foundUser = findUserInStore(user.userId);
 
+    sessionStorage.setItem('selectedUser', JSON.stringify(foundUser))
+    setEditUserDetailsState(foundUser);
+
+    setOpenDeleteModal(true);
+    console.log(openDeleteModal)
   };
-  console.log(selectedUser)
 
 
+  //open edit user dialog
   const handleEdit = (user) => {
-    setEditUserDetailsState(user);
-    setProfileImageUrl(user.profilePicture || "");
+    console.log(user)
+    const foundUser = findUserInStore(user.userId);
+
+    sessionStorage.setItem('selectedUser', JSON.stringify(foundUser))
+    setEditUserDetailsState(foundUser);
+
+    setProfileImageUrl(user.profilePictureUrl || "");
     setEditDialogOpen(true);
 
     setSelectedProgram(user.program);
 
-    const filteredInstructors = userData.filter(
-      (instructor) =>
-        instructor.role === "instructor" &&
-        Array.isArray(instructor.programsAssigned) &&
-        instructor.programsAssigned.includes(user.program)
-    );
+    // const filteredInstructors = userData.filter(
+    //   (instructor) =>
+    //     instructor.role === "instructor" &&
+    //     Array.isArray(instructor.programsAssigned) &&
+    //     instructor.programsAssigned.includes(user.program)
+    // );
 
   };
 
@@ -110,57 +112,46 @@ const useUserManagement = () => {
     setSelectedProgram(program);
   };
 
-  const handleEditSubmit = async () => {
-    try {
-      let imageUrl = profileImageUrl;
-
-      if (profileImage) {
-        imageUrl = await handleImageUpload(profileImage);
-        setProfileImageUrl(imageUrl);
-      }
-
-      const updatedUserDetails = {
-        ...editUserDetailsState,
-        profilePicture: imageUrl,
-      };
-
-      if (selectedInstructor) {
-        updatedUserDetails.assignedInstructor = selectedInstructor;
-      }
+  //close confirmation modals
+  const handleConfirmationModalClose = () => {
+    setConfirmModalOpen(false)
+  }
 
 
-      const updatedUserData = userData.map((user) =>
-        user.id === editUserDetailsState.id ? updatedUserDetails : user
-      );
-      setUserData(updatedUserData);
-      setEditDialogOpen(false);
-    } catch (error) {
-      console.error("Error updating user details:", error);
-    }
-  };
+ const handleDelete = async () => {
+  // Trigger a rerender before any operation
+  const selectedUserInStore = await JSON.parse(sessionStorage.getItem('selectedUser'));
+  if (!selectedUserInStore) return;
+  try {
+      console.log(selectedUserInStore);
+    const body = {
+      userId: selectedUserInStore.userId,
+      role: selectedUserInStore.role,
+      courseName: selectedUserInStore.program,
+      cohortName: selectedUserInStore.cohort,
+    };
 
-  const handleDelete = async () => {
-    if (!selectedUser) return;
-    try {
-      const user = findUserInStore(selectedUser.userId);
-      const body = {
-        userId: user.userId,
-        role: user.role,
-        courseName: user.program,
-        cohortName: user.cohort
-      };
-      console.log(body);
-      callApi(endpoints.USER,"DELETE", body)
-      const updatedUserData = userData.filter(
-        (user) => user.id !== selectedUser.id
-      );
-      setUserData(updatedUserData);
-      setConfirmDialogOpen(false);
+    await callDeleteApi(endpoints.USER, "DELETE", body);
+
+    if (deleteData) {
+     // Dispatch the deleteUser action to update the Redux store
+     dispatch(deleteUser(selectedUserInStore.userId, selectedUserInStore.role));
+
+      sessionStorage.removeItem('selectedUser');
+      sessionStorage.setItem('confrimModal', true)
+      setOpenDeleteModal(false);
       setSelectedUser(null);
-    } catch (error) {
-      console.error("Error deleting user:", error);
+      setRerender(!rerender);
+    } else {
+      sessionStorage.setItem('confrimModal', true);
+      setRerender(!rerender);
+
     }
-  };
+  } catch (error) {
+    console.error("Error deleting user:", error);
+  }
+ 
+};
 
   const columns = [
     { id: "sn", label: "S/N", width: 90 },
@@ -189,37 +180,63 @@ const useUserManagement = () => {
       label: "Actions",
       width: 200, // Increase the width to fit the new icon
       renderCell: (row) => (
-        <div className="action-buttons">
-          <IconButton 
-          onClick={() => {handleEdit(row)
-            setSelectedUser(row);
-
-          }}>
-            <EditIcon />
-          </IconButton>
-          <IconButton
-            onClick={() => {
-              setConfirmDialogOpen(true);
-              setSelectedUser(row);
-            }}
-          >
-            <DeleteIcon />
-          </IconButton>
-          <IconButton
-            onClick={() => {
-              setSelectedUser(row); // Set the user for viewing details
-              setViewUserDetails(true); // Open the view details dialog (if applicable)
-            }}
-          >
-            <VisibilityIcon />
-          </IconButton>
-        </div>
+            <div className="action-buttons" style={{ display: 'flex' }}>
+              <IconButton
+                onClick={() => {
+                  handleEdit(row);
+                }}
+                sx={{
+                  fontSize: {
+                    xs: '12px',  // Extra small screens (phones)
+                    sm: '12px',  // Small screens (tablets)
+                    md: '18px',  // Medium screens (desktops)
+                    lg: '18px',  // Large screens
+                    xl: '18px',  // Extra large screens
+                  },
+                }}
+              >
+                <EditIcon fontSize="inherit" />
+              </IconButton>
+        
+              <IconButton
+                onClick={() => {
+                  handleDeleteOpen(row);
+                }}
+                sx={{
+                  fontSize: {
+                    xs: '12px',  // Extra small screens (phones)
+                    sm: '12px',  // Small screens (tablets)
+                    md: '18px',  // Medium screens (desktops)
+                    lg: '18px',  // Large screens
+                    xl: '18px',  // Extra large screens
+                  },
+                }}
+              >
+                <DeleteIcon fontSize="inherit" />
+              </IconButton>
+        
+              <IconButton
+                onClick={() => {
+                  setSelectedUser(row);
+                  setViewUserDetails(true);
+                }}
+                sx={{
+                  fontSize: {
+                    xs: '12px',  // Extra small screens (phones)
+                    sm: '12px',  // Small screens (tablets)
+                    md: '18px',  // Medium screens (desktops)
+                    lg: '18px',  // Large screens
+                    xl: '18px',  // Extra large screens
+                  },
+                }}
+              >
+                <VisibilityIcon fontSize="inherit" />
+              </IconButton>
+            </div>
+      
       ),
     },
   ];
-  
-
-
 
   const studentData = students
     .map((user, index) => ({
@@ -257,43 +274,40 @@ const useUserManagement = () => {
   
   
   //formattted offline student data
-  const formattedOfflineStudents = offlineStudents
-    .map((user, index) => ({
-      id: user.userId,
-      sn: index + 1,
-      role: user.role,
-      userId: user.studentId,
-      name: `${user.firstName || "N/A"} ${user.lastName || "N/A"}`,
-      phoneNumber: user.phoneNumber || "N/A",
-      program: user.program || "N/A",
-      registeredDate: user.createdAt || "N/A",
-    }))
-    .sort((a, b) => a.sn - b.sn); // Sorting by S/N in ascending order
+  // const formattedOfflineStudents = offlineStudents
+  //   .map((user, index) => ({
+  //     id: user.userId,
+  //     sn: index + 1,
+  //     role: user.role,
+  //     userId: user.studentId,
+  //     name: `${user.firstName || "N/A"} ${user.lastName || "N/A"}`,
+  //     phoneNumber: user.phoneNumber || "N/A",
+  //     program: user.program || "N/A",
+  //     registeredDate: user.createdAt || "N/A",
+  //   }))
+  //   .sort((a, b) => a.sn - b.sn); // Sorting by S/N in ascending order
 
-  const getUniqueProgramsAssigned = () => {
-    const assignedPrograms = [];
-    userData.forEach((user) => {
-      if (user.role === "instructor" && Array.isArray(user.programsAssigned)) {
-        assignedPrograms.push(...user.programsAssigned);
-      }
-    });
-    return [...new Set(assignedPrograms)];
-  };
+  // const getUniqueProgramsAssigned = () => {
+  //   const assignedPrograms = [];
+  //   userData.forEach((user) => {
+  //     if (user.role === "instructor" && Array.isArray(user.programsAssigned)) {
+  //       assignedPrograms.push(...user.programsAssigned);
+  //     }
+  //   });
+  //   return [...new Set(assignedPrograms)];
+  // };
 
-  const programsAssignedOptions = getUniqueProgramsAssigned();
+  // const programsAssignedOptions = getUniqueProgramsAssigned();
 
   const handleTabChange = (event, newTabIndex) => {
     setTabIndex(newTabIndex);
   };
-
 
   return {
     studentData,
     instructorData,
     selectedRole,
     setSelectedRole,
-    userData,
-    setUserData,
     sortBy,
     sortDirection,
     setSortBy,
@@ -306,8 +320,8 @@ const useUserManagement = () => {
     setSelectedUser,
     editUserDetailsState,
     setEditUserDetailsState,
-    confirmDialogOpen,
-    setConfirmDialogOpen,
+    openDeleteModal,
+    setOpenDeleteModal,
     editDialogOpen,
     setEditDialogOpen,
     signUpDialogOpen,
@@ -322,23 +336,27 @@ const useUserManagement = () => {
     setSelectedProgram,
     offlineStudents,
     setOfflineStudents,
-    handleImageUpload,
     handleRoleSelect,
     handleSortChange,
     handlePageChange,
     handleRowsPerPageChange,
-    handleRowClick,
     handleEdit,
     handleProgramChange,
-    handleEditSubmit,
     handleDelete,
-    programsAssignedOptions,
+    // programsAssignedOptions,
     columns,
     tabIndex,
     handleTabChange,
     instructors,
     viewUserDetails,
-    setViewUserDetails
+    setViewUserDetails,
+    confirmModalOpen,
+    deleteData,
+    loading: deleteLoading || updateLoading,
+    handleConfirmationModalClose,
+    setConfirmModalOpen,
+    rerender,
+    deleteError
   };
 };
 

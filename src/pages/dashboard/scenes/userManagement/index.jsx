@@ -7,8 +7,8 @@ import Header from '../../components/Header';
 import TableComponent from "../../../../components/table";
 import useUserManagement from './useUserManagement';
 import ScrollDialog from '../../components/scrollDialog'; // Importing the ScrollDialog component
-import SignUpForm from '../../../../components/signUp';
 import withDashboardWrapper from '../../../../components/dasboardPagesContainer';
+import { DeleteModal, EditFormModal} from './modals';
 
 const UserManagement = () => {
   const theme = useTheme();
@@ -28,8 +28,6 @@ const UserManagement = () => {
     rowsPerPage,
     setRowsPerPage,
     selectedUser,
-    setSelectedUser,
-    confirmDialogOpen,
     setConfirmDialogOpen,
     editDialogOpen,
     setEditDialogOpen,
@@ -39,20 +37,16 @@ const UserManagement = () => {
     handleSortChange,
     handlePageChange,
     handleRowsPerPageChange,
-    handleRowClick,
     handleEdit,
-    handleProgramChange,
-    handleDelete,
     columns,
     tabIndex,
     handleTabChange,
     viewUserDetails,
-    setViewUserDetails
+    setViewUserDetails,
+    openDeleteModal,
+     setOpenDeleteModal,
+     rerender
   } = useUserManagement();
-
-  const openConfirmDialog = () => setConfirmDialogOpen(true);
-  const openEditDialog = () => setEditDialogOpen(true);
-  const openSignUpDialog = () => setSignUpDialogOpen(true);
 
   // Ensure the dialogs open when the selectedUser is set
   useEffect(() => {
@@ -98,7 +92,10 @@ const UserManagement = () => {
             onPageChange={handlePageChange}
             onRowsPerPageChange={handleRowsPerPageChange}
             onRowClick={() => setSelectedRole('student')}
-          />
+            hiddenColumnsSmallScreen={[ 'phoneNumber', 'registeredDate', 'userId']}
+            hiddenColumnsTabScreen={[ 'registeredDate', 'program', 'userId']}
+
+            />
         </Box>
       )}
 
@@ -117,6 +114,8 @@ const UserManagement = () => {
             onPageChange={handlePageChange}
             onRowsPerPageChange={handleRowsPerPageChange}
             onRowClick={() => setSelectedRole('instructor')}
+            hiddenColumnsSmallScreen={[ 'phoneNumber', 'registeredDate', 'userId']}
+            hiddenColumnsTabScreen={[ 'registeredDate',  'userId']}
           />
         </Box>
       )}
@@ -138,7 +137,7 @@ const UserManagement = () => {
       )}
 
       {/* User Details View */}
-      {selectedUser && (
+      {viewUserDetails && (
         <ScrollDialog
           buttonLabel="View User Details"
           dialogTitle="User Details"
@@ -161,34 +160,19 @@ const UserManagement = () => {
         />
       )}
 
-      {/* Confirm Delete Dialog */}
-      <ScrollDialog
-        buttonLabel="Confirm Delete"
-        dialogTitle="Confirm Delete"
-        dialogContent={<Typography>Are you sure you want to delete this user?</Typography>}
-        scrollType="body"
-        actionText1="Cancel"
-        actionText2="Confirm"
-        open={confirmDialogOpen}
-        onClose={() => setConfirmDialogOpen(false)}
-        onConfirm={handleDelete}
-      />
+      {/* delete modal */}
+      <DeleteModal 
+        open={openDeleteModal} 
+        onClose={() => setOpenDeleteModal(false) }
+         />
 
       {/* Edit User Form */}
-      <ScrollDialog
-        buttonLabel="Edit User"
-        dialogTitle="Edit User"
-        dialogContent={
-          selectedUser && (
-            <SignUpForm role={selectedRole} selectedUser={selectedUser.id} />
-          )
-        }
-        scrollType="body"
-        actionText1="Cancel"
-        actionText2="Confirm"
-        open={editDialogOpen}
-        onClose={() => setEditDialogOpen(false)}
-        onConfirm={handleEdit}
+      <EditFormModal
+        selectedRole={selectedRole}
+        editDialogOpen={editDialogOpen}
+        setEditDialogOpen={setEditDialogOpen}
+        handleEdit={handleEdit}
+        rerender= {rerender}
       />
 
       {/* Sign Up User Dialog */}

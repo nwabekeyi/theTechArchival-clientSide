@@ -6,22 +6,48 @@ import useApi from '../../../hooks/useApi';
 
 const ContactForm = () => {
   const [formData, setFormData] = useState({ name: '', message: '', phoneNumber: '' });
-  const { callApi, loading, error } = useApi();
+  const [error, setError] = useState('');
+  const { callApi, loading } = useApi();
 
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
+    setError(''); // Reset error when user is typing
+  };
+
+  const validatePhoneNumber = (phoneNumber) => {
+    if (phoneNumber.startsWith('0')) {
+      if (phoneNumber.length !== 11) {
+        return 'Phone number starting with 0 must be 11 digits long.';
+      }
+    } else if (phoneNumber.startsWith('234')) {
+      if (phoneNumber.length !== 13) {
+        return 'Phone number starting with 234 must be 13 digits long.';
+      }
+    } else {
+      return 'Phone number must start with 0 or 234.';
+    }
+    return ''; // No error
   };
 
   const handleSubmit = async (e) => {
-    const baseUrl = import.meta.env.VITE_API_BASE_URL
+    const baseUrl = `${import.meta.env.VITE_API_BASE_URL}${import.meta.env.VITE_ENQUIRY_ENDPOINT}`;
+
     e.preventDefault();
+    const phoneError = validatePhoneNumber(formData.phoneNumber);
+
+    if (phoneError) {
+      setError(phoneError);
+      return;
+    }
+
     try {
-      const result = await callApi(`${baseUrl}/api/v1/enquiries`, 'POST', formData);
+      const result = await callApi(baseUrl, 'POST', formData);
       console.log('Enquiry submitted successfully:', result);
-      setFormData({ name: '', message: '', phoneNumber: '' }); 
+      setFormData({ name: '', message: '', phoneNumber: '' });
     } catch (err) {
       console.error('Error submitting enquiry:', err.message);
+      setError('Failed to submit enquiry. Please try again.');
     }
   };
 
@@ -41,6 +67,7 @@ const ContactForm = () => {
         value={formData.phoneNumber}
         onChange={handleChange}
       />
+      {error && <ErrorMessage>{error}</ErrorMessage>} {/* Display error message */}
       <StyledTextArea
         name="message"
         placeholder="Message"
@@ -48,7 +75,9 @@ const ContactForm = () => {
         onChange={handleChange}
       />
       <BtnWrapperStyle>
-        <ChatbotBtn onClick={handleSubmit}>Submit Enquiry</ChatbotBtn>
+        <ChatbotBtn onClick={handleSubmit} disabled={loading}>
+          {loading ? 'Submitting...' : 'Submit Enquiry'}
+        </ChatbotBtn>
       </BtnWrapperStyle>
     </StyledEnquiryForm>
   );
@@ -78,6 +107,11 @@ const StyledTextArea = styled.textarea`
   padding: 10px;
   resize: none;
   height: 5em;
+`;
+
+const ErrorMessage = styled.p`
+  color: red;
+  margin: 5px 0;
 `;
 
 export default ContactForm;

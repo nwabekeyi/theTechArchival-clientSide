@@ -3,11 +3,8 @@ import {
   Button,
   Grid,
   Paper,
-  Typography,
-  Box,
   useTheme,
   Tooltip,
-  IconButton
 } from '@mui/material';
 import { tokens } from '../../../theme';
 import DeleteIcon from '@mui/icons-material/Delete';
@@ -19,6 +16,7 @@ import useCourses from './useCourses';
 import { AddCurriculumModal, AddCourseModal, AddCohortModal, COurseDetailsModal, CurriculumList } from './courseModals';
 import { useSelector } from 'react-redux';
 import TableComponent from "../../../../../components/table"; // Import your custom TableComponent
+import CustomIconButton from '../../../components/customIconButton';
 
 const Admin = () => {
   const theme = useTheme();
@@ -89,12 +87,14 @@ const Admin = () => {
       renderCell: (row) => (
         <>
           <Tooltip title="View Details">
-            <IconButton onClick={() => {
-              openCourseDetailsModal(row);
-              sessionStorage.setItem('selectedCourse', JSON.stringify(row));
+            <CustomIconButton 
+              onClick={() => {
+                openCourseDetailsModal(row);
+                sessionStorage.setItem('selectedCourse', JSON.stringify(row));
+              icon: {<VisibilityIcon />
+              }
               }}>
-              <VisibilityIcon />
-            </IconButton>
+            </CustomIconButton>
           </Tooltip>
           <Tooltip title="Edit Course">
             <IconButton
@@ -187,6 +187,8 @@ const Admin = () => {
                 onPageChange={handlePageChange}
                 onRowsPerPageChange={handleRowsPerPageChange}
                 onRowClick={handleRowClick}
+                hiddenColumnsSmallScreen={[ 'description', 'duration', 'cost']}
+                hiddenColumnsTabScreen={[ 'description',  'duration']}
               />
 
               <Button onClick={() => {openAddCourseModal('add')}} variant="contained" color="primary" style={{ marginTop: '20px' }}>
