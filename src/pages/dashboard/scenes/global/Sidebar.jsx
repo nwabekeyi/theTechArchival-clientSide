@@ -136,76 +136,73 @@ const Sidebar = () => {
 
   return (
     <Box
-      sx={{
-        "& .pro-sidebar .pro-menu": {
-          padding: `${isCollapsed ? '8px 0 0 0' : '20px'}`,
-          display: !isCollapsed && 'flex'
-        },
-        "& .pro-sidebar-inner": {
-          backgroundColor: colors.primary[400],
-          position: "fixed",
-          width: 'fit-content',
-          height: '95%',
-          borderRadius: `${isCollapsed ? '20px' : '10px'}`,
-          boxShadow: theme.palette.mode === 'light'
-            ? '0px 4px 12px rgba(0, 0, 0, 0.3)'
-            : '0px 4px 12px rgba(0, 0, 0, 0.5)',
-        },
-        "& .pro-sidebar": {
-          paddingLeft: "4%",
-          minWidth: isCollapsed ? "50px" : "220px",
-          width: 'fit-content',
-          maxWidth: isCollapsed ? "50px" : "220px",
-          display: 'flex',
-          alignItems: 'center',
-          backgroundColor:
-            theme.palette.mode === "light"
-              ? colors.primary[900]
-              : colors.primary[500],
-          justifyContent: "center",
-        },
-        "& .pro-sidebar.collapsed": {
-          minWidth: '60px'
-        },
-        "& .pro-sidebar .pro-menu.square .pro-menu-item > .pro-inner-item > .pro-icon-wrapper":{
-          backgroundColor: "transparent",
-          margin: "1vh 0",
-          display: "flex",
-          justifyContent: 'center',
-          height: 'auto'
-        },
-        "& .pro-icon": {
-          justifyContent: "flex-start !important",
-        },
-        "& .pro-menu-item.active ": {
-          justifyContent: "start !important",
-        },
-
-        
-        "& .pro-inner-item": {
-          padding: "10px 5px 5px 5px !important",
-          color: theme.palette.mode === "light"
-            ? colors.grey[100]
-            : colors.primary[200],
-        },
-        "& .pro-inner-item:hover": {
-          color: "#868dfb !important",
-        },
-        "& .pro-menu-item.active": {
-          display: 'flex',
-          justifyContent: "center",
-          color: "#6870fa !important",
-
-        },
-        "& .css-1l8icbj": {
-          padding: 0,
-        },
-        "& .pro-sidebar > .pro-sidebar-inner > .pro-sidebar-layout": {
-          padding: '5px',
-        },
-
-      }}
-    >
+    sx={{
+      minWidth: isCollapsed ? "85px !important" : "245px !important",
+      "& .pro-sidebar .pro-menu": {
+        padding: `${isCollapsed ? '8px 0 0 0' : '20px'} !important`,
+        display: !isCollapsed && 'flex !important'
+      },
+      "& .pro-sidebar > .pro-sidebar-inner": {
+        backgroundColor: `${colors.primary[400]} !important`,
+        position: "fixed !important",
+        width: 'fit-content !important',
+        height: `${isCollapsed ? '95%' : '100%'} !important`,
+        borderRadius: `${isCollapsed ? '20px' : '0px'} !important`,
+        boxShadow: theme.palette.mode === 'light'
+          ? '0px 4px 12px rgba(0, 0, 0, 0.3) !important'
+          : '0px 4px 12px rgba(0, 0, 0, 0.5) !important',
+      },
+      "& .pro-sidebar": {
+        paddingLeft: `${isCollapsed ? '4%' : '0%'} !important`,
+        minWidth: isCollapsed ? "60px !important" : "245px !important",
+        width: 'fit-content !important',
+        // maxWidth: isCollapsed ? "60px !important" : "220px !important",
+        display: 'flex !important',
+        alignItems: 'center !important',
+        backgroundColor:
+          theme.palette.mode === "light"
+            ? `${colors.primary[900]} !important`
+            : `${colors.primary[500]} !important`,
+        justifyContent: "center !important",
+      },
+      // "& .pro-sidebar.collapsed": {
+      //   minWidth: '70px !important'
+      // },
+      "& .pro-sidebar .pro-menu.square .pro-menu-item > .pro-inner-item > .pro-icon-wrapper": {
+        backgroundColor: "transparent !important",
+        margin: "1vh 0 !important",
+        display: "flex !important",
+        justifyContent: 'center !important',
+        height: 'auto !important'
+      },
+      "& .pro-icon": {
+        justifyContent: "flex-start !important",
+      },
+      "& .pro-menu-item.active": {
+        justifyContent: "start !important",
+      },
+      "& .pro-inner-item": {
+        padding: "10px 5px 5px 5px !important",
+        color: theme.palette.mode === "light"
+          ? `${colors.grey[100]} !important`
+          : `${colors.primary[200]} !important`,
+      },
+      "& .pro-inner-item:hover": {
+        color: "#868dfb !important",
+      },
+      "& .pro-menu-item.active": {
+        display: 'flex !important',
+        justifyContent: "center !important",
+        color: "#6870fa !important",
+      },
+      "& .css-1l8icbj": {
+        padding: "0 !important",
+      },
+      "& .pro-sidebar > .pro-sidebar-inner > .pro-sidebar-layout": {
+        padding: '5px !important',
+      },
+    }}
+    >    
       <ProSidebar collapsed={isCollapsed}>
         <Menu iconShape="square">
 

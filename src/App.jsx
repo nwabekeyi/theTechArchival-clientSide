@@ -9,12 +9,15 @@ import { store, persistor } from './reduxStore/store';
 function App() {
 
   return (
-    <Provider store={store}> {/* Provide Redux store */}
+
+        <Provider store={store}> {/* Provide Redux store */}
       <PersistGate loading={null} persistor={persistor}> {/* Wait for persisted state */}
           <MyRoute />
       </PersistGate>
     </Provider>
+
   );
+
 }
 
 export default App;

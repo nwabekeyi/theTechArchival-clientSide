@@ -1,16 +1,16 @@
+
+import "./index.css";
 import React, { useState,lazy, Suspense } from "react";
 import { Routes, Route } from "react-router-dom";
 import Topbar from "./scenes/global/Topbar";
 import Sidebar from "./scenes/global/Sidebar";
 import { CssBaseline, ThemeProvider, Box } from "@mui/material";
 import { ColorModeContext, useMode } from "./theme";
-import "./index.css";
 import { useSelector } from "react-redux";
 import FloatingMessageIcon from "./components/floatingMessageIcon";
 import { tokens } from "./theme";
 import SignIn from "../../components/Signin";
 import Loader from "../../utils/loader";
-
 
 
 // Lazy load the components
@@ -42,11 +42,9 @@ import useWebSocket from '../../hooks/useWebSocket'; // Import socket instance
 
 function DashboardHome() {
   const [theme, colorMode] = useMode();
-  const [isSidebar, setIsSidebar] = useState(true);
   const [userData, setUserData] = useState(null);
   const colors = tokens(theme.palette.mode);
   const user = useSelector((state) => state.users.user);
-  console.log(user)
   const userRole = user ? user.role : 'not logged in';
   const { emit, isConnected, listen} = useWebSocket();
 
@@ -115,14 +113,13 @@ function DashboardHome() {
       </div>
 
       :
-
       <ColorModeContext.Provider value={colorMode}>
       <FloatingMessageIcon />
       <ThemeProvider theme={theme}>
         <CssBaseline />
         <div style={{ display: "flex", height: "100%", gap: '0'}}>
           {/* Sidebar */}
-          <Sidebar isSidebar={isSidebar} />
+          <Sidebar />
 
           {/* Content */}
           <Box
