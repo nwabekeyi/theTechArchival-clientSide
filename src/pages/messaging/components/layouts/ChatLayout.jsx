@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useRef } from "react";
-import { Box, Grid, Paper, IconButton, useTheme } from "@mui/material";
+import { Box, Grid, IconButton, useTheme } from "@mui/material";
 import { tokens } from "../../../dashboard/theme"; // Your token function
 import { useQuery } from "@apollo/client";
 import { GET_CHATROOMS, GET_CHATROOM } from "../../../../utils/graphql/queries"; // Import the queries
@@ -21,7 +21,6 @@ export default function ChatLayout() {
   const [chatRooms, setChatRooms] = useState([]);
   const [filteredRooms, setFilteredRooms] = useState([]);
   const [currentChat, setCurrentChat] = useState();
-  const [onlineUsersId, setOnlineUsersId] = useState([]);
   const [searchQuery, setSearchQuery] = useState("");
   const [isContact, setIsContact] = useState(false);
   const socket = useRef();
@@ -110,12 +109,15 @@ export default function ChatLayout() {
         maxHeight: "100%",
         height: "100%",
         display: "flex",
-        flexDirection: "column",
         backgroundColor: `${
           theme.palette.mode === "light"
             ? colors.primary[100]
             : colors.primary[400]
         }`,
+        boxShadow: theme.palette.mode === 'light'
+          ? '0px 4px 12px rgba(0, 0, 0, 0.3)' // Lighter shadow for light mode
+          : '0px 4px 12px rgba(0, 0, 0, 0.5)',
+          borderRadius:"20px",
       }}
     >
       <Grid container sx={{ height: "100%" }}>
@@ -128,37 +130,34 @@ export default function ChatLayout() {
             borderRight: `1px solid ${colors.grey[300]}`,
             display: "flex",
             flexDirection: "column",
-            backgroundColor: `${
-              theme.palette.mode === "light"
-                ? colors.blueAccent[800]
-                : colors.primary[100]
-            }`,
-            overflowY: "auto",
+            backgroundColor:
+            theme.palette.mode === "light"
+              ? `${colors.primary[900]} !important`
+              : `${colors.primary[500]} !important`,            overflowY: "auto",
             height: "100%",
           }}
         >
-          <Paper
+          <Box
             sx={{
               padding: 2,
-              backgroundColor: colors.primary[800],
-              borderRadius: 0,
               display: "flex",
               alignItems: "center",
               justifyContent: "space-between", // This aligns the icon to the right
             }}
           >
-            <SearchUsers handleSearch={handleSearch} />
+            <SearchUsers 
+              handleSearch={handleSearch}
+            />
             {/* Icon at the right side */}
             <IconButton>
               <GroupIcon sx={{ color: colors.grey[100] }} />
             </IconButton>
-          </Paper>
+          </Box>
 
-          <Paper
+          <Box
             sx={{
               padding: 2,
               overflowY: "auto",
-              backgroundColor: colors.primary[900],
               borderRadius: 0,
               flexGrow: 1,
             }}
@@ -180,7 +179,7 @@ export default function ChatLayout() {
               changeChat={handleChatChange}
               role={user.role}
             />
-          </Paper>
+          </Box>
         </Grid>
 
         {/* Right Side - Chat Room or Welcome Screen */}
@@ -195,9 +194,8 @@ export default function ChatLayout() {
             maxHeight: "100%",
           }}
         >
-          <Paper
+          <Box
             sx={{
-              backgroundColor: colors.primary[500],
               height: "100%",
               borderRadius: 0,
             }}
@@ -223,7 +221,7 @@ export default function ChatLayout() {
             ) : (
               <Welcome />
             )}
-          </Paper>
+          </Box>
         </Grid>
       </Grid>
     </Box>

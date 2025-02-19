@@ -1,11 +1,12 @@
 import React, { useState } from 'react';
-import { Box, Button, CircularProgress, TextField } from '@mui/material';
+import { Box, CircularProgress, TextField } from '@mui/material';
 import { endpoints } from '../../../../utils/constants';
 import Modal from '../../components/modal'; 
 import { useSelector, useDispatch } from 'react-redux';
 import useApi from '../../../../hooks/useApi';
 import { setUser} from '../../../../reduxStore/slices/usersSlice';
-
+import ActionButton from '../../components/actionButton';
+import PaymentIcon from '@mui/icons-material/Payment';
 
 
 const PaystackButton = ({ onSuccess = () => {} }) => {  // Default to an empty function
@@ -114,14 +115,13 @@ const PaystackButton = ({ onSuccess = () => {} }) => {  // Default to an empty f
 
   return (
     <Box>
-      <Button
+      <ActionButton
+      icon={<PaymentIcon />}
         disabled={loading}
         onClick={handleOpenModal}  // Open modal on button click
-        variant="contained"
-        color="primary"
-      >
-        {loading ? <CircularProgress size={24} /> : 'Pay Now'}
-      </Button>
+        content= {loading ? <CircularProgress size={24} /> : 'Pay Now'}
+
+      />
 
       {/* Modal for inputting payment amount */}
       <Modal

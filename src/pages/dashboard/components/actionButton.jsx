@@ -1,7 +1,7 @@
 import { Box, Typography, useTheme, ButtonBase } from '@mui/material';
 import { tokens } from '../theme';
 
-const ActionButton = ({ icon, content, onClick, ...props }) => {
+const ActionButton = ({ icon, content, onClick, submit, ...props }) => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
 
@@ -18,6 +18,7 @@ const ActionButton = ({ icon, content, onClick, ...props }) => {
     <ButtonBase
       onClick={onClick}
       sx={{ width: 'auto' }} // Ensures the button expands to full width
+      type= {submit && 'submit'}
     >
       <Box
         width={{
@@ -38,7 +39,8 @@ const ActionButton = ({ icon, content, onClick, ...props }) => {
         <Typography
           color={textColor}
           sx={{
-            ml: '5px',
+            mb: '5px',
+            mx: '5px',
             fontSize: {
               xs: '12px',  // Font size for extra-small screens (mobile)
               sm: '14px',  // Font size for small screens (tablet)

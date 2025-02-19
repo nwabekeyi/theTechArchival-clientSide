@@ -11,6 +11,7 @@ import useApi from '../../../../hooks/useApi';
 import { endpoints } from '../../../../utils/constants';
 import Loader from "../../../../utils/loader";
 import ConfirmationModal from '../../components/confirmationModal';
+import ActionButton from '../../components/actionButton';
 
 const Assignment = () => {
   const theme = useTheme();
@@ -96,8 +97,23 @@ const Assignment = () => {
       const formData = new FormData();
       formData.append('submission', file);
       formData.append('studentId', studentId);
-      postAssignment(`${endpoints.ASSIGNMENT}/submissions/${userDetails.cohort}/${assignmentId}`, 'PATCH', formData);
-      if (postAssignment || postAssignmentError) {
+      const response = postAssignment(`${endpoints.ASSIGNMENT}/submissions/${userDetails.cohort}/${assignmentId}`, 'PATCH', formData);
+      if (response && response.message) {
+         // Update the assignment state after successful submission
+      setAssignments((prevAssignments) =>
+        prevAssignments.map((assignment) =>
+          assignment.id === assignmentId
+            ? {
+                ...assignment,
+                submissions: [...assignment.submissions, { studentId }], // Add the submission for the student
+              }
+            : assignment
+        )
+      );
+        SetSubmissionMessageModal(true);
+      }
+
+      if (postAssignmentError) {
         SetSubmissionMessageModal(true);
       }
     }
@@ -114,6 +130,8 @@ const Assignment = () => {
       if (postAssignment || postAssignmentError) {
         SetSubmissionMessageModal(true);
       }
+     
+
     }
     handleCloseSubmitModal();
   };
@@ -202,17 +220,15 @@ const Assignment = () => {
 
       {/* Modal to submit assignment as a file */}
       <Modal open={openSubmitModal} onClose={handleCloseSubmitModal} title={`Submit assignment for ${selectedAssignment?.title}`} noConfirm>
-        <Box>
+        <Box display='flex'>
           <TextField type="file" onChange={handleFileChange} fullWidth />
-          <Button
+
+          <ActionButton 
             onClick={() => {selectedAssignment?.hasSubmitted ? handleFileResubmit(selectedAssignment?.assignmentId) : handleFileSubmit(selectedAssignment?.assignmentId)}}
-            variant="contained"
-            color="primary"
-            fullWidth
-            sx={{marginTop: '20px'}}
-          >
-            {selectedAssignment?.hasSubmitted ? "Resubmit" : "Submit"}
-          </Button>
+            content= {selectedAssignment?.hasSubmitted ? "Resubmit" : "Submit"}
+            sx={{margin: '10px', }}
+          />
+
         </Box>
       </Modal>
 

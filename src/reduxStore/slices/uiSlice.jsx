@@ -3,6 +3,7 @@ import { createSlice } from '@reduxjs/toolkit';
 const initialState = {
   loading: false,
   error: null,
+  isDashboardCollapse: true, // Initial value set to true
 };
 
 const uiSlice = createSlice({
@@ -15,8 +16,11 @@ const uiSlice = createSlice({
     setError: (state, action) => {
       state.error = action.payload;
     },
+    toggleDashboardCollapse: (state, action) => {
+      state.isDashboardCollapse = action.payload;
+    },
   },
 });
 
-export const { setLoading, setError } = uiSlice.actions;
+export const { setLoading, setError, toggleDashboardCollapse } = uiSlice.actions;
 export default uiSlice.reducer;

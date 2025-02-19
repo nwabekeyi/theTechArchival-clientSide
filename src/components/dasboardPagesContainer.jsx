@@ -9,11 +9,10 @@ const withDashboardWrapper = (WrappedComponent) => {
 
     return (
 <Box sx={{ 
-            p: { xs: 1, sm: 1, md: 1, lg: 2}, 
+            // p: { xs: 1, sm: 0, md: 0, lg: 0}, 
             // pr: { xs: 0, sm: 0, md: 0, lg: 2 }, 
-            mx: { xs: 1, md: 0 },
             overflow: 'auto',
-            maxWidth: {sx: '90%', sm: '100%', md:"100%", lg: '100%'}
+            minWidth: {sx: '90%', sm: '100%', md:"100%", lg: '100%'}
             }}>
         <WrappedComponent {...props} />
       </Box>

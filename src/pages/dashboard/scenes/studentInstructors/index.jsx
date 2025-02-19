@@ -92,18 +92,21 @@ function StudentInstructors() {
                     key={index}
                     title={`${instructor.firstName} ${instructor.lastName}`}
                     details={
-                        <Box display="flex" flexDirection="column" alignItems="center">
+                        <Box display="flex" alignItems="center" justifyContent='center' gap="10px">
                             <Avatar
                                 src={instructor.profilePictureUrl}
                                 alt={`${instructor.firstName} ${instructor.lastName}`}
                                 sx={{ width: 120, height: 120, mb: 2 }}
                             />
-                            <Typography variant="body2" color={colors.grey[500]}>
+                            <Box>
+                                <Typography variant="body2" color={colors.grey[100]}>
                                 {instructor.role}
                             </Typography>
-                            <Typography variant="body2" color={colors.grey[500]} mt="5px">
+                            <Typography variant="body2" color={colors.grey[100]} mt="5px">
                                 {instructor.program}
                             </Typography>
+
+                            </Box>
                         </Box>
                     }
                     actions={[

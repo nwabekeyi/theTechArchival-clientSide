@@ -180,7 +180,7 @@ export default function ChatRoom({ currentChat, currentUser }) {
 
   return (
     <Box sx={{ width: '100%', display: 'flex', flexDirection: 'column', height: '100%'}}>
-      <Paper sx={{ padding: 2, backgroundColor: colors.primary[800], borderBottom: 1, borderColor: 'divider', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+      <Box sx={{ padding: 2, borderBottom: 1, borderColor: 'divider', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
         <Box sx={{ display: 'flex', alignItems: 'center' }}>
           {selectedView !== 'messages' && (
             <IconButton onClick={() => setSelectedView('messages')}>
@@ -210,7 +210,7 @@ export default function ChatRoom({ currentChat, currentUser }) {
           <MenuItem onClick={() => handleMenuSelect('search')}>Search</MenuItem>
           <MenuItem onClick={() => handleMenuSelect('participants')}>See Group Participants</MenuItem>
         </Menu>
-      </Paper>
+      </Box>
 
       {selectedView === 'messages' && (
         <>

@@ -9,7 +9,6 @@ export default function Welcome() {
         flexDirection: "column",
         alignItems: "center",
         paddingLeft: 2,
-        backgroundColor: "background.paper",
         height: "100%",
         justifyContent: "center",
       }}

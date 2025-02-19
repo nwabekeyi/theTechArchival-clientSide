@@ -2,7 +2,8 @@ import { Box, Button, TextField, Typography, Alert, MenuItem, FormControl, Input
 import useSignUp from './useSignUp';
 import ConfirmationModal from "../../pages/dashboard/components/confirmationModal";
 import { tokens } from '../../pages/dashboard/theme';
-import Loader from '../../utils/loader'
+import Loader from '../../utils/loader';
+import ActionButton from '../../pages/dashboard/components/actionButton';
 
 const SignUpForm = ({ role, offline, selectedUser }) => {
     const theme = useTheme();
@@ -111,9 +112,10 @@ const SignUpForm = ({ role, offline, selectedUser }) => {
                     </Box>
                 ))}
                 {error && <Alert severity="error">{error}</Alert>}
-                <Button variant="contained" type="submit" >
-                    {selectedUser ? 'Update' : 'Sign Up'}
-                </Button>
+                <ActionButton 
+                content= {selectedUser ? 'Update' : 'Sign Up'} 
+                submit />
+                    
             </form>
 
             {/* Modal */}

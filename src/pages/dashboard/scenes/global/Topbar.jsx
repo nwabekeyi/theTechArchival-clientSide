@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useSelector } from 'react-redux';
-import { Box, InputBase, IconButton, useTheme, Badge, List, ListItem, ListItemText, Divider } from "@mui/material";
+import { Box, Avatar, InputBase, IconButton, useTheme, Badge, List, ListItem, ListItemText, Divider } from "@mui/material";
 import NotificationsOutlinedIcon from "@mui/icons-material/NotificationsOutlined";
 import SettingsOutlinedIcon from "@mui/icons-material/SettingsOutlined";
 import SearchIcon from "@mui/icons-material/Search";
@@ -16,7 +16,7 @@ const Topbar = () => {
 
   const { unreadCount } = useSelector((state) => state.notifications);
   const userDetails = useSelector((state) => state.users.user);
-
+  const isDashboardCollapse = useSelector((state) => state.ui.isDashboardCollapse);
   const [notificationsAnchorEl, setNotificationsAnchorEl] = useState(null);
   const [settingsAnchorEl, setSettingsAnchorEl] = useState(null);
   const [searchQuery, setSearchQuery] = useState("");
@@ -76,10 +76,10 @@ const Topbar = () => {
       mt={3}
       display="flex"
       justifyContent="stretch"
-      py={2}
+      py={1}
       px={4}
       sx={{
-        borderRadius:"25px",
+        borderRadius:"20px",
         boxShadow: theme.palette.mode === 'light'
           ? '0px 4px 12px rgba(0, 0, 0, 0.3)' // Lighter shadow for light mode
           : '0px 4px 12px rgba(0, 0, 0, 0.5)', // Darker shadow for dark mode
@@ -87,15 +87,22 @@ const Topbar = () => {
         top: 0,
         zIndex: 1000,
         backgroundColor: colors.primary[400],
-        width: "95%",
+        width: "100%",
       }}
     >
       {/* SEARCH BAR */}
       <Box display="flex" alignItems='center' sx={{flex:'2'}}>
         <Box
-          display="flex"
-          backgroundColor={theme.palette.mode === "dark" ? colors.grey[400] : colors.primary[700]}  // Grey background in dark mode
-          borderRadius="3px"
+         sx={{
+          display: 'flex',
+          alignItems: 'center',
+          borderRadius: '10px',
+          backgroundColor: colors.primary[800],
+          padding: '0 10px',
+          '&:hover': {
+            borderColor: theme.palette.primary.main,
+          },
+         }}
         >
           <InputBase
             sx={{ pl: 2, flex: 1, color: 'white' }}
@@ -151,26 +158,38 @@ const Topbar = () => {
       )}
 
       {/* ICONS */}
-      <Box display="flex" sx={{justifyContent:'end', marginLeft: '10px'}}>
-        <IconButton onClick={handleOpenNotifications} sx={{ color:theme.palette.mode === "light"
-            ? colors.grey[100]
-            : colors.primary[200], 
-          padding: '4px'
+      <Box display="flex" sx={{ justifyContent: 'end', alignItems: 'center' }}>
+      <IconButton
+        onClick={handleOpenNotifications}
+        sx={{
+          color: theme.palette.mode === "light" ? colors.grey[100] : colors.primary[200],
+          padding: '4px',
         }}
-            >
-          <Badge badgeContent={unreadCount} color="error">
-            <NotificationsOutlinedIcon />
-          </Badge>
-        </IconButton>
-        <IconButton onClick={handleOpenSettings} sx={{ color:theme.palette.mode === "light"
-            ? colors.grey[100]
-            : colors.primary[200], 
-            padding: '4px'
+      >
+        <Badge badgeContent={unreadCount} color="error">
+          <NotificationsOutlinedIcon />
+        </Badge>
+      </IconButton>
+
+      {/* Conditionally render based on isDashboardCollapse */}
+      {isDashboardCollapse ? (
+        <Avatar 
+          src={userDetails.profileUrl} alt="User Profile" 
+          sx={{ width: 25, height: 25 }} 
+          onClick={handleOpenSettings}
+/>
+      ) : (
+        <IconButton
+          onClick={handleOpenSettings}
+          sx={{
+            color: theme.palette.mode === "light" ? colors.grey[100] : colors.primary[200],
+            padding: '4px',
           }}
-            >
+        >
           <SettingsOutlinedIcon />
         </IconButton>
-      </Box>
+      )}
+    </Box>
 
       {/* Notifications Popover */}
       <NotificationsPopover

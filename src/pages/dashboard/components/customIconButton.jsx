@@ -1,9 +1,10 @@
 import { IconButton } from '@mui/material';
 import React from 'react';
 
-const CustomIconButton = ({ onClick, icon, ...props }) => {
+const CustomIconButton = ({ onClick, icon, title, ...props }) => {
   return (
     <IconButton
+    title ={title}
       onClick={onClick}
       sx={{
         fontSize: {

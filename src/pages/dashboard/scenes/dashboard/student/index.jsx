@@ -96,7 +96,7 @@ const Student = () => {
           </ResponsiveContainer>
 
           <ResponsiveContainer sm={6} md={3} >
-            <DashboardDataBox >
+            <DashboardDataBox noFlex>
               <Typography variant="h6" fontWeight="600" mb="5px">
                 Next Class
               </Typography>
@@ -118,12 +118,12 @@ const Student = () => {
         {/* SECOND ROW */}
         <RowContainer>
           <ResponsiveContainer md={8}>
-            <DashboardDataBox height='350px'>
+            <DashboardDataBox height='350px' noFlex>
               <PerfromanceLineChart />
             </DashboardDataBox>
           </ResponsiveContainer>
           <ResponsiveContainer md={4}>
-            <DashboardDataBox
+            <DashboardDataBox noFlex
             >
               <Typography variant="h5" fontWeight="600" mb="15px">
                 Upcoming Schedule
@@ -131,7 +131,7 @@ const Student = () => {
               {timeTableData && timeTableData.length > 0 ? (
                 timeTableData.map((schedule) => (
                   <Card key={schedule.id} sx={{ mb: 2 }}>
-                    <CardContent sx={{ backgroundColor: conBg }}>
+                    <CardContent sx={{ backgroundColor: conBg, textAlign: 'left' }}>
                       <Typography variant="h6">{schedule.topic}</Typography>
                       <Typography>{formatDateToDDMMYYYY(schedule.date)}</Typography>
                       <Typography>{schedule.time}</Typography>
@@ -162,7 +162,7 @@ const Student = () => {
               {announcements && announcements.length > 0 ? (
                 announcements.map((announcement) => (
                   <Card key={announcement.id} sx={{ mb: 2 }}>
-                    <CardContent sx={{ backgroundColor: conBg }}>
+                    <CardContent sx={{ backgroundColor: conBg, textAlign: 'left' }}>
                       <Typography variant="h6">{announcement.title}</Typography>
                       <Typography variant="body2">{announcement.message}</Typography>
                       <Typography variant="caption" color="gray">
@@ -188,7 +188,7 @@ const Student = () => {
               </Typography>
               {resources.map((res, i) => (
                 <Card key={i} sx={{ mb: 2 }}>
-                  <CardContent sx={{ backgroundColor: conBg }}>
+                  <CardContent sx={{ backgroundColor: conBg, textAlign: 'left'}}>
                     <Typography variant="h6">{res.title}</Typography>
                     <a href={res.link} target="_blank" rel="noopener noreferrer">
                       {res.link}
