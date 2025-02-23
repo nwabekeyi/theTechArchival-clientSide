@@ -114,8 +114,12 @@ const initialState = {
   chatroomMessages: {}, // This will store chatroom messages
   messageLoading: false,
   error: null,
-  chatrooms : [],
-  unreadChatroomMessages : []
+  chatrooms: [],
+  unreadChatroomMessages: [],
+  replyToMessage: null, // Initial state for replyToMessage
+  selectedView: null, // Initial state for selectedView
+  message: null, // Initial state for single message
+  messages: '' // Initial state for multiple messages
 };
 
 const messageSlice = createSlice({
@@ -203,7 +207,29 @@ const messageSlice = createSlice({
 
     addChatroom: (state, action) => {
       state.chatrooms.push(action.payload); // Add a new chatroom to the list
-    }
+    },
+
+    // New reducer for setting replyToMessage
+    setReplyToMessage: (state, action) => {
+      state.replyToMessage = action.payload;
+    },
+
+    // New reducer for setting selectedView
+    setSelectedView: (state, action) => {
+      state.selectedView = action.payload;
+    },
+
+    // New reducer for setting a single message
+    setMessage: (state, action) => {
+      state.message = action.payload;
+    },
+
+    // New reducer for setting multiple messages
+    setMessages: (state, action) => {
+      state.messages = action.payload;
+    },
+    
+    // Rest of the reducers...
   },
   extraReducers: (builder) => {
     builder
@@ -234,7 +260,7 @@ const messageSlice = createSlice({
   },
 });
 
-// Export the actions
+// Export the actions for the newly added reducers
 export const {
   addPrivateMessage,
   addChatroomMessages,
@@ -244,7 +270,11 @@ export const {
   addChatroom,
   setAdminChatrooms,
   setUnreadChatroomMessages,
-  updateReadby
+  updateReadby,
+  setReplyToMessage,
+  setSelectedView,
+  setMessage,
+  setMessages
 } = messageSlice.actions;
 
 // Export the reducer

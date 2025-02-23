@@ -77,11 +77,11 @@ const Topbar = () => {
       display="flex"
       justifyContent="stretch"
       py={1}
-      px={4}
+      px={{xs:2, md:4}}
       sx={{
         borderRadius:"20px",
         boxShadow: theme.palette.mode === 'light'
-          ? '0px 4px 12px rgba(0, 0, 0, 0.3)' // Lighter shadow for light mode
+          ? '0px 4px 0px rgba(0, 0, 0, 0.1)' // Lighter shadow for light mode
           : '0px 4px 12px rgba(0, 0, 0, 0.5)', // Darker shadow for dark mode
         position: 'sticky',
         top: 0,
@@ -174,8 +174,8 @@ const Topbar = () => {
       {/* Conditionally render based on isDashboardCollapse */}
       {isDashboardCollapse ? (
         <Avatar 
-          src={userDetails.profileUrl} alt="User Profile" 
-          sx={{ width: 25, height: 25 }} 
+          src={userDetails.profilePictureUrl} alt="User Profile" 
+          sx={{ width: 25, height: 25, cursor: 'pointer' }} 
           onClick={handleOpenSettings}
 />
       ) : (

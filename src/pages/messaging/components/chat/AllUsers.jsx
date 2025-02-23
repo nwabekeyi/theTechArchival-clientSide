@@ -1,7 +1,8 @@
 import { useState, useEffect } from "react";
-import { createChatRoom } from "../../services/ChatService";
 import { Avatar, List, ListItem, ListItemText, Typography, Box, useTheme } from "@mui/material";
 import { tokens } from "../../../dashboard/theme"; // Your token function
+import { setSelectedView } from '../../../../reduxStore/slices/messageSlice';
+import { useDispatch } from 'react-redux';
 
 export default function AllUsers({
   chatRooms, // Default to empty array
@@ -13,6 +14,8 @@ export default function AllUsers({
   const [selectedChat, setSelectedChat] = useState(null);
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
+  const dispatch = useDispatch();
+
 
   useEffect(() => {
     if (!role) {
@@ -44,12 +47,16 @@ export default function AllUsers({
       <ListItem
         button
         selected={selectedChat === chatRoom}
-        onClick={() => changeCurrentChat(chatRoom)}
+        onClick={() => {
+          changeCurrentChat(chatRoom);
+          dispatch(setSelectedView('messages'));
+        }}
         sx={{
-          backgroundColor: selectedChat === chatRoom ? colors.greenAccent[700] : colors.greenAccent[900],
+          backgroundColor: selectedChat === chatRoom ? colors.greenAccent[700] : colors.greenAccent[700],
           '&:hover': {
             backgroundColor: 'action.hover',
           },
+          borderRadius: '20px'
         }}
       >
         <Avatar
@@ -86,7 +93,7 @@ export default function AllUsers({
         selected={selectedChat === chatRoom}
         onClick={() => changeCurrentChat(chatRoom)}
         sx={{
-          backgroundColor: selectedChat === chatRoom ? 'action.selected' : 'background.paper',
+          backgroundColor: selectedChat === chatRoom ? colors.primary[800] : colors.primary[800],
           '&:hover': {
             backgroundColor: 'action.hover',
           },
@@ -104,7 +111,7 @@ export default function AllUsers({
         {/* Render chat room name */}
         <ListItemText
             primary={
-              <Typography variant="h1" sx={{ fontWeight: 'bold' }}>
+              <Typography variant="h1" sx={{ fontWeight: 'bold'}}>
                 {chatRoom.name}
               </Typography>
             }

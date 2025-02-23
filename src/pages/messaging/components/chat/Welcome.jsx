@@ -5,10 +5,10 @@ export default function Welcome() {
   return (
     <Box
       sx={{
-        display: "flex",
+        display: {xs: 'none', md: "flex"},
         flexDirection: "column",
         alignItems: "center",
-        paddingLeft: 2,
+        paddingLeft: 35,
         height: "100%",
         justifyContent: "center",
       }}

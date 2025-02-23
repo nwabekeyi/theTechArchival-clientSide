@@ -167,8 +167,8 @@ const Sidebar = () => {
         height: `${isCollapsed ? '95%' : '100%'} !important`,
         borderRadius: `${isCollapsed ? '20px' : '0px'} !important`,
         boxShadow: theme.palette.mode === 'light'
-          ? '0px 4px 12px rgba(0, 0, 0, 0.3) !important'
-          : '0px 4px 12px rgba(0, 0, 0, 0.5) !important',
+        ? '0px 4px 4px rgba(0, 0, 0, 0.1)' // Lighter shadow for light mode
+        : '0px 4px 12px rgba(0, 0, 0, 0.5) !important',
       },
       "& .pro-sidebar": {
         minWidth: '90%',

@@ -5,8 +5,9 @@ import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import { tokens } from "../../../dashboard/theme";
 import GroupParticipants from "../chat/ChatRoom/GroupParticipants";
 import InfoIcon from '@mui/icons-material/Info';
-import { useSelector } from 'react-redux';
+import { useSelector, useDispatch} from 'react-redux';
 import { createSelector } from 'reselect';
+import { setReplyToMessage } from '../../../../reduxStore/slices/messageSlice';
 
 // Memoized selector for deliveredTo array
 const getDeliveredToArray = createSelector(
@@ -21,13 +22,12 @@ const getReadByArray = createSelector(
 );
 
 const Message = ({
-  message,
   self,
   onReply,
   isReplyingTo,
-  setIsReplyingTo,
   mention,
-  currentChat
+  currentChat,
+  message
 }) => {
   const [menuOpen, setMenuOpen] = useState(false);
   const [infoOpen, setInfoOpen] = useState(false);
@@ -40,11 +40,11 @@ const Message = ({
 
   const deliveredToRef = useRef([]);
   const readByRef = useRef([]);
+  const dispatch = useDispatch();
 
 // Function to filter users with existing userId and remove duplicates
 const removeDuplicates = (array) => {
   const uniqueUsers = {};
-  
   // First, filter users where user is not null and userId exists
   const filteredArray = array.filter((user) => user && user.userId);
 
@@ -72,7 +72,7 @@ const removeDuplicates = (array) => {
   const handleReply = (event) => {
     event.stopPropagation(); // Prevents the event from propagating to the handleClickOutside
     console.log('Reply button clicked'); // Check if the click is triggering correctly
-    setIsReplyingTo(message); // Set the message to be replied to
+    dispatch(setReplyToMessage(message));
 
     // Ensure the menu stays open or close it manually
     setMenuOpen(true); // If you want to keep the menu open after clicking Reply
@@ -106,7 +106,7 @@ const removeDuplicates = (array) => {
         position: 'relative',
         flexWrap: 'wrap',
       }}
-      data-message-id={message._id}
+      data-message-id={message && message._id}
     >
       <Box
         sx={{
@@ -114,11 +114,11 @@ const removeDuplicates = (array) => {
           flexDirection: 'column',
           alignItems: 'end',
           padding: 1,
-          backgroundColor: self === message.sender.id ? colors.primary[500] : colors.primary[600],
+          backgroundColor: message.sender && message && self === message.sender.id ? colors.primary[500] : colors.primary[600],
           borderRadius: 2,
-          maxWidth: '50%',
+          maxWidth: {xs: '95%', sm: '80%', md: '50%'},
           width: 'auto',
-          marginLeft: self === message.sender?.id ? 'auto' : '0',
+          marginLeft: message && self === message.sender?.id ? 'auto' : '0',
           cursor: 'pointer',
           '&:hover': { backgroundColor: colors.grey[700] },
           wordWrap: 'break-word',
@@ -129,7 +129,7 @@ const removeDuplicates = (array) => {
         onMouseEnter={() => setIsHovered(true)}
         onMouseLeave={() => setIsHovered(false)}
       >
-        {message.replyTo && Object.keys(message.replyTo).length !== 0 && (
+        {message && message.replyTo && Object.keys(message.replyTo).length !== 0 && (
           <Typography
             variant="caption"
             color="textSecondary"
@@ -142,7 +142,7 @@ const removeDuplicates = (array) => {
         <Box
           sx={{
             display: 'flex',
-            flexDirection: self !== message.sender.id ? 'column' : 'row',
+            flexDirection: message.sender && message && self !== message.sender.id ? 'column' : 'row',
             alignItems: 'start',
             justifyContent: 'center',
             width: '100%',
@@ -159,7 +159,7 @@ const removeDuplicates = (array) => {
               marginRight: '20px'
             }}
           >
-            {message.message}
+            {message && message.message}
           </Typography>
 
           {isHovered && (
@@ -176,14 +176,14 @@ const removeDuplicates = (array) => {
             >
               <KeyboardArrowDownIcon
                 sx={{
-                  fontSize: self === message.sender.id ? '1.5rem' : '1.5rem',
+                  fontSize: message.sender && message && self === message.sender.id ? '1.5rem' : '1.5rem',
                 }}
               />
             </Box>
           )}
         </Box>
 
-        {self !== message.sender.id && (
+        {message.sender && message && self !== message.sender.id && (
           <Box
             sx={{
               display: 'flex',
@@ -220,12 +220,11 @@ const removeDuplicates = (array) => {
                 <ReplyIcon sx={{ marginRight: 1 }} /> Reply
               </MenuItem>
               {
-                self === message.sender.id && <MenuItem onClick={() => setInfoOpen(true)}>
+                message.sender && message && self === message.sender.id && <MenuItem onClick={() => setInfoOpen(true)}>
                 <InfoIcon sx={{ marginRight: 1 }} /> Info
               </MenuItem>
               }
             </Menu>
-              
           </Box>
 
 
