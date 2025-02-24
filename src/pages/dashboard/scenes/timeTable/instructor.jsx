@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Box, TextField, Button } from '@mui/material';
+import { Box, TextField } from '@mui/material';
 import { useTheme } from '@mui/material';
 import Header from '../../components/Header';
 import Modal from '../../components/modal';
@@ -12,7 +12,7 @@ import ConfirmationModal from '../../components/confirmationModal';
 import CustomIconButton from '../../components/customIconButton';
 import EditIcon from '@mui/icons-material/Edit';
 import ActionButton from '../../components/actionButton';
-
+ import { AttendanceModal } from './Modals';
 
 const Instructor = () => {
   const theme = useTheme();
@@ -30,7 +30,8 @@ const Instructor = () => {
   const [schedules, setSchedules] = useState([]);
   const [deleteConfirm, setDeleteConfrim] = useState(false);
   const [updateConfirm, setUpdateConfrim] = useState(false)
-
+  const [openAttendanceModal, setOpenAttendanceModal] = useState(false);
+  const [timeTableToMark, setTimeTableToMark] = useState('');
 
   const userDetails = useSelector((state) => state.users.user);
   const cohortName = userDetails.cohort;
@@ -46,6 +47,17 @@ const Instructor = () => {
       setUpdateConfrim(false);
     }
   };
+
+  //open mark attendance modal
+const openAttendance =  (timeTable)=> {
+  setOpenAttendanceModal(true);
+  setTimeTableToMark(timeTable);
+}
+
+  //close mark attendance modal
+  const handleAttendanceModalClose =  (timeTableId)=> {
+    setOpenAttendanceModal(false);
+  }
 
   const { loading: postLoading, data: postData, error: postError, callApi: postCallApi } = useApi();
   const { loading: getLoading, error: getError, callApi: getCallApi } = useApi();
@@ -76,6 +88,7 @@ const Instructor = () => {
     return scheduleDateTime; // Return the Date object for comparison
   };
   
+
   const columns = [
     {
       id: 'date',
@@ -95,25 +108,25 @@ const Instructor = () => {
         const isPast = scheduleDateTime <= currentDateTime; // Check if the scheduled time is in the past
   
         return (
-          <>
+          <Box sx={{px:0}}>
               < CustomIconButton
                 onClick={() => handleEdit(row)}
                 icon= {<EditIcon />}
               />
-            <Button
-            sx={{
-              fontSize: { xs: '0.5rem', sm: '0.7rem' },  // Smaller font on small screens
-              padding: { xs: '4px', sm: '8px' },  // Adjust padding for small screens
-              minWidth: { xs: '50px', sm: '70px' },  // Reduce width on small screens
-              ml: 1
-            }}
-              variant="contained"
-              color={isPast ? 'success' : 'secondary'} // Change color if past
+
+          <ActionButton 
+                onClick={() => openAttendance(row)}
+                content=  'Mark Attendance'
+              sx={{width: '120px'}}
+            />
+
+             <ActionButton 
               onClick={() => (handleDelete(row))}
-            >
-              {isPast ? 'Mark as Done' : 'Delete'} {/* Change text conditionally */}
-            </Button>
-          </>
+              content= {isPast ? 'Mark as Done' : 'Delete'}
+              sx={{width: '120px', mx: 1}}
+            />
+
+          </Box>
         );
       },
     },
@@ -243,8 +256,6 @@ const Instructor = () => {
         onClick={handleOpenEditModal}
         content= 'Add Schedule'
       />
-
-
       <TableComponent
         columns={columns}
         data={schedules}
@@ -336,6 +347,14 @@ const Instructor = () => {
       >
         
       </ConfirmationModal>
+
+      {/* mark attendance modal */}
+      <AttendanceModal 
+        openAttendanceModal={openAttendanceModal}
+        cohortName={userDetails.cohort}
+        timeTable={timeTableToMark}
+        handleAttendanceModalClose={handleAttendanceModalClose}
+      />
     </Box>
   );
 };

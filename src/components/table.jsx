@@ -147,7 +147,7 @@ const TableComponent = ({
                         key={column.id}
                         sx={{
                           fontSize: isSmallScreen ? '0.65rem' : '0.875rem', // Adjust font size
-                          padding: isSmallScreen ? '4px 8px' : '16px', // Adjust cell padding
+                          padding: isSmallScreen ? '4px 8px' : '16px 10px', // Adjust cell padding
                         }}
                       >
                         {column.renderCell ? column.renderCell(row) : formatCellData(row[column.id])}

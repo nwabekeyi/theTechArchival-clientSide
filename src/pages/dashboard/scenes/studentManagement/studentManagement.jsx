@@ -3,13 +3,11 @@ import {
   Box,
   Grid,
   Typography,
-  IconButton,
   Avatar,
   useTheme,
   Accordion,
   AccordionSummary,
   AccordionDetails,
-  Button
 } from '@mui/material';
 import { Message } from '@mui/icons-material';
 import Header from '../../components/Header';
@@ -18,7 +16,6 @@ import { endpoints } from '../../../../utils/constants';
 import useApi from '../../../../hooks/useApi';
 import { useSelector } from 'react-redux';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
-import VisibilityIcon from '@mui/icons-material/Visibility'; // Import the eye icon
 import { tokens } from '../../theme';
 import withDashboardWrapper from '../../../../components/dasboardPagesContainer';
 
@@ -26,7 +23,7 @@ const StudentManagement = () => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
   const user = useSelector((state) => state.users.user);
-  const { callApi, loading, data } = useApi();
+  const { callApi, } = useApi();
   const [students, setStudents] = useState([]);
 
   useEffect(async () => {

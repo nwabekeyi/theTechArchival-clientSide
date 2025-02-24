@@ -241,7 +241,7 @@ const Assignment = () => {
         title="ASSIGNMENTS"
         subtitle="Overview of Assignments"
       />
-         <ActionButton 
+         <ActionButton
         onClick={() => handleOpenModal()}
         content= 'Add Assignment'
       />

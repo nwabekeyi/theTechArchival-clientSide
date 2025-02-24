@@ -189,7 +189,7 @@ const Assignment = () => {
       {loading ? (
         <Loader />
       ) : (
-        <Box m="40px 0 0 0" height="75vh">
+        <Box height="75vh">
           <TableComponent
             columns={columns}
             tableHeader="Overview of Assignments"

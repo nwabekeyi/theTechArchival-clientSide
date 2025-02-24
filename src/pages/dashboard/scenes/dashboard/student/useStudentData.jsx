@@ -151,15 +151,18 @@ const useStudentData = () => {
     const completedTimetables = timePastTimetables.filter(timetable => timetable.done);
 
     // Calculate the number of completed classes the student attended
-    const attendedClasses = completedTimetables.filter(timetable =>
+    const attendedClasses = timeTableData && timeTableData.filter(timetable =>
       timetable.attendance.includes(studentData.userId)
     ).length;
+    console.log(attendedClasses);
 
     // Calculate attendance rate based on the attended classes and completed timetables
-    const totalDoneTimetables = completedTimetables.length;
+    const totalDoneTimetables = timeTableData && timeTableData.length;
     const attendanceRate = totalDoneTimetables > 0
       ? (attendedClasses / totalDoneTimetables) * 100
       : 0;
+
+      console.log(attendanceRate)
 
     // Calculate outstanding amount and percentage
     const amountPaid = studentData.amountPaid || 0;

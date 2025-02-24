@@ -25,12 +25,63 @@ const Topbar = () => {
   const navigate = useNavigate();  // For navigation based on search
 
   // Sample search data (could be dynamic)
-  const searchData = [
-    { name: 'Dashboard', path: '/dashboard' },
-    { name: 'User Management', path: '/dashboard/userManagement' },
-    { name: 'Timetable', path: '/dashboard/timeTable' },
-    // Add more pages or sections as required
-  ];
+
+  const searchResult = () => {
+    switch(userDetails?.role){
+      case 'student': return [
+        { name: "Dashboard", to: "/dashboard" },
+        { name: "Timetable", to: "/dashboard/timeTable"},
+        { name: "Assignments", to: "/dashboard/assignment"},
+        { name: "Learning Plan", to: "/dashboard/learningPlan"},
+        { name: "Student Progress", to: "/dashboard/studentProgress"},
+        { name: "Instructor", to: "/dashboard/studentInstructors"},
+        { name: "Curriculum", to: "/dashboard/curriculum"},
+        { name: "Payment History", to: "/dashboard/studentPayment"},
+      ];
+      break;
+      
+      case 'instructor': return [
+        { name: "Dashboard", to: "/dashboard"},
+        { name: "Course Details", to: "/dashboard/courseManagement"},
+        { name: "Timetable", to: "/dashboard/timeTable"},
+        { name: "Assignments", to: "/dashboard/assignment"},
+        { name: "Student Management", to: "/dashboard/studentManagement"},
+        { name: "Learning Plan", to: "/dashboard/learningPlan"},
+        { name: "Reviews", to: "/dashboard/instructorReviews"},
+      ];
+      break;
+
+      case 'admin': return [
+        { name: "Dashboard", to: "/dashboard" },
+        { name: "User Management", to: "/dashboard/userManagement"},
+        { name: "Course Management", to: "/dashboard/courseManagement"},
+        { name: "Analytics and Reporting", to: "/dashboard/analytics"},
+        { name: "Contacts", to: "/dashboard/contacts" },
+        { name: "Support", to: "/dashboard/support"},
+        { name: "Feedbacks", to: "/dashboard/feedbacks"},
+        { name: "Enquiries", to: "/dashboard/enquiries"},
+        { name: "Generated Codes", to: "/dashboard/offlineStudents"},
+      ];
+      break;
+
+      default: return [
+        { name: "Dashboard", to: "/dashboard"},
+        { name: "User Management", to: "/dashboard/userManagement"},
+        { name: "Course Management", to: "/dashboard/courseManagement"},
+        { name: "Financial Management", to: "/dashboard/financialManagement"},
+        { name: "Team", to: "/dashboard/team"},
+        { name: "Analytics and Reporting", to: "/dashboard/analytics"},
+        { name: "Growth & Innovation", to: "/dashboard/growth"},
+        { name: "Contacts", to: "/dashboard/contacts"},
+        { name: "Support", to: "/dashboard/support"},
+        { name: "Feedbacks", to: "/dashboard/feedbacks"},
+        { name: "Enquiries", to: "/dashboard/enquiries"},
+        { name: "Generated Codes", to: "/dashboard/offlineStudents"},
+      ];
+
+    }
+  }
+  const searchData = searchResult();
 
   // Handle search input change
   const handleSearchChange = (event) => {
@@ -144,7 +195,7 @@ const Topbar = () => {
           <List>
             {searchResults.length > 0 ? (
               searchResults.map((result) => (
-                <ListItem button onClick={() => handleSearchResultClick(result.path)} key={result.path}>
+                <ListItem button onClick={() => handleSearchResultClick(result.to)} key={result.path}>
                   <ListItemText primary={result.name} />
                 </ListItem>
               ))

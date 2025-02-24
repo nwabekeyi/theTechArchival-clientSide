@@ -136,7 +136,10 @@ const SettingsPopover = ({ anchorEl, handleClose, userDetails }) => {
           horizontal: 'right',
         }}
         sx={{
-          width: '70%', // Default width for small screens
+          width: '70%', // Default width for small 
+          [theme.breakpoints.up('xs')]: {
+            width: '80%', // Width for medium screens
+          },
           [theme.breakpoints.up('md')]: {
             width: '50%', // Width for medium screens
           },

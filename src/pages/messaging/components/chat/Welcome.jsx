@@ -8,7 +8,7 @@ export default function Welcome() {
         display: {xs: 'none', md: "flex"},
         flexDirection: "column",
         alignItems: "center",
-        paddingLeft: 35,
+        paddingLeft: 40,
         height: "100%",
         justifyContent: "center",
       }}

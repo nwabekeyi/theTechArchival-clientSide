@@ -39,10 +39,15 @@ const TimeTable = () => {
     }
   }, [data]);
 
+   // Function to check if attendance is already marked for the student
+   const isAttendanceMarked = (schedule) => {
+    return schedule?.attendance?.includes(userDetails.userId); // Check if studentId is in the attendance array
+  };
+
   // Map timeTable data to the format required by the table
   const schedules = timeTable.map((schedule) => ({
     ...schedule,
-    attended: schedule.done ? 'Yes' : 'No', // Use 'attended' field based on 'done'
+    attended: isAttendanceMarked(schedule) ? 'Yes' : 'No', // Use 'attended' field based on 'done'
   }));
 
   const columns = [
@@ -78,7 +83,6 @@ const TimeTable = () => {
         <Loader />
       ) : (
         <Box>
-          <Divider />
           <TableComponent
             columns={columns}
             tableHeader={`Schedule`}

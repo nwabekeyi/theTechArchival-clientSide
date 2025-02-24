@@ -23,7 +23,7 @@ const Component = ({home}) => {
     <Box >
       {/* HEADER */}
       <Box display="flex" justifyContent="space-between" alignItems="center">
-        <Header title={user.firstName} subtitle="Welcome to your Babtech virtual learning dashboard" />
+        <Header home title={user.firstName} subtitle="Welcome to your Babtech virtual learning dashboard" />
         <Box sx={{ display: 'flex' }}>
           {user.role === 'superadmin' && (
             <Box 

@@ -10,6 +10,10 @@ const ActionButton = ({ icon, content, onClick, submit, ...props }) => {
     ? '#514b82'  // Lighter color for light mode
     : colors.greenAccent[600]; // Darker color for dark mode
 
+  const hoverBackgroundColor = theme.palette.mode === 'light'
+    ? '#423c71'  // Darker hover color for light mode
+    : '#000000'; // Lighter hover color for dark mode
+
   const textColor = theme.palette.mode === 'light'
     ? colors.grey[900]  // Dark text for light mode
     : colors.grey[100]; // Light text for dark mode
@@ -18,7 +22,7 @@ const ActionButton = ({ icon, content, onClick, submit, ...props }) => {
     <ButtonBase
       onClick={onClick}
       sx={{ width: 'auto' }} // Ensures the button expands to full width
-      type= {submit && 'submit'}
+      type={submit && 'submit'}
     >
       <Box
         width={{
@@ -34,6 +38,13 @@ const ActionButton = ({ icon, content, onClick, submit, ...props }) => {
         justifyContent="center"
         backgroundColor={backgroundColor}
         borderRadius="4px"
+        sx={{
+          transition: 'all 0.3s ease',  // Smooth transition effect
+          '&:hover': {
+            backgroundColor: hoverBackgroundColor,
+            transform: 'scale(1.02)',  // Slightly enlarge the button on hover
+          },
+        }}
         {...props}
       >
         <Typography
