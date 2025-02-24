@@ -11,7 +11,7 @@ const OfflineSignUp = lazy(() => import('./pages/offlineSignUp'));
 const VideoCall = lazy(() => import('./pages/VideoCalls'));
 const ResetPassword  = lazy(() => import('./pages/resetPassword'));
 const ForgotPasswordPage = lazy(() => import('./pages/forgotPassword'));
-const StudentProfile = lazy(() => import("./pages/dashboard/components/studentProfile"));
+
 
 
 function MyRoute() {
@@ -29,7 +29,7 @@ function MyRoute() {
           <Route path="/videoCall" element={<VideoCall />} />
           <Route path="/forgot-password" element={<ForgotPasswordPage />} />
           <Route path="/reset-password" element={<ResetPassword />} /> 
-          <Route path="/student-profile" element={<StudentProfile />} />
+          
           
                  </Routes>
       </Suspense>
