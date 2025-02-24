@@ -3,6 +3,7 @@ import { useSelector, useDispatch} from "react-redux";
 import {setAllCourses} from '../../reduxStore/slices/adminDataSlice'
 import useApi from "../../hooks/useApi";
 import { endpoints } from "../../utils/constants";
+import { updateUser, addUser} from '../../reduxStore/slices/adminDataSlice'; 
 
 const useSignUp = ({ offline, role, selectedUser }) => {
 
@@ -11,12 +12,12 @@ const useSignUp = ({ offline, role, selectedUser }) => {
     const [cohortsOptions, setCohortsOptions] = useState([]); // State to store cohort options
     const [loadingCohorts, setLoadingCohorts] = useState(false); // Loading state for cohorts
     const [error, setError] = useState('');
-    const { data, loading, error: submitError, callApi } = useApi();
+    const { data, error: submitError, callApi } = useApi();
     const [modalOpen, setModalOpen] = useState(false);
     const [modalMessage, setModalMessage] = useState('');
-    const [confirmationModal, setConfirmationModal] = useState(false);
     const { data: courseData, loading: courseLoading, error: courseError, callApi: courseApi } = useApi();
     const [courses, setCourses] = useState([]);
+    const [loading, setLoading] = useState(false);
 
     const dispatch = useDispatch();
     //get courses
@@ -201,9 +202,8 @@ const useSignUp = ({ offline, role, selectedUser }) => {
         }
     };
     const handleSubmit = async (e) => {
-        e.preventDefault();
-        console.log(selectedUser);
-    
+        setLoading(true);
+        e.preventDefault();    
         // If updating an existing user, remove required fields for all inputs
         if (selectedUser) {
             formRef.current.querySelectorAll('[required]').forEach(field => {
@@ -259,6 +259,19 @@ const useSignUp = ({ offline, role, selectedUser }) => {
                         'Content-Type': 'multipart/form-data', // FormData automatically sets the boundary
                     }
                 );
+
+                 // Check if the response contains user data, and handle success/failure
+                if (response && response?.user) {
+                    setLoading(false);
+                    dispatch(updateUser(response.user.userId, response.user, response.user.role));
+                    console.log(response)
+                    setModalMessage(`${response.user.firstName} ${response.user.lastName} has been successfully Update`);
+                    setFormData(getInitialFormData(role));  // Clear form on success
+
+                } else {
+                    setLoading(false);
+                    setModalMessage(`${response?.message}`);
+                };
             } else {
                 // POST request for creating a new user
                 response = await callApi(
@@ -269,17 +282,18 @@ const useSignUp = ({ offline, role, selectedUser }) => {
                         'Content-Type': 'multipart/form-data', // FormData automatically sets the boundary
                     }
                 );
-            }
-            
-    
-            // Check if the response contains user data, and handle success/failure
-            if (data?.user) {
-                setModalMessage(`${data.user.firstName} ${response.data.user.lastName} has been successfully registered as ${response.data.user.role}`);
-                setFormData(getInitialFormData(role));  // Clear form on success
-                setConfirmationModal(true);
-            } else {
-                console.log(data);
-                setModalMessage(`${response?.message}`);
+
+                 // Check if the response contains user data, and handle success/failure
+                if (response && response?.user) {
+                    setLoading(false);
+                    console.log(response);
+                    dispatch(addUser(response?.user));
+                    setModalMessage(`${response.user.firstName} ${response.user.lastName} has been successfully registered as ${response.user.role}`);
+                    setFormData(getInitialFormData(role));  // Clear form on success
+                } else {
+                    setLoading(false);
+                    setModalMessage(`${response?.message}`);
+                }
             }
     
             setModalOpen(true); // Show success/error modal
@@ -307,8 +321,6 @@ const useSignUp = ({ offline, role, selectedUser }) => {
         modalOpen,
         modalMessage,
         setModalOpen,
-        confirmationModal,
-        setConfirmationModal
     };
 };
 

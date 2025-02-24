@@ -16,6 +16,8 @@ import { useSelector } from 'react-redux';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import Modal from "../../../components/modal";
+import ActionButton from '../../../components/actionButton';
+import CustomIconButton from '../../../components/customIconButton';
 
 
 
@@ -83,13 +85,10 @@ const AddCurriculumModal = ({ courseId }) => {
         margin="normal"
       />
 
-      <Button
+      <ActionButton 
         onClick={handleSubmit} // On submit, send the data with resources array
-        variant="contained"
-        color="primary"
-      >
-        Add Curriculum
-      </Button>
+        content="Add Curriculum"
+      />
     </Box>
   );
 };
@@ -188,9 +187,10 @@ const AddCourseModal = ({ course, handleSubmit }) => {
           fullWidth
         />
       </Box>
-      <Button onClick={handleFormSubmit} variant="contained" color="primary">
-        {isUpdating === 'update' ? 'Update Course' : 'Add Course'}
-      </Button>
+      <ActionButton 
+        onClick={handleFormSubmit}  // On submit, send the data with resources array
+        content= {isUpdating === 'update' ? 'Update Course' : 'Add Course'}
+      />
     </Box>
   );
 };
@@ -224,9 +224,10 @@ const AddCohortModal = ({ courseId }) => {
         value={cohortName}
         onChange={handleChange}
       />
-      <Button onClick={handleSubmit} variant="contained" color="primary">
-        Add Cohort
-      </Button>
+      <ActionButton 
+        onClick={handleSubmit}   // On submit, send the data with resources array
+        content= "Add cohort"
+      />
     </Box>
   );
 };
@@ -274,15 +275,20 @@ const COurseDetailsModal = ({selectedCourse, userRole, openAddCurriculumModal, o
     )} */}
 
     {userRole === "admin" || userRole === "superadmin" && (
-      <div>
-        <Button variant="contained" color="primary" onClick={openCohortAddModal}>
-          Add Cohort
-        </Button>
-        <Button onClick={openAddCurriculumModal} variant="contained" color="primary">
-        Add Curriculum
-      </Button>
-      </div>
+      <Box sx={{display: 'flex', gap:'5px'}}>
+        <ActionButton 
+        onClick={openCohortAddModal}   // On submit, send the data with resources array
+        content= "Add cohort"
+      />
+
+      <ActionButton
+          onClick={openAddCurriculumModal}   // On submit, send the data with resources array
+          content= "Add curriculum"
+        />
+      </Box>
     )}
+
+    <CurriculumList id={selectedCourse.id} />
   </Box>
   )
 }
@@ -384,15 +390,21 @@ const CurriculumList = ({ id }) => {
               <Typography variant="h5" gutterBottom>{curriculumItem.topic}</Typography>
               <Box>
 
-                {/* Edit Button */}
-                <IconButton color="primary" onClick={handleOpenEditOpen}>
-                  <EditIcon />
-                </IconButton>
+            {/* Edit Button */}
+            <CustomIconButton 
+              color="primary" 
+              onClick={handleOpenEditOpen} 
+              icon={<EditIcon />} 
+              sx={{ /* Add any additional styles if needed */ }} 
+            />
 
-                {/* Delete Button */}
-                <IconButton color="secondary" onClick={handleOpenConfimModal}>
-                  <DeleteIcon />
-                </IconButton>
+            {/* Delete Button */}
+            <CustomIconButton 
+              color="secondary" 
+              onClick={handleOpenConfimModal} 
+              icon={<DeleteIcon />} 
+              sx={{ /* Add any additional styles if needed */ }} 
+            />
               </Box>
             </Box>
 
@@ -463,17 +475,9 @@ const CurriculumList = ({ id }) => {
   );
 };
 
-export default CurriculumList;
-
-
-
-
-
-
 
 export {AddCurriculumModal,
         AddCourseModal,
         AddCohortModal,
         COurseDetailsModal,
-        CurriculumList
 };

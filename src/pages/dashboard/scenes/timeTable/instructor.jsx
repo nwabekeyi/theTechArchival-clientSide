@@ -9,6 +9,10 @@ import useApi from '../../../../hooks/useApi';
 import { useSelector } from 'react-redux';
 import { endpoints } from '../../../../utils/constants';
 import ConfirmationModal from '../../components/confirmationModal';
+import CustomIconButton from '../../components/customIconButton';
+import EditIcon from '@mui/icons-material/Edit';
+import ActionButton from '../../components/actionButton';
+
 
 const Instructor = () => {
   const theme = useTheme();
@@ -92,23 +96,16 @@ const Instructor = () => {
   
         return (
           <>
-            <Button
-              variant="contained"
-              color="primary"
-              onClick={() => handleEdit(row)}
-              sx={{ mr: 1,
-                fontSize: { xs: '0.5rem', sm: '0.7rem' },  // Smaller font on small screens
-              padding: { xs: '4px', sm: '8px' },  // Adjust padding for small screens
-              minWidth: { xs: '50px', sm: '70px' },  
-              }}
-            >
-              Edit
-            </Button>
+              < CustomIconButton
+                onClick={() => handleEdit(row)}
+                icon= {<EditIcon />}
+              />
             <Button
             sx={{
               fontSize: { xs: '0.5rem', sm: '0.7rem' },  // Smaller font on small screens
               padding: { xs: '4px', sm: '8px' },  // Adjust padding for small screens
               minWidth: { xs: '50px', sm: '70px' },  // Reduce width on small screens
+              ml: 1
             }}
               variant="contained"
               color={isPast ? 'success' : 'secondary'} // Change color if past
@@ -121,8 +118,7 @@ const Instructor = () => {
       },
     },
   ];
-  
-  
+
 
   const handleOpenEditModal = () => setOpenEditModal(true);
   const handleCloseEditModal = () => {
@@ -243,14 +239,11 @@ const Instructor = () => {
     <Box>
       <Header title="TIME TABLE" subtitle="Overview of Weekly Schedule" />
 
-      <Button
-        variant="contained"
-        color="secondary"
+      <ActionButton 
         onClick={handleOpenEditModal}
-        sx={{ mb: '15px' }}
-      >
-        Add Schedule
-      </Button>
+        content= 'Add Schedule'
+      />
+
 
       <TableComponent
         columns={columns}

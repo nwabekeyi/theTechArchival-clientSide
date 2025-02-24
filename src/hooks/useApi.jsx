@@ -33,18 +33,25 @@ const useApi = () => {
       try {
         const response = await fetch(url, options);
         if (!response.ok) {
-          throw new Error(`HTTP error! Status: ${response.status}`);
+          let errorMessage = await response.json()
+          console.log(errorMessage)
+          if(errorMessage && errorMessage.message){
+            setError( errorMessage.message || 'Something went wrong');
+            console.log(error)
+          }
+        }else{
+          const contentType = response.headers.get('Content-Type');
+          let responseData;
+          if (contentType && contentType.includes('application/json')) {
+            responseData = await response.json();
+          } else {
+            responseData = await response.text(); // Fallback for non-JSON responses
+          }
+  
+          setData(responseData);
+          return responseData;
         }
-        const contentType = response.headers.get('Content-Type');
-        let responseData;
-        if (contentType && contentType.includes('application/json')) {
-          responseData = await response.json();
-        } else {
-          responseData = await response.text(); // Fallback for non-JSON responses
-        }
-
-        setData(responseData);
-        return responseData;
+      
       } catch (err) {
         setError(err.message || 'Something went wrong');
         return null;

@@ -23,9 +23,7 @@ const Admin = () => {
   const [loading, setLoading] = useState(true);
   const [students, setStudents] = useState(0);
   const [instructors, setInstructors] = useState(0);
-  const { usersData, totalRevenue, programStats, topInstructors, outstandingPayments, mockCohorts } = useAdminData();
-  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
-  const isTablet = useMediaQuery(theme.breakpoints.between('sm', 'md'));
+  const { usersData, totalRevenue, programStats, topInstructors, outstandingPayments, mockCohorts, unreadEnquiries } = useAdminData();
 
   useEffect(() => {
     if (usersData) {
@@ -48,6 +46,8 @@ const Admin = () => {
       }))
       .sort((a, b) => b.studentCount - a.studentCount); // Sorting by student count
 
+      //styles
+      const statStyle =  { mt: "15px", fontWeight: 'bold'}
     return (
       <Box>
 
@@ -61,8 +61,8 @@ const Admin = () => {
               Students
             </Typography>
             <Box display="flex" flexDirection="column" alignItems="center" mt="25px">
-              <GroupsIcon sx={{ fontSize: '70px' }} />
-              <Typography variant="h5" color={colors.blueAccent[500]} sx={{ mt: "15px" }}>
+              <GroupsIcon sx={{ fontSize: '70px', color: colors.blueAccent[200] }} />
+              <Typography variant="h4" color={colors.blueAccent[200]} sx={statStyle}>
                 {`${students} students`}
               </Typography>
               <Typography>Total students</Typography>
@@ -77,8 +77,8 @@ const Admin = () => {
               Instructors
             </Typography>
             <Box display="flex" flexDirection="column" alignItems="center" mt="25px">
-              <SchoolIcon sx={{ fontSize: '70px' }} />
-              <Typography variant="h5" color={colors.blueAccent[500]} sx={{ mt: "15px" }}>
+              <SchoolIcon sx={{ fontSize: '70px', color: colors.blueAccent[200] }} />
+              <Typography variant="h4" color={colors.blueAccent[200]} sx={statStyle}>
                 {`${instructors} instructors`}
               </Typography>
               <Typography>Total instructors</Typography>
@@ -93,8 +93,8 @@ const Admin = () => {
               New students
             </Typography>
             <Box display="flex" flexDirection="column" alignItems="center" mt="25px">
-              <PersonAddIcon sx={{ fontSize: '70px' }} />
-              <Typography variant="h5" color={colors.blueAccent[500]} sx={{ mt: "15px" }}>
+              <PersonAddIcon sx={{ fontSize: '70px', color: colors.blueAccent[200] }} />
+              <Typography variant="h4" color={colors.blueAccent[200]} sx={statStyle}>
                 {`${usersData.studentsIn24Hrs || 0} students`}
               </Typography>
               <Typography>Students registered within 24hrs</Typography>
@@ -109,9 +109,9 @@ const Admin = () => {
               Unread Enquiries
             </Typography>
             <Box display="flex" flexDirection="column" alignItems="center" mt="25px">
-              <PersonAddIcon sx={{ fontSize: '70px' }} />
-              <Typography variant="h5" color={colors.blueAccent[500]} sx={{ mt: "15px" }}>
-                {`2 Enquiries unread`}
+              <PersonAddIcon sx={{ fontSize: '70px', color: colors.blueAccent[200] }} />
+              <Typography variant="h4" color={colors.blueAccent[200]} sx={statStyle}>
+                {unreadEnquiries}
               </Typography>
               <Typography>Read enquiries</Typography>
             </Box>
@@ -165,9 +165,9 @@ const Admin = () => {
                   progress={outstandingPayments.totalOutstanding > 0 ? ((outstandingPayments.totalOutstanding / totalRevenue) * 100).toFixed(2) : 0}
                 />
                 <Typography
-                  variant="h5"
-                  color={colors.blueAccent[500]}
-                  sx={{ pt: '20px' }}
+                  variant="h4"
+                  color={colors.blueAccent[200]}
+                  sx={statStyle}
                 >
                   ₦{outstandingPayments.totalOutstanding} outstanding payment
                 </Typography>

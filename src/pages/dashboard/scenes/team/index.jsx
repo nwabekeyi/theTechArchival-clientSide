@@ -57,7 +57,7 @@ const Team = () => {
             <Typography color={colors.grey[100]} sx={{ ml: "5px" }}>
               {access}
             </Typography>
-          </Box>
+          </Box>  
         );
       },
     },

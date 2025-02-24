@@ -1,67 +1,14 @@
-
-
-// import React from 'react';
-// import { useEnquiries } from './useEnquiries'; 
-
-// const Enquiries = () => {
-//   const {
-//     enquiries,
-//     loading,
-//     error,
-//     markAsRead,
-//     removeEnquiry,
-//     openDeleteModal,
-//     closeDeleteModal,
-//     confirmDeleteModal,
-//   } = useEnquiries();
-
-//   if (loading) return <p>Loading enquiries...</p>;
-//   if (error) return <p>{error}</p>;
-
-//   return (
-//     <div>
-//       <h1>Enquiries</h1>
-//       {enquiries.length === 0 ? (
-//         <p>No enquiries found.</p>
-//       ) : (
-//         <ul>
-//           {enquiries.map((enquiry) => (
-//             <li key={enquiry._id}>
-//               <p>{enquiry.message}</p>
-//               <p>Status: {enquiry.read ? 'Read' : 'Unread'}</p>
-//               <button onClick={() => markAsRead(enquiry._id)}>
-//                 Mark as {enquiry.read ? 'Unread' : 'Read'}
-//               </button>
-//               <button onClick={openDeleteModal}>Delete</button>
-//             </li>
-//           ))}
-//         </ul>
-//       )}
-//       {confirmDeleteModal && (
-//         <div className="modal">
-//           <p>Are you sure you want to delete this enquiry?</p>
-//           <button onClick={closeDeleteModal}>Cancel</button>
-//           <button
-//             onClick={() => {
-//               const enquiryToDelete = enquiries.find((e) => e._id);
-//               if (enquiryToDelete) removeEnquiry(enquiryToDelete._id);
-//               closeDeleteModal();
-//             }}
-//           >
-//             Confirm Delete
-//           </button>
-//         </div>
-//       )}
-//     </div>
-//   );
-// };
-
-// export default Enquiries;
-
-
-import React from 'react';
-import { useEnquiries } from './useEnquiries'; 
+import {useState} from 'react';
+import { IconButton } from '@mui/material';
+import DeleteIcon from '@mui/icons-material/Delete';
+import VisibilityIcon from '@mui/icons-material/Visibility';
+import MarkAsUnreadIcon from '@mui/icons-material/MarkAsUnread';
+import { useEnquiries } from './useEnquiries';
 import Modal from '../../components/modal';
+import TableComponent from '../../../../components/table'; // Assuming your reusable table component is here
+import Header from '../../components/Header';
+import MarkEmailReadIcon from '@mui/icons-material/MarkEmailRead';
+
 
 const Enquiries = () => {
   const {
@@ -73,95 +20,126 @@ const Enquiries = () => {
     closeModal,
     confirmDeleteModal,
     removeEnquiry,
+    markAsRead,
   } = useEnquiries();
+
+
+  // Define table columns for enquiries
+  const columns = [
+    { id: 'name', label: 'Name', minWidth: 100 },
+    { id: 'phoneNumber', label: 'Phone No.', minWidth: 50 },
+    { id: 'status', label: 'Status', minWidth: 50 },
+    { id: 'actions', label: 'Actions', minWidth: 150, renderCell: (row) => row.actions },
+  ];
+
+  // Create rows from the enquiries data
+  const rows = enquiries.map((enquiry) => ({
+    ...enquiry,
+    status: enquiry.read ? 'Read' : 'Unread',
+    actions: (
+      <>
+      {/* View Icon */}
+      <IconButton onClick={() => openModal(enquiry)} aria-label="view" style={{ marginRight: '10px' }}>
+        <VisibilityIcon />
+      </IconButton>
+
+      {/* Delete Icon */}
+      <IconButton onClick={() => removeEnquiry(enquiry._id)} aria-label="delete" color="error">
+        <DeleteIcon />
+      </IconButton>
+    </>
+    ),
+  }));
+
+  // Table state for sorting and pagination
+  const [sortBy, setSortBy] = useState('name');
+  const [sortDirection, setSortDirection] = useState('asc');
+  const [page, setPage] = useState(0);
+  const [rowsPerPage, setRowsPerPage] = useState(10);
+
+  // Sorting logic
+  const handleSortChange = (columnId) => {
+    const isAsc = sortBy === columnId && sortDirection === 'asc';
+    setSortDirection(isAsc ? 'desc' : 'asc');
+    setSortBy(columnId);
+  };
+
+  // Pagination logic
+  const handlePageChange = (event, newPage) => {
+    setPage(newPage);
+  };
+
+  const handleRowsPerPageChange = (event) => {
+    setRowsPerPage(parseInt(event.target.value, 10));
+    setPage(0);
+  };
 
   return (
     <div>
-      <h1>Enquiries</h1>
+      <Header title="Enquiries" subtitle="Enquiries from prospects" />
+
 
       {loading && <p>Loading...</p>}
       {error && <p style={{ color: 'red' }}>{error}</p>}
-
       {!loading && !error && enquiries.length === 0 && <p>No enquiries found.</p>}
 
-      <ul style={{ listStyleType: 'none', padding: 0 }}>
-        {enquiries.map((enquiry) => (
-          <li
-            key={enquiry._id}
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              // justifyContent: 'center',
-              padding: '10px 0',
-              margin: '10px',
-              gap: '15px',
-            }}
-          >
-            <span>{enquiry.name}</span>
-            <span
-              onClick={() => openModal(enquiry)}
-              style={{
-                cursor: 'pointer',
-                color: '#007bff',
-                textDecoration: 'underline',
-                display: 'flex',
-                alignItems: 'center',
-              }}
-            >
-              Details →
-            </span>
-          </li>
-        ))}
-      </ul>
-  
-  {confirmDeleteModal && selectedEnquiry && (
-    <Modal
-      open={confirmDeleteModal} 
-      onClose={closeModal} 
-      aria-labelledby="enquiry-modal-title"
-      aria-describedby="enquiry-modal-description"
-    >
-      <div className="modal-content">
-        {/* Display the enquiry details */}
-        <h2 id="enquiry-modal-title" style={{ marginBottom: '10px' }}>
-          {selectedEnquiry.name}
-        </h2>
-        <p id="enquiry-modal-description" style={{ margin: '10px 0' }}>
-          {selectedEnquiry.message}
-        </p>
-        <p style={{ fontWeight: 'bold', margin: '10px 0' }}>
-          Status: {selectedEnquiry.read ? 'Read' : 'Unread'}
-        </p>
-  
-        {/* Action buttons */}
-        <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '20px' }}>
-          <button
-            onClick={() => {
-              removeEnquiry(selectedEnquiry._id);
-              closeModal();
-            }}
-            className="modal-delete-btn"
-          >
-            Delete
-          </button>
-          <button
-            onClick={() => {
-              markAsRead(selectedEnquiry._id);
-              closeModal();
-            }}
-            className="modal-mark-read-btn"
-          >
-            Mark as Read
-          </button>
-          <button onClick={closeModal} className="modal-close-btn">
-            Close
-          </button>
-        </div>
-      </div>
-    </Modal>
-  )}
-  
+      {/* Reusable TableComponent */}
+      {!loading && !error && enquiries.length > 0 && (
+        <TableComponent
+          columns={columns}
+          tableHeader="Enquiries"
+          data={rows}
+          sortBy={sortBy}
+          sortDirection={sortDirection}
+          onSortChange={handleSortChange}
+          page={page}
+          rowsPerPage={rowsPerPage}
+          onPageChange={handlePageChange}
+          onRowsPerPageChange={handleRowsPerPageChange}
+          onRowClick={(row) => openModal(row)} // Handle row click for modal
+        />
+      )}
 
+{confirmDeleteModal && selectedEnquiry && (
+  <Modal open={confirmDeleteModal} onClose={closeModal} noConfirm title="Enquiry">
+    <div className="modal-content">
+      <h2>{selectedEnquiry.name}</h2>
+      <p>{selectedEnquiry.message}</p>
+      <p>
+        <strong>Status: </strong>{selectedEnquiry.read ? 'Read' : 'Unread'}
+      </p>
+      <div style={{ display: 'flex', justifyContent: 'end', marginTop: '20px' }}>
+        
+        {/* Delete Button */}
+        <IconButton
+          onClick={() => {
+            removeEnquiry(selectedEnquiry._id);
+            closeModal();
+          }}
+          aria-label="delete"
+          color="error"
+        >
+          <DeleteIcon />
+        </IconButton>
+
+        {/* Mark as Read Button */}
+        {
+          !selectedEnquiry.read &&
+          <IconButton
+          onClick={() => {
+            markAsRead(selectedEnquiry._id);
+            closeModal();
+          }}
+          aria-label="mark as read"
+          color="primary"
+        >
+          <MarkEmailReadIcon />
+        </IconButton>
+        }
+      </div>
+    </div>
+  </Modal>
+)}
     </div>
   );
 };

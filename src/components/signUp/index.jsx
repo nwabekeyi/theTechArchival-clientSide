@@ -2,6 +2,8 @@ import { Box, Button, TextField, Typography, Alert, MenuItem, FormControl, Input
 import useSignUp from './useSignUp';
 import ConfirmationModal from "../../pages/dashboard/components/confirmationModal";
 import { tokens } from '../../pages/dashboard/theme';
+import Loader from '../../utils/loader';
+import ActionButton from '../../pages/dashboard/components/actionButton';
 
 const SignUpForm = ({ role, offline, selectedUser }) => {
     const theme = useTheme();
@@ -20,16 +22,21 @@ const SignUpForm = ({ role, offline, selectedUser }) => {
         modalOpen,
         modalMessage,
         setModalOpen,
-        confirmationModal,
-        setConfirmationModal
+        loading
     } = useSignUp({ offline, role, selectedUser });
+
 
     const handleCloseModal = () => {
         setModalOpen(false);
     };
 
-    return (
-        <Box>
+    if(loading) {
+    return <div>
+        <Loader />
+        </div> 
+    }else{
+         return (
+          <Box>
             <Typography variant="h4">
                 Sign Up ({role.charAt(0).toUpperCase() + role.slice(1)})
             </Typography>
@@ -105,42 +112,24 @@ const SignUpForm = ({ role, offline, selectedUser }) => {
                     </Box>
                 ))}
                 {error && <Alert severity="error">{error}</Alert>}
-                <Button variant="contained" type="submit" >
-                    {selectedUser ? 'Update' : 'Sign Up'}
-                </Button>
+                <ActionButton 
+                content= {selectedUser ? 'Update' : 'Sign Up'} 
+                submit />
+                    
             </form>
 
             {/* Modal */}
-            <Modal
+            <ConfirmationModal
                 open={modalOpen}
-                onClose={handleCloseModal}
-                closeAfterTransition
-                BackdropComponent={Backdrop}
-                BackdropProps={{
-                    timeout: 500,
-                }}
-            >
-                <Fade in={modalOpen}>
-                    <Box sx={{display:'grid', placeContent:"center", position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', bgcolor: colors.primary[100], padding: 4, width: '400px', height: '40%'}}>
-                        <Typography variant="h6" component="h2">
-                            {modalMessage}
-                        </Typography>
-                        <Button onClick={handleCloseModal}>Close</Button>
-                    </Box>
-                </Fade>
-            </Modal>
-
-            {/* <ConfirmationModal
-                open={confirmationModal}
-                message= "User successfully created"
+                message= {modalMessage}
                 title= 'User registration confrimation'
-                onClose={()=>{setConfirmationModal(false)}}
-                onConfirm={()=>{setConfirmationModal(false)}}
+                onClose={handleCloseModal}
 
-               /> */}
+               />
 
         </Box>
     );
+}
 };
 
 export default SignUpForm;

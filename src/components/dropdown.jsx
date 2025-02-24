@@ -13,7 +13,7 @@ const Dropdown = ({ label, options, onSelect }) => {
 
   return (
     <FormControl
-      sx={{ width: "15%", paddingBottom: '2%' }}
+      sx={{ width: "170px", paddingBottom: '2%' }}
       variant="outlined"
     >
       <InputLabel id={`${label}-select-label`}>{label}</InputLabel>

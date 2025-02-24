@@ -1,16 +1,16 @@
-import React, { useState,lazy, Suspense } from "react";
-import { Routes, Route } from "react-router-dom";
+
+import "./index.css";
+import React, { useState,lazy, Suspense, useEffect } from "react";
+import { Routes, Route, useLocation } from "react-router-dom";
 import Topbar from "./scenes/global/Topbar";
 import Sidebar from "./scenes/global/Sidebar";
 import { CssBaseline, ThemeProvider, Box } from "@mui/material";
 import { ColorModeContext, useMode } from "./theme";
-import "./index.css";
 import { useSelector } from "react-redux";
 import FloatingMessageIcon from "./components/floatingMessageIcon";
 import { tokens } from "./theme";
 import SignIn from "../../components/Signin";
 import Loader from "../../utils/loader";
-
 
 
 // Lazy load the components
@@ -42,14 +42,24 @@ import useWebSocket from '../../hooks/useWebSocket'; // Import socket instance
 
 function DashboardHome() {
   const [theme, colorMode] = useMode();
-  const [isSidebar, setIsSidebar] = useState(true);
   const [userData, setUserData] = useState(null);
   const colors = tokens(theme.palette.mode);
   const user = useSelector((state) => state.users.user);
-  console.log(user)
   const userRole = user ? user.role : 'not logged in';
   const { emit, isConnected, listen} = useWebSocket();
+  const location = useLocation();
 
+  useEffect(() => {
+    // Check if the document.referrer includes 'dashboard'
+    const referrerPath = document.referrer.split('/');
+    const isFromDashboard = referrerPath.includes("dashboard");
+    console.log(referrerPath);
+
+    // Reload the page if "dashboard" is not in the referrer path
+    if (!isFromDashboard) {
+      window.location.reload();
+    }
+  }, []); // Empty dependency array to ensure it runs only once on mount
 
 
   const renderRoutesBasedOnRole = (role) => {
@@ -115,47 +125,47 @@ function DashboardHome() {
       </div>
 
       :
-
       <ColorModeContext.Provider value={colorMode}>
       <FloatingMessageIcon />
       <ThemeProvider theme={theme}>
         <CssBaseline />
-        <div style={{ display: "flex", height: "100%", gap: '0'}}>
+        <Box sx={{ display: "flex", height: "100%",backgroundColor:theme.palette.mode === "light"
+      ? colors.primary[900]
+      : colors.primary[500],
+        px: 2,
+        gap: 1
+      }}>
           {/* Sidebar */}
-          <Sidebar isSidebar={isSidebar} />
-
+          <Sidebar />
           {/* Content */}
           <Box
             id="dashboard"
             className="content"
             sx={{
-               px:{xs:0, md: 2, lg:0},
               marginX: "0",
               width: '100%',
-              backgroundColor:
-                theme.palette.mode === "light"
-                  ? colors.primary[900]
-                  : colors.primary[500],
+              backgroundColor:'transparent',
               height: "100vh", // Make the content area take full height
               display: "flex",
               flexDirection: "column",
               overflowY: "auto", // Enable vertical scrolling,
               justifyContent: 'center',
-              alignItems: 'center'
+              alignItems: 'center',
+              paddingBottom: '1%'
             }}
             >
-            <Box 
-            sx={{ 
-              height: "auto", 
-              width:'100%', 
-              display: 'flex', 
+            <Box
+            sx={{
+              height: "auto",
+              width:'100%',
+              display: 'flex',
               justifyContent:'center',
-              backgroundColor:'none'}}>
+              backgroundColor:'transparent'}}>
               <Topbar userData={userData} />
             </Box>
 
             {/* Routes */}
-            <Box sx={{ flexGrow: 1, overflowY: "auto", minWidth: '100%'}}>
+            <Box sx={{ overflowY: "auto", width: '100%', height: '100%'}}>
               <Suspense fallback={<Loader />}>
                 <Routes>
                   <Route path={userRole === 'not logged in' ? "/signin" : "/"} element={<Dashboard userData={userData} />} />
@@ -165,12 +175,12 @@ function DashboardHome() {
             </Box>
             </Box>
 
-        </div>
+        </Box>
       </ThemeProvider>
     </ColorModeContext.Provider>
     }
      </>
  );
-}
+};
 
 export default DashboardHome;

@@ -5,6 +5,7 @@ import { setUsersData, setAllCourses } from '../../../../../reduxStore/slices/ad
 import { useEffect, useMemo, useState } from 'react';
 import { setFetchedUsers } from '../../../../../reduxStore/slices/apiCallCheck';
 import { endpoints } from '../../../../../utils/constants';
+import { useEnquiries } from '../../enquiries/useEnquiries';
 
 const useAdminData = () => {
   const [students, setStudents] = useState([]);
@@ -18,7 +19,9 @@ const useAdminData = () => {
     { name: 'Cohort 4', courseName: 'Machine Learning', numStudents: 35, progress: 60 },
     { name: 'Cohort 5', courseName: 'AI and Robotics', numStudents: 45, progress: 90 },
   ]);
-  
+  const [unreadEnquiries, setUnreadEnquiries] = useState([0]);
+
+  const {fetchEnquiries} = useEnquiries();
   const fetchedUsers = useSelector((state) => state.apiCallCheck.fetchedUsers);
   const dispatch = useDispatch();
 
@@ -30,6 +33,15 @@ const useAdminData = () => {
   useEffect(() => {
     callApi(endpoints.COURSES, 'GET');
   }, [callApi]);
+
+  // Fetch enquiries count
+  useEffect(async() => {
+    const count = await fetchEnquiries();
+    if(count){
+      setUnreadEnquiries(count);
+    }
+  }, []);
+
 
   // Handle course data
   useEffect(() => {
@@ -158,7 +170,18 @@ const useAdminData = () => {
     }
   }, [data, students]);
 
-  return { data, loading, error, usersData, totalRevenue, programStats, topInstructors, outstandingPayments, mockCohorts };
+  return {
+    data,
+    loading,
+    error,
+    usersData,
+    totalRevenue,
+    programStats,
+    topInstructors,
+    outstandingPayments,
+    mockCohorts,
+    unreadEnquiries
+  };
 };
 
 export default useAdminData;

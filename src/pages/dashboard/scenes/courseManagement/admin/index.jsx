@@ -1,13 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import {
-  Button,
-  Grid,
-  Paper,
-  Typography,
   Box,
+  Grid,
   useTheme,
-  Tooltip,
-  IconButton
 } from '@mui/material';
 import { tokens } from '../../../theme';
 import DeleteIcon from '@mui/icons-material/Delete';
@@ -16,24 +11,21 @@ import VisibilityIcon from '@mui/icons-material/Visibility'; // Import the eye i
 import Header from "../../../components/Header";
 import Modal from "../../../components/modal";
 import useCourses from './useCourses';
-import { AddCurriculumModal, AddCourseModal, AddCohortModal, COurseDetailsModal, CurriculumList } from './courseModals';
+import { AddCurriculumModal, AddCourseModal, AddCohortModal, COurseDetailsModal} from './courseModals';
 import { useSelector } from 'react-redux';
 import TableComponent from "../../../../../components/table"; // Import your custom TableComponent
+import CustomIconButton from '../../../components/customIconButton';
+import ActionButton from '../../../components/actionButton';
 
 const Admin = () => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
   const {
-    handleUpdateCourse,
-    handleAddCurriculum,
     addCurriculumOpen,
     courses,
     addCourseModalOpen,
-    updateCurriculumModalOpen,
     deleteCourseModal,
     selectedCourse,
-    handleAddCourse,
-    handleUpdateCurriculum,
     handleDeleteCourse,
     openAddCourseModal,
     closeAddCourseModal,
@@ -45,13 +37,10 @@ const Admin = () => {
     closeAddCurriculumModal,
     cohortAddModalOpen,
     openCurriculumList,
-    openCurriculum,
     closeCurriculum,
     openCourseDetails,
     closeDeleteCourseModal,
     openDeleteCourseModal,
-    setSelectedCourse, // Ensure this is available to set the selected course
-    e // To manage modal mode (add or update)
   } = useCourses();
 
   const userRole = useSelector((state) => state.users.user.role);
@@ -87,43 +76,34 @@ const Admin = () => {
       id: 'actions',
       label: 'Actions',
       renderCell: (row) => (
-        <>
-          <Tooltip title="View Details">
-            <IconButton onClick={() => {
-              openCourseDetailsModal(row);
-              sessionStorage.setItem('selectedCourse', JSON.stringify(row));
-              }}>
-              <VisibilityIcon />
-            </IconButton>
-          </Tooltip>
-          <Tooltip title="Edit Course">
-            <IconButton
+        <div className="action-buttons" style={{ display: 'flex' }}>
+            < CustomIconButton
               onClick={() => {
-                console.log(row)
-                sessionStorage.setItem('selectedCourseId', JSON.stringify(row.id));
-                openAddCourseModal('update'); // Open the course modal for editing
+                openCourseDetailsModal(row);
+                sessionStorage.setItem('selectedCourse', JSON.stringify(row));
               }}
-            >
-              <EditIcon />
-            </IconButton>
-          </Tooltip>
-          <Tooltip title="Delete Course">
-            <IconButton onClick={() => {openDeleteCourseModal(row)}}>
-              <DeleteIcon />
-            </IconButton>
-          </Tooltip>
-          <Tooltip title="Manage Curriculum">
-            <Button onClick={() => openCurriculum(row)} variant="contained" color="primary">
-              Curriculum
-            </Button>
-          </Tooltip>
-        </>
+              icon= {<VisibilityIcon />}
+              />
+            < CustomIconButton
+                onClick={() => {
+                  console.log(row)
+                  sessionStorage.setItem('selectedCourseId', JSON.stringify(row.id));
+                  openAddCourseModal('update'); // Open the course modal for editing
+                }}
+                icon= {<EditIcon />}
+                />
+
+          < CustomIconButton
+                onClick={() => {openDeleteCourseModal(row)}}
+                icon= {<DeleteIcon />}
+                />
+        </div>
       ),
     },
   ];
 
 
-  const rows = courses.map((course, index) => ({
+  const rows = courses? courses.map((course, index) => ({
     sn: index + 1, // Adding serial number (S/N)
     id: course.courseId,
     courseName: course.courseName,
@@ -131,7 +111,7 @@ const Admin = () => {
     duration: course.duration,
     startDate: course.startDate,
     cost: course.cost,
-  }));
+  })) : [];
 
   // Handle sorting changes
   const handleSortChange = (columnId) => {
@@ -172,7 +152,13 @@ const Admin = () => {
 
       {userRole === 'admin' || userRole === 'superadmin' && (
           <Grid item xs={12}>
-            <Paper elevation={3} style={{ padding: '20px', backgroundColor: colors.background }}>
+
+              <Box sx={{display: 'flex', justifyContent:"end"}}>
+              <ActionButton
+                  content="Add course"
+                  onClick={() => {openAddCourseModal('add')}}
+                  />
+            </Box>
 
               {/* Display courses using TableComponent */}
               <TableComponent
@@ -187,12 +173,10 @@ const Admin = () => {
                 onPageChange={handlePageChange}
                 onRowsPerPageChange={handleRowsPerPageChange}
                 onRowClick={handleRowClick}
+                hiddenColumnsSmallScreen={[ 'description', 'duration', 'cost', 'startDate']}
+                hiddenColumnsTabScreen={[ 'description',  'duration']}
               />
 
-              <Button onClick={() => {openAddCourseModal('add')}} variant="contained" color="primary" style={{ marginTop: '20px' }}>
-                Add Course
-              </Button>
-            </Paper>
           </Grid>
       )}
 
@@ -209,7 +193,7 @@ const Admin = () => {
       </Modal>
 
       {/* Modals for Adding Course, Cohort, and Curriculum */}
-      <Modal open={addCourseModalOpen} onClose={closeAddCourseModal} title='Course'>
+      <Modal open={addCourseModalOpen} onClose={closeAddCourseModal} title='New Course' noConfirm> 
         <AddCourseModal
           course={selectedCourse} // Pass the selected course for editing
         />
@@ -224,11 +208,6 @@ const Admin = () => {
         <AddCurriculumModal courseId={selectedCourse?.id} />
       </Modal>
 
-      {/* Curriculum Modal */}
-      <Modal open={openCurriculumList} onClose={closeCurriculum} title="Curriculum" noConfirm>
-        <CurriculumList id={selectedCourse?.id} noConfirm />
-      </Modal>
-      
       {/* delet course modal */}
       <Modal open={deleteCourseModal} onClose={closeDeleteCourseModal} title="Delete Course" onConfirm={() => {handleDeleteCourse(courseId)}}>
         <p>Deleting this course means that you will delete all Cohorts and Chat rooms attached to this course. Kindly click on confirm to continue </p>

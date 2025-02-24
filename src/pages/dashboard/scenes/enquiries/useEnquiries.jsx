@@ -16,12 +16,17 @@ export const useEnquiries = () => {
   const fetchEnquiries = async () => {
     setError(null);
     try {
-      console.log('hey')
       const data = await fetchEnquiriesApi(
         `${import.meta.env.VITE_API_BASE_URL}${import.meta.env.VITE_ENQUIRY_ENDPOINT}`,
         'GET'
       );
-      setEnquiries(Array.isArray(data) ? data : []);
+      if (data) {
+        setEnquiries(Array.isArray(data) ? data : []);
+
+        const unreadEnquiries = data.filter(enquiry => !enquiry.read)
+        return unreadEnquiries.length
+      };
+
     } catch (err) {
       console.error('Error fetching enquiries:', err);
       setError('Failed to fetch enquiries');
@@ -68,7 +73,9 @@ export const useEnquiries = () => {
   // Open modal for selected enquiry
   const openModal = (enquiry) => {
     setSelectedEnquiry(enquiry);
-    markAsRead(enquiry._id); // Mark as read when modal opens
+    if (enquiry.read !== true) {
+      markAsRead(enquiry._id); // Mark as read only if it's not already read
+    }
     setConfirmDeleteModal(true);
   };
 

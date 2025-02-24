@@ -1,4 +1,5 @@
-import { useState, useEffect } from "react";
+
+import React, { useState, useEffect } from "react";
 import { ProSidebar, Menu, MenuItem } from "react-pro-sidebar";
 import { Box, Typography, Avatar, useTheme } from "@mui/material";
 import { Link } from "react-router-dom";
@@ -23,8 +24,9 @@ import LibraryBooksIcon from "@mui/icons-material/LibraryBooks";
 import SettingsOutlinedIcon from "@mui/icons-material/SettingsOutlined";
 import profileImg from "../../../../images/profile-placeholder.png";
 import EmailIcon from "@mui/icons-material/Email";
-import { useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
 import CloseIcon from '@mui/icons-material/Close';
+import { toggleDashboardCollapse } from '../../../../reduxStore/slices/uiSlice';
 
 const Item = ({ title, to, icon, selected, setSelected, isCollapsed }) => {
   const theme = useTheme();
@@ -32,23 +34,34 @@ const Item = ({ title, to, icon, selected, setSelected, isCollapsed }) => {
 
   return (
     <MenuItem
-      active={selected === title}
       style={{
         display: 'flex',
-        color: selected === title ? "#6870fa" : colors.grey[100], // Matching title color with icon
         boxShadow: selected === title ? "0 4px 12px rgba(0, 0, 0, 0.3)" : "none", // Adding box shadow for active menu
-        borderRadius: selected === title ? "15px" : "none", // Adding box shadow for active menu
-
+        width: "100%",
+        alignItems: isCollapsed ? 'center' : 'none',
+        justifyContent: isCollapsed ? 'center' : 'none',
       }}
       onClick={() => setSelected(title)}
-      icon={icon}
-      title={title}
+      icon={React.cloneElement(icon, {
+        style: {
+          color: selected === title ? colors.greenAccent[500] : colors.grey[100], // Matching icon color with title
+        },
+      })}
     >
-      {!isCollapsed && <Typography>{title}</Typography>}
+      {!isCollapsed && (
+        <Typography
+          sx={{
+            color: selected === title ? colors.greenAccent[500] : colors.grey[100], // Matching title color with icon
+          }}
+        >
+          {title}
+        </Typography>
+      )}
       <Link to={to} />
     </MenuItem>
   );
 };
+
 
 const Sidebar = () => {
   const theme = useTheme();
@@ -56,6 +69,11 @@ const Sidebar = () => {
   const [isCollapsed, setIsCollapsed] = useState(true);
   const [selected, setSelected] = useState("Dashboard");
   const user = useSelector((state) => state.users.user);
+  const dispatch = useDispatch();
+
+  useEffect(() => {
+    dispatch(toggleDashboardCollapse(isCollapsed));
+  }, [isCollapsed])
 
   const [isMobileOrTablet, setIsMobileOrTablet] = useState(false);
 
@@ -136,76 +154,71 @@ const Sidebar = () => {
 
   return (
     <Box
-      sx={{
-        "& .pro-sidebar .pro-menu": {
-          padding: `${isCollapsed ? '8px 0 0 0' : '20px'}`,
-          display: !isCollapsed && 'flex'
-        },
-        "& .pro-sidebar-inner": {
-          backgroundColor: colors.primary[400],
-          position: "fixed",
-          width: 'fit-content',
-          height: '95%',
-          borderRadius: `${isCollapsed ? '20px' : '10px'}`,
-          boxShadow: theme.palette.mode === 'light'
-            ? '0px 4px 12px rgba(0, 0, 0, 0.3)'
-            : '0px 4px 12px rgba(0, 0, 0, 0.5)',
-        },
-        "& .pro-sidebar": {
-          paddingLeft: "4%",
-          minWidth: isCollapsed ? "50px" : "220px",
-          width: 'fit-content',
-          maxWidth: isCollapsed ? "50px" : "220px",
-          display: 'flex',
-          alignItems: 'center',
-          backgroundColor:
-            theme.palette.mode === "light"
-              ? colors.primary[900]
-              : colors.primary[500],
-          justifyContent: "center",
-        },
-        "& .pro-sidebar.collapsed": {
-          minWidth: '60px'
-        },
-        "& .pro-sidebar .pro-menu.square .pro-menu-item > .pro-inner-item > .pro-icon-wrapper":{
-          backgroundColor: "transparent",
-          margin: "1vh 0",
-          display: "flex",
-          justifyContent: 'center',
-          height: 'auto'
-        },
-        "& .pro-icon": {
-          justifyContent: "flex-start !important",
-        },
-        "& .pro-menu-item.active ": {
-          justifyContent: "start !important",
-        },
-
-        
-        "& .pro-inner-item": {
-          padding: "10px 5px 5px 5px !important",
-          color: theme.palette.mode === "light"
-            ? colors.grey[100]
-            : colors.primary[200],
-        },
-        "& .pro-inner-item:hover": {
-          color: "#868dfb !important",
-        },
-        "& .pro-menu-item.active": {
-          display: 'flex',
-          justifyContent: "center",
-          color: "#6870fa !important",
-
-        },
-        "& .css-1l8icbj": {
-          padding: 0,
-        },
-        "& .pro-sidebar > .pro-sidebar-inner > .pro-sidebar-layout": {
-          padding: '5px',
-        },
-
-      }}
-    >
+    sx={{
+      minWidth: isCollapsed ? "65px !important" : "240px !important",
+      "& .pro-sidebar .pro-menu": {
+        padding: `${isCollapsed ? '8px 0 0 0' : '0'} !important`,
+        display: !isCollapsed && 'flex !important'
+      },
+      "& .pro-sidebar > .pro-sidebar-inner": {
+        backgroundColor: `${colors.primary[400]} !important`,
+        position: "fixed !important",
+        width: isCollapsed ? "55px" : "240px !important",
+        height: `${isCollapsed ? '95%' : '100%'} !important`,
+        borderRadius: `${isCollapsed ? '20px' : '0px'} !important`,
+        boxShadow: theme.palette.mode === 'light'
+        ? '0px 4px 4px rgba(0, 0, 0, 0.1)' // Lighter shadow for light mode
+        : '0px 4px 12px rgba(0, 0, 0, 0.5) !important',
+      },
+      "& .pro-sidebar": {
+        minWidth: '90%',
+        width: 'fit-content !important',
+        maxWidth: isCollapsed ? "60px !important" : "220px !important",
+        display: 'flex !important',
+        alignItems: 'center !important',
+        backgroundColor:
+          theme.palette.mode === "light"
+            ? `${colors.primary[900]} !important`
+            : `${colors.primary[500]} !important`,
+        justifyContent: "center !important",
+      },
+      // "& .pro-sidebar.collapsed": {
+      //   minWidth: '70px !important'
+      // },
+      "& .pro-sidebar .pro-menu.square .pro-menu-item > .pro-inner-item > .pro-icon-wrapper": {
+        backgroundColor: "transparent !important",
+        margin: "1vh 0 !important",
+        display: "flex !important",
+        justifyContent: 'center !important',
+        height: 'auto !important'
+      },
+      "& .pro-icon": {
+        justifyContent: "flex-start !important",
+      },
+      // "& .pro-menu-item.active": {
+      //   justifyContent: "start !important",
+      // },
+      "& .pro-inner-item": {
+        padding: "10px 5px 5px 5px !important",
+        color: theme.palette.mode === "light"
+          ? `${colors.grey[100]} !important`
+          : `${colors.primary[200]} !important`,
+      },
+      "& .pro-inner-item:hover": {
+        color: "#868dfb !important",
+      },
+      "& .pro-menu-item.active": {
+        display: 'flex !important',
+        justifyContent: "center !important",
+        color: "#6870fa !important",
+      },
+      "& .css-1l8icbj": {
+        padding: "0 !important",
+      },
+      "& .pro-sidebar > .pro-sidebar-inner > .pro-sidebar-layout ul": {
+        width: !isCollapsed ? '100%' : 'none',
+      },
+    }}>
       <ProSidebar collapsed={isCollapsed}>
         <Menu iconShape="square">
 
@@ -221,12 +234,10 @@ const Sidebar = () => {
                 }}
               >
             {!isCollapsed ? 
-              <Box display="flex"  color={colors.grey[100]} justifyContent="space-between" alignItems="center" ml="15px">
-                <Typography variant="h3" >
-                  {user?.role}
-                </Typography>
+              <Box display="flex"  color={colors.grey[100]} justifyContent="space-between" alignItems="center" mx='15px'>
                 <CloseIcon sx={{color:colors.grey[100]}}
-                 onClick={() => setIsCollapsed(!isCollapsed)} />
+                 onClick={() => setIsCollapsed(!isCollapsed)
+                 } />
               </Box>
               :
               <Box display="flex"  color={colors.grey[100]} justifyContent="center" alignItems="center">
@@ -238,7 +249,7 @@ const Sidebar = () => {
            }
 
           {!isCollapsed && (
-            <Box mb="25px" display="flex" justifyContent="center" alignItems="center">
+            <Box mb="25px" display="flex" justifyContent="center" alignItems="center" flexDirection= 'column'>
               <Avatar
                 src={profileImage}
                 alt="user-profile"
@@ -246,12 +257,30 @@ const Sidebar = () => {
                   width: "120px",
                   height: "120px",
                   cursor: "pointer",
+                  mb: '10px'
                 }}
               />
+                <Typography 
+                    variant="h3" 
+                    color= {theme.palette.mode === 'light' ? 
+                    colors.greenAccent[100] : colors.grey[100]}>
+                  {user?.firstName}
+                </Typography>
+                <Typography variant="h5" 
+                 color= {theme.palette.mode === 'light' ? 
+                  colors.greenAccent[100] : colors.grey[100]}>
+                  {user?.role}
+                </Typography>
             </Box>
           )}
 
-          <Box paddingLeft={isCollapsed ? undefined : "10%"}>
+          <Box
+            sx ={{
+                  display: 'flex',
+                  flexDirection: 'column', 
+                  alignItems: 'center',
+                  width: !isCollapsed ? '100%' : 'none'
+                  }}>
             {menuItems.map(({ title, to, icon }) => (
               <Item
                 key={title}

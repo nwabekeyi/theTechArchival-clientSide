@@ -12,7 +12,8 @@ import { useSelector } from 'react-redux';
 import useApi from '../../../../hooks/useApi';
 import { endpoints } from '../../../../utils/constants';
 import ConfirmationModal from '../../components/confirmationModal';
-
+import ActionButton from '../../components/actionButton';
+import CustomIconButton from '../../components/customIconButton';
 
 const Assignment = () => {
   const theme = useTheme();
@@ -32,6 +33,7 @@ const Assignment = () => {
   const [assignmentToDelete, setAssignmentToDelete] = useState(null); // Store assignment to delete
   const [deleteConfirm, setDeleteConfrim] = useState(false);
   const [updateConfirm, setUpdateConfrim] = useState(false)
+  const [postConfirm, setPostConfrim] = useState(false)
 
     //handle confirm modal close
     const handleConfirmModalClose = () => {
@@ -41,6 +43,9 @@ const Assignment = () => {
   
       if(updateConfirm === true){
         setUpdateConfrim(false);
+      };
+      if(postConfirm === true){
+        setPostConfrim(false);
       }
     };
 
@@ -117,6 +122,9 @@ const Assignment = () => {
           const newAssignmentWithId = { ...newAssignment, id: assignments.length + 1 };
           const updatedAssignments = [...assignments, newAssignmentWithId];
           setAssignments(sortAssignments(updatedAssignments)); // Sort after adding
+          setPostConfrim(true);
+        }else{
+          setPostConfrim(true);
         }
       }
 
@@ -206,35 +214,22 @@ const Assignment = () => {
       minWidth: 150,
       renderCell: (row) => (
         <Box display="flex" justifyContent="start">
-      <IconButton
-        onClick={() => handleOpenModal(row)}
-        title="Edit assignment"
-        sx={{
-          fontSize: { xs: '1rem', sm: '1.5rem' }, // Smaller icon size on small screens
-        }}
-      >
-        <EditIcon sx={{ fontSize: { xs: '1rem', sm: '1.5rem' } }} /> {/* Adjust icon size inline */}
-      </IconButton>
+           < CustomIconButton
+                title="Edit assignment"
+                onClick={() => handleOpenModal(row)}
+                icon= {<EditIcon />}
+              />
+             < CustomIconButton
+                onClick={() => handleDeleteAssignment(row)}
+                title="Delete assignment"
+                icon= {<DeleteIcon />}
+              />
 
-      <IconButton
-        onClick={() => handleDeleteAssignment(row)}
-        title="Delete assignment"
-        sx={{
-          fontSize: { xs: '1rem', sm: '1.5rem' }, // Smaller icon size on small screens
-        }}
-      >
-        <DeleteIcon sx={{ fontSize: { xs: '1rem', sm: '1.5rem' } }} />
-      </IconButton>
-
-      <IconButton
-        onClick={() => handleViewSubmissions(row)}
-        title="View submissions"
-        sx={{
-          fontSize: { xs: '1rem', sm: '1.5rem' }, // Smaller icon size on small screens
-        }}
-      >
-        <VisibilityIcon sx={{ fontSize: { xs: '1rem', sm: '1.5rem' } }} />
-      </IconButton>
+              < CustomIconButton
+                onClick={() => handleViewSubmissions(row)}
+                title="View submissions"
+                icon= {<VisibilityIcon />}
+              />
     </Box>
       ),
     },
@@ -246,15 +241,11 @@ const Assignment = () => {
         title="ASSIGNMENTS"
         subtitle="Overview of Assignments"
       />
-    
-      <Button
-        variant="contained"
-        color="secondary"
+         <ActionButton 
         onClick={() => handleOpenModal()}
-        sx={{ mb: '15px' }}
-      >
-        Add Assignment
-      </Button>
+        content= 'Add Assignment'
+      />
+
       <TableComponent
         columns={columns}
         tableHeader="Overview of Assignments"
@@ -391,28 +382,19 @@ const Assignment = () => {
 
        {/* delete and update confrim modal */}
       <ConfirmationModal
-        open={deleteConfirm || updateConfirm}
+        open={deleteConfirm || updateConfirm || postConfirm}
         onClose={handleConfirmModalClose}
-        title= {deleteConfirm ? "Delete Confirmation" : 'Update confirmation'}
-        isLoading= {deleteConfirm ? deleteLoading : putLoading}
+        title= {deleteConfirm ? "Delete Confirmation" : postConfirm ? "Assignment created" : 'Update confirmation'}
+        isLoading= {deleteConfirm ? deleteLoading : postConfirm ? postLoading : putLoading}
         message= {deleteConfirm ?
           "Assignment successfully deleted" :
           updateConfirm ? 'Assignment successfully updated' :
           deleteConfirm && deleteError ? "Could not update assignemnt, something went wrong" :
           updateConfirm && putError ? "Could not update assignemnt, something went wrong" :
+          postConfirm ? 'Assignment successfully posted' :
            "something went wrong"
           }
-
-      >
-
-       {deleteConfirm ?
-       "Assignment successfully deleted" :
-       updateConfirm ? 'Assignment successfully updated' :
-       deleteConfirm && deleteError ? "Could not update assignemnt, something went wrong" :
-       updateConfirm && putError ? "Could not update assignemnt, something went wrong" :
-        "something went wrong"
-       }
-      </ConfirmationModal>
+      />
     </Box>
   );
 };
