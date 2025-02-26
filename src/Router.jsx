@@ -13,6 +13,7 @@ const ResetPassword  = lazy(() => import('./pages/resetPassword'));
 const ForgotPasswordPage = lazy(() => import('./pages/forgotPassword'));
 
 
+
 function MyRoute() {
   return (
     <Router>
@@ -27,7 +28,10 @@ function MyRoute() {
           <Route path="/offlineSignup" element={<OfflineSignUp />} />
           <Route path="/videoCall" element={<VideoCall />} />
           <Route path="/forgot-password" element={<ForgotPasswordPage />} />
-          <Route path="/reset-password" element={<ResetPassword />} />        </Routes>
+          <Route path="/reset-password" element={<ResetPassword />} /> 
+          
+          
+                 </Routes>
       </Suspense>
     </Router>
   );
