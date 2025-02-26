@@ -13,6 +13,9 @@ import CustomIconButton from '../../components/customIconButton';
 import EditIcon from '@mui/icons-material/Edit';
 import ActionButton from '../../components/actionButton';
  import { AttendanceModal } from './Modals';
+ import DeleteIcon from '@mui/icons-material/Delete';
+ import VisibilityIcon from '@mui/icons-material/Visibility';
+
 
 const Instructor = () => {
   const theme = useTheme();
@@ -32,11 +35,14 @@ const Instructor = () => {
   const [updateConfirm, setUpdateConfrim] = useState(false)
   const [openAttendanceModal, setOpenAttendanceModal] = useState(false);
   const [timeTableToMark, setTimeTableToMark] = useState('');
+  const [openDetailsModal, setOpenDetailsModal] = useState(false); 
+  const [isDone, setIsDone] = useState(false); 
+  const [isPast, setIsPast] = useState(false); 
 
   const userDetails = useSelector((state) => state.users.user);
   const cohortName = userDetails.cohort;
   const postUrl = `${endpoints.TIMETABLE}/${cohortName}`;
-
+console.log(cohortName);
   //handle confirm modal close
   const handleConfirmModalClose = () => {
     if(deleteConfirm === true){
@@ -63,6 +69,7 @@ const openAttendance =  (timeTable)=> {
   const { loading: getLoading, error: getError, callApi: getCallApi } = useApi();
   const { loading: putLoading, data: putData, error: putError, callApi: putCallApi } = useApi();
   const { loading: deleteLoading, data: deleteData, error: deleteError, callApi: deleteCallApi } = useApi();
+  const { loading: loadDone, data: doneData, error: doneError, callApi: doneApi } = useApi();
 
   useEffect(() => {
     const fetchSchedules = async () => {
@@ -104,27 +111,19 @@ const openAttendance =  (timeTable)=> {
       renderCell: (row) => {
         const scheduleDateTime = formatDateTime(row.date, row.time); // Get the scheduled date and time
         const currentDateTime = new Date(); // Get the current date and time
-  
-        const isPast = scheduleDateTime <= currentDateTime; // Check if the scheduled time is in the past
-  
+        
+        const Past = scheduleDateTime <= currentDateTime  // Check if the scheduled time is in the past
+        const done = row.done;
+        setIsDone(done);
+        setIsPast(Past);
         return (
           <Box sx={{px:0}}>
               < CustomIconButton
                 onClick={() => handleEdit(row)}
                 icon= {<EditIcon />}
               />
-
-          <ActionButton 
-                onClick={() => openAttendance(row)}
-                content=  'Mark Attendance'
-              sx={{width: '120px'}}
-            />
-
-             <ActionButton 
-              onClick={() => (handleDelete(row))}
-              content= {isPast ? 'Mark as Done' : 'Delete'}
-              sx={{width: '120px', mx: 1}}
-            />
+               <CustomIconButton onClick={() => handleViewDetails(row)} icon={<VisibilityIcon />} />
+               <CustomIconButton onClick={() => handleDelete(row)} icon={<DeleteIcon />} />
 
           </Box>
         );
@@ -191,8 +190,40 @@ const openAttendance =  (timeTable)=> {
     }
   };
 
-  const handleDelete = (schedule) => {
+//mark as done
+const markAsDone = async () => {
+  if (editingSchedule) {
+    const updatedSchedule = {
+      cohortName,
+      entryId: editingSchedule.id
+    };
+
+    const response = await doneApi(endpoints.MARK_TIMETABLE, 'PATCH', updatedSchedule);
+
+    // If the API call is successful, update the frontend state (mark as done)
+    if (response) {
+      setSchedules((prevSchedules) =>
+        prevSchedules.map((schedule) =>
+          schedule.id === editingSchedule.id ? { ...schedule, done: true } : schedule
+        )
+      );
+      setUpdateConfrim(true);
+    } else {
+      setUpdateConfrim(true);
+    }
+
+    handleCloseEditModal();
+  }
+};
+
+console.log(doneData)
+  const handleViewDetails = (schedule) => {
     setEditingSchedule(schedule);
+    setOpenDetailsModal(true); // Open the details modal
+  };
+
+  const handleDelete = (schedule) => {
+    setScheduleToDelete(schedule);
     handleOpenDeleteModal();
   };
 
@@ -320,6 +351,33 @@ const openAttendance =  (timeTable)=> {
         />
       </Modal>
 
+            {/* Assignment Details Modal */}
+        <Modal
+        open={openDetailsModal}
+        onClose={() => setOpenDetailsModal(false)}
+        title="Assignment Details"
+        noConfirm
+      >
+        <Box>
+          <p>Topic: {editingSchedule?.topic}</p>
+          <p>Date: {editingSchedule?.date}</p>
+          <p>Time: {editingSchedule?.time}</p>
+          <p>Location: {editingSchedule?.location}</p>
+        </Box>
+        <ActionButton 
+                onClick={() => openAttendance(row)}
+                content=  'Mark Attendance'
+              sx={{width: '120px'}}
+            />
+
+             <ActionButton 
+              onClick={() => (markAsDone())}
+              content= {isDone ? 'Schedule completed' : 'Mark as done'}
+              sx={{width: '120px', mx: 1}}
+              disable= {isDone}
+            />
+      </Modal>
+
       {/* Delete Modal */}
       <Modal
         open={openDeleteModal}
@@ -336,16 +394,16 @@ const openAttendance =  (timeTable)=> {
         onClose={handleConfirmModalClose}
         title= {deleteConfirm ? "Delete Confirmation" : 'Update confirmation'}
         isLoading= {deleteConfirm ? deleteLoading : putLoading}
-        message= {deleteConfirm ?
+        message= {
+          deleteConfirm ?
           "Time Table successfully deleted" :
-          updateConfirm ? 'Time Table successfully updated' :
-          deleteConfirm && deleteError ? "Could not update time tab;e, something went wrong" :
+          updateConfirm ? putError :
+          deleteConfirm && deleteError ? "Could not update time table, something went wrong" :
           updateConfirm && putError ? "Could not update time table, something went wrong" :
            "something went wrong"
           }
 
       >
-        
       </ConfirmationModal>
 
       {/* mark attendance modal */}

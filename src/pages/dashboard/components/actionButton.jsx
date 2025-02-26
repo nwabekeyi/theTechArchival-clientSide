@@ -21,7 +21,10 @@ const ActionButton = ({ icon, content, onClick, submit, ...props }) => {
   return (
     <ButtonBase
       onClick={onClick}
-      sx={{ width: 'auto' }} // Ensures the button expands to full width
+      sx={{ 
+        width: 'auto',
+        justifyContent:"center"
+        }} // Ensures the button expands to full width
       type={submit && 'submit'}
     >
       <Box
