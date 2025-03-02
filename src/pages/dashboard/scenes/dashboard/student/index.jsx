@@ -5,10 +5,8 @@ import {
   useTheme,
   Card,
   CardContent,
-  Grid,
 } from "@mui/material";
 import { tokens } from "../../../theme";
-import { mockResources } from "../../../data/mockData";
 import SchoolIcon from "@mui/icons-material/School";
 import ProgressCircle from "../../../components/ProgressCircle";
 import useStudentData from "./useStudentData";
@@ -25,41 +23,37 @@ import useApi from "../../../../../hooks/useApi";
 const Student = () => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
-  const { data, loading, callApi } = useApi();
-  const [resources, setResources] = useState([]);
-  const { progressPercentage, attendanceRate, outstandings, nextClass, timeTableData, formatDateToDDMMYYYY } = useStudentData();
+  const {callApi } = useApi();
+  const {
+    progressPercentage,
+    attendanceRate,
+    missedClasses,
+    outstandings,
+    nextClass,
+    allResources,
+    formatDateToDDMMYYYY
+  } = useStudentData();
+
   const [announcements, setAnnouncements] = useState(null);
 
   useEffect(async() => {
     const response = await callApi(endpoints.ANNOUNCEMENT, "GET");
     if(response){
-      console.log(response)
       setAnnouncements(response);
     }
   }, []);
 
-  useEffect(() => {
-    let isMounted = true;
-    setTimeout(() => {
-      if (isMounted) {
-        setResources(mockResources);
-      }
-    }, 1000);
-
-    return () => {
-      isMounted = false;
-    };
-  }, []);
 
   const progressData = [
     { title: "Course Progress", value: progressPercentage, details: "Current course completion" },
     { title: "Attendance Level", value: attendanceRate, details: "Attendance percentage" },
   ];
 
+
   const conBg = `${
     theme.palette.mode === "light" ? colors.blueAccent[800] : colors.greenAccent[600]
   } !important`;
-
+const paymentProgress = 100 - outstandings.percentageDifference
   return (
     <Box
     >
@@ -87,10 +81,10 @@ const Student = () => {
               </Typography>
               <ProgressCircle
                 size="125"
-                progress={parseInt(100 - outstandings.percentageDifference)}
+                progress={paymentProgress / 100}
               />
               <Typography variant="body2" mt="10px">
-                Outstanding Payments: {outstandings.totalOutstanding}
+                Outstanding Payents: {outstandings.totalOutstanding}
               </Typography>
             </DashboardDataBox>
           </ResponsiveContainer>
@@ -126,10 +120,10 @@ const Student = () => {
             <DashboardDataBox noFlex
             >
               <Typography variant="h5" fontWeight="600" mb="15px">
-                Upcoming Schedule
+                Missed Schedules
               </Typography>
-              {timeTableData && timeTableData.length > 0 ? (
-                timeTableData.map((schedule) => (
+              {missedClasses.length > 0 ? (
+                missedClasses.map((schedule) => (
                   <Card key={schedule.id} sx={{ mb: 2 }}>
                     <CardContent sx={{ backgroundColor: conBg, textAlign: 'left' }}>
                       <Typography variant="h6">{schedule.topic}</Typography>
@@ -140,7 +134,7 @@ const Student = () => {
                   </Card>
                 ))
               ) : (
-                <Typography>No timetable found</Typography>
+                <Typography>You attended all classes</Typography>
               )}
             </DashboardDataBox>
           </ResponsiveContainer>
@@ -179,24 +173,29 @@ const Student = () => {
 
 
           <ResponsiveContainer md={6} >
-            <DashboardDataBox noFlex   moreStyles={{
-            height: '400px',
-            overflowY: 'auto'
-          }}>
+          <DashboardDataBox noFlex moreStyles={{ height: '400px', overflowY: 'auto' }}>
               <Typography variant="h5" fontWeight="600" mb="15px">
                 Useful Resources
               </Typography>
-              {resources.map((res, i) => (
-                <Card key={i} sx={{ mb: 2 }}>
-                  <CardContent sx={{ backgroundColor: conBg, textAlign: 'left'}}>
-                    <Typography variant="h6">{res.title}</Typography>
-                    <a href={res.link} target="_blank" rel="noopener noreferrer">
-                      {res.link}
-                    </a>
-                  </CardContent>
-                </Card>
-              ))}
+
+              {allResources.length > 0 ? (
+                allResources.map((res, i) => (
+                  <Card key={i} sx={{ mb: 2 }}>
+                    <CardContent sx={{ backgroundColor: conBg, textAlign: 'left' }}>
+                      <Typography variant="h6">{res.title}</Typography>
+                      <a href={res} target="_blank" rel="noopener noreferrer">
+                        {res}
+                      </a>
+                    </CardContent>
+                  </Card>
+                ))
+              ) : (
+                <Typography variant="h6" fontWeight="500" mb="15px">
+                  No Resources Available
+                </Typography>
+              )}
             </DashboardDataBox>
+
           </ResponsiveContainer>
         </RowContainer>
       </RowGrid>

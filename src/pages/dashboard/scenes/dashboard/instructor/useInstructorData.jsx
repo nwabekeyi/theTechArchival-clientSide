@@ -3,12 +3,24 @@ import { useSelector, useDispatch } from 'react-redux';
 import { endpoints } from '../../../../../utils/constants';
 import useApi from "../../../../../hooks/useApi";
 import { setAssignments, setTimetable } from '../../../../../reduxStore/slices/studentdataSlice';
-
 const useInstructorData = () => {
   const [courses, setCourses] = useState([]);
   const [nextClass, setNextClass] = useState(null);
   const [topStudents, setTopStudents] = useState([]);
   const [leastStudents, setLeastStudents] = useState([]);
+  const [cohort, setCohort] = useState(null);
+  const [announcements, setAnnouncements] = useState(null);
+  const { data, loading, callApi } = useApi();
+
+  //get announcements
+  useEffect(async() => {
+    const response = await callApi(endpoints.ANNOUNCEMENT, "GET");
+    if(response){
+      console.log(response)
+      setAnnouncements(response);
+    }
+  }, []);
+
 
   const instructorData = useSelector((state) => state.users.user);
   const dispatch = useDispatch();
@@ -19,12 +31,15 @@ const useInstructorData = () => {
   const { data: studentData, callApi: studentFetch, loading: studentLoading } = useApi(); // Fetch student details
 
   // Fetch cohort data when instructorData or courseData changes
-  useEffect(() => {
+  useEffect(async () => {
     if (instructorData && instructorData.cohort && courseData) {
       const instructorCourse = courseData.courses.find(course => instructorData.program === course.courseName);
 
       if (instructorCourse) {
-        cohortFetch(`${endpoints.COHORT}/${instructorCourse.courseId}/${instructorData.cohort}`, 'GET');
+        const response = await cohortFetch(`${endpoints.COHORT}/${instructorCourse.courseId}/${instructorData.cohort}`, 'GET');
+        if(response && response?.cohort){
+          setCohort(response);
+        }
       }
     }
   }, [instructorData, courseData, cohortFetch]);
@@ -101,43 +116,64 @@ const useInstructorData = () => {
 
   // Calculate course progress
   const courseProgress = useMemo(() => {
-    if (!cohortData || !cohortData.timetable || cohortData.timetable.length === 0) return 0;
 
-    const totalClasses = cohortData.timetable.length;
-    const completedClasses = cohortData.timetable.filter(timetable => timetable.done === true).length;
+    if (cohort){
 
-    return Math.round((completedClasses / totalClasses) * 100);
-  }, [cohortData]);
+      const totalClasses = cohort?.cohort?.timetable.length;
+      const completedClasses = cohort.cohort?.timetable.filter(timetable => timetable.done === true).length;
+  
+      return Math.round((completedClasses / totalClasses) * 100);
+    }else{
+      return 0
+    }
+
+  }, [cohort]);
 
   // Calculate attendance rate
   const attendanceRate = useMemo(() => {
-    if (!cohortData || !cohortData.timetable || !cohortData.students || cohortData.students.length === 0) return 0;
-
-    const totalStudents = cohortData.students.length;
-    const totalAttendance = cohortData.timetable.reduce((total, classSession) => {
+    if (cohort){
+      const totalStudents = cohort.cohort?.students.length;
+    const totalAttendance = cohort.cohort?.timetable.reduce((total, classSession) => {
       return total + (classSession.attendance ? classSession.attendance.length : 0);
     }, 0);
 
-    const totalPossibleAttendance = totalStudents * cohortData.timetable.length;
-
+    const totalPossibleAttendance = totalStudents * cohort.cohort?.timetable.length;
     return Math.round((totalAttendance / totalPossibleAttendance) * 100);
-  }, [cohortData]);
+
+    }else{
+      return 0
+    }
+
+    
+
+
+  }, [cohort]);
 
   // Calculate assignment submission rate
   const assignmentSubmissionRate = useMemo(() => {
-    if (!cohortData || !cohortData.assignments || cohortData.assignments.length === 0 || !cohortData.students) return 0;
 
-    const totalStudents = cohortData.students.length;
+    if (cohort && cohort.cohort?.assignments){
+      const totalStudents = cohort.cohort?.students.length;
+      const assignmentRate = cohort.cohort.assignments.map(assignment => {
+        const submissionsCount = assignment.submissions.length;
+        const submissionRate = (submissionsCount / totalStudents) * 100;
+        const rate = {
+          title: assignment.title,
+          submissionRate: Math.round(submissionRate)
+        };
+        return rate;
+      });
+       const totalRate = assignmentRate.reduce((sum, assignment) => sum + assignment.submissionRate, 0);
+       const totalAssignmentRate = totalRate/assignmentRate.length;
 
-    return cohortData.assignments.map(assignment => {
-      const submissionsCount = assignment.submissions.length;
-      const submissionRate = (submissionsCount / totalStudents) * 100;
-      return {
-        title: assignment.title,
-        submissionRate: Math.round(submissionRate)
-      };
-    });
-  }, [cohortData]);
+
+
+      return {assignmentRate, totalAssignmentRate};
+    }else{
+      return 0
+    }
+
+  }, [cohort]);
 
   // Finding the top 5 students with highest and lowest activity rate
   useEffect(() => {
@@ -168,6 +204,7 @@ const useInstructorData = () => {
     attendanceRate,
     assignmentSubmissionRate,
     studentData,
+    announcements,
     topStudents, // Now this contains the top 5 students with highest activity
     leastStudents // Now this contains the top 5 students with lowest activity
   };

@@ -1,17 +1,51 @@
-import { useMemo, useState, useEffect } from 'react';
+import { useMemo, useReducer, useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { endpoints } from '../../../../../utils/constants';
 import useApi from "../../../../../hooks/useApi";
 import { setAssignments, setTimetable } from '../../../../../reduxStore/slices/studentdataSlice'; // Import dispatch actions
 
+// Define action types for the reducer
+const actionTypes = {
+  SET_COURSES: 'SET_COURSES',
+  SET_PAST_TIMETABLES: 'SET_PAST_TIMETABLES',
+  SET_NEXT_CLASS: 'SET_NEXT_CLASS',
+  SET_MISSED_CLASSES: 'SET_MISSED_CLASSES',
+  SET_ALL_RESOURCES: 'SET_ALL_RESOURCES', // New action type for resources
+};
+
+// Define the initial state
+const initialState = {
+  courses: [],
+  timePastTimetables: [],
+  nextClass: null,
+  missedClasses: [],
+  allResources: [], // New state for all resources
+};
+
+// Reducer function to handle state changes
+const reducer = (state, action) => {
+  switch (action.type) {
+    case actionTypes.SET_COURSES:
+      return { ...state, courses: action.payload };
+    case actionTypes.SET_PAST_TIMETABLES:
+      return { ...state, timePastTimetables: action.payload };
+    case actionTypes.SET_NEXT_CLASS:
+      return { ...state, nextClass: action.payload };
+    case actionTypes.SET_MISSED_CLASSES:
+      return { ...state, missedClasses: action.payload };
+    case actionTypes.SET_ALL_RESOURCES:
+      return { ...state, allResources: action.payload }; // Handle resources
+    default:
+      return state;
+  }
+};
+
 const useStudentData = () => {
-  const [timePastTimetables, setTimePastTimetables] = useState([]);
-  const [courses, setCourses] = useState([]);
-  const [nextClass, setNextClass] = useState(null);
-
+  const [state, localDispatch] = useReducer(reducer, initialState); // Initialize useReducer
+  const { courses, timePastTimetables, nextClass, missedClasses, allResources } = state; // Include resources in destructuring
+  const timeTable = useSelector((state) => state.student.timetable);
   const studentData = useSelector((state) => state.users.user);
-  const dispatch = useDispatch(); // Initialize dispatch
-
+  const dispatch = useDispatch(); // Initialize redux dispatch
   const { data: timeTableData, callApi: timeTableFetch, loading: timeTableLoading } = useApi();
   const { data: courseData, callApi: courseFetch, loading: courseLoading } = useApi();
   const { data: assignmentData, callApi: assignementFetch, loading: assignmentLoading } = useApi();
@@ -51,9 +85,9 @@ const useStudentData = () => {
   // Set courses data when received from the API
   useEffect(() => {
     if (courseData) {
-      setCourses(courseData.courses);
+      localDispatch({ type: actionTypes.SET_COURSES, payload: courseData.courses });
     }
-  }, [courseData, studentData]);
+  }, [courseData]);
 
   // Update timePastTimetables when timeTableData is updated
   useEffect(() => {
@@ -63,7 +97,7 @@ const useStudentData = () => {
         const timetableDateTime = new Date(`${timetable.date}T${timetable.time}`);
         return timetableDateTime < currentDateTime;
       });
-      setTimePastTimetables(pastTimetables);
+      localDispatch({ type: actionTypes.SET_PAST_TIMETABLES, payload: pastTimetables });
     }
   }, [timeTableData]);
 
@@ -76,15 +110,14 @@ const useStudentData = () => {
     return `${day}/${month}/${year}`;
   };
 
+  // Find the next class from the timetable data
   useEffect(() => {
     if (timeTableData && timeTableData.length > 0) {
       const currentDateTime = new Date();
       let closestClass = null;
 
-      // Loop through the timeTableData and find the closest date/time in the future
       timeTableData.forEach(timetable => {
         const timetableDateTime = new Date(`${timetable.date.split('T')[0]}T${timetable.time}`);
-
         if (timetableDateTime > currentDateTime) {
           if (!closestClass || timetableDateTime < new Date(`${closestClass.date.split('T')[0]}T${closestClass.time}`)) {
             closestClass = timetable;
@@ -92,31 +125,17 @@ const useStudentData = () => {
         }
       });
 
-      // If a next class is found, format the date and set it
       if (closestClass) {
-        // Create a new object by spreading the properties of closestClass and adding the formattedDate property
         const formattedClass = {
-          ...closestClass,  // Spread the properties of closestClass
-          formattedDate: formatDateToDDMMYYYY(closestClass.date),  // Add the formatted date
+          ...closestClass,
+          formattedDate: formatDateToDDMMYYYY(closestClass.date),
         };
-        setNextClass(formattedClass);  // Set the new object with formatted date
+        localDispatch({ type: actionTypes.SET_NEXT_CLASS, payload: formattedClass });
       }
     }
   }, [timeTableData]);
 
-  if (!studentData || typeof studentData !== 'object') {
-    return {
-      completedCourses: [],
-      remainingCourses: [],
-      progressPercentage: 0,
-      timePastTimetables: [],
-      nextClass: null,
-      attendanceRate: 0,
-      outstandings: { totalOutstanding: 0, percentageDifference: 0 },
-      loading: timeTableLoading || courseLoading,
-    };
-  }
-
+  // Process courses, curriculum, and missed classes
   const {
     completedCourses,
     remainingCourses,
@@ -126,45 +145,43 @@ const useStudentData = () => {
   } = useMemo(() => {
     const completedCourses = [];
     const remainingCourses = [];
+    const missedClassesList = [];
+    let allResources = [];
 
-    // Iterate through courses and segregate completed and remaining topics
+    timeTable.forEach(topic => {
+      if (topic.done && topic.attendance.includes(studentData.userId)) {
+        completedCourses.push(topic);
+      } else if (!topic.done) {
+        remainingCourses.push(topic);
+      } else {
+        missedClassesList.push(topic);
+      }
+    });
+
+    // Set missed classes in the reducer
+    localDispatch({ type: actionTypes.SET_MISSED_CLASSES, payload: missedClassesList });
+
+    // Collect resources from each course's curriculum
     courses.forEach(course => {
-      const { curriculum } = course;
-      if (Array.isArray(curriculum)) {
-        curriculum.forEach(topic => {
-          if (topic.isCompleted) {
-            completedCourses.push(topic);
-          } else {
-            remainingCourses.push(topic);
-          }
+      if (course.curriculum && course.curriculum.length > 0) {
+        course.curriculum.forEach(item => {
+          allResources = [...allResources, ...item.resources];
         });
       }
     });
 
-    // Calculate progress percentage based on completed and remaining topics
+    // Dispatch all resources to the reducer
+    localDispatch({ type: actionTypes.SET_ALL_RESOURCES, payload: allResources });
+
     const totalTopics = completedCourses.length + remainingCourses.length;
-    const progressPercentage = totalTopics > 0
-      ? (completedCourses.length / totalTopics) * 100
-      : 0;
-
-    // Filter the timetables that are marked as 'done'
-    const completedTimetables = timePastTimetables.filter(timetable => timetable.done);
-
-    // Calculate the number of completed classes the student attended
+    const progressPercentage = totalTopics > 0 ? (completedCourses.length / totalTopics) * 100 : 0;
     const attendedClasses = timeTableData && timeTableData.filter(timetable =>
       timetable.attendance.includes(studentData.userId)
     ).length;
-    console.log(attendedClasses);
 
-    // Calculate attendance rate based on the attended classes and completed timetables
     const totalDoneTimetables = timeTableData && timeTableData.length;
-    const attendanceRate = totalDoneTimetables > 0
-      ? (attendedClasses / totalDoneTimetables) * 100
-      : 0;
+    const attendanceRate = totalDoneTimetables > 0 ? (attendedClasses / totalDoneTimetables) * 100 : 0;
 
-      console.log(attendanceRate)
-
-    // Calculate outstanding amount and percentage
     const amountPaid = studentData.amountPaid || 0;
     const totalCost = courses.reduce((acc, course) => {
       const cost = parseInt(course.cost, 10) || 0;
@@ -172,15 +189,13 @@ const useStudentData = () => {
     }, 0);
 
     const totalOutstanding = totalCost - amountPaid;
-    const percentageDifference = totalCost > 0
-      ? (totalOutstanding / totalCost) * 100
-      : 0;
+    const percentageDifference = totalCost > 0 ? (totalOutstanding / totalCost) * 100 : 0;
 
     return {
       completedCourses,
       remainingCourses,
       progressPercentage,
-      attendanceRate,  // Updated attendance rate calculation
+      attendanceRate,
       outstandings: { totalOutstanding, percentageDifference, amountPaid },
     };
   }, [courses, timePastTimetables, studentData]);
@@ -190,13 +205,14 @@ const useStudentData = () => {
     remainingCourses,
     progressPercentage,
     timePastTimetables,
-    nextClass, // Return nextClass in the return object
+    nextClass,
     attendanceRate,
     outstandings,
     studentData,
-    timeTableData,
+    missedClasses,
+    allResources, // Return resources as part of the data
     loading: timeTableLoading || courseLoading,
-    formatDateToDDMMYYYY
+    formatDateToDDMMYYYY,
   };
 };
 

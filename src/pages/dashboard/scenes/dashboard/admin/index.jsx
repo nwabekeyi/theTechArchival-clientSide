@@ -2,9 +2,7 @@ import { Box, Typography, useTheme, Avatar, useMediaQuery, Grid } from '@mui/mat
 import { tokens } from '../../../theme';
 import GroupsIcon from '@mui/icons-material/Groups';
 import PersonAddIcon from '@mui/icons-material/PersonAdd';
-import EmailIcon from '@mui/icons-material/Email';
 import SchoolIcon from '@mui/icons-material/School';
-import StatBox from '../../../components/StatBox';
 import LineChart from '../../../components/LineChart';
 import useAdminData from './useAdminData';
 import { useState, useEffect } from 'react';

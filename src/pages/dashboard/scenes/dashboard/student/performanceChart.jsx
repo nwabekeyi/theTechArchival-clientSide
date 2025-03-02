@@ -4,137 +4,166 @@ import { useTheme, Box } from '@mui/material';
 import { tokens } from '../../../theme';
 import { useSelector } from 'react-redux';
 
-const PerfromanceLineChart = ({ isCustomLineColors = false, isDashboard = false }) => {
+const PerformanceLineChart = ({ isCustomLineColors = false, isDashboard = false }) => {
   const [lineData, setLineData] = useState([]);
   const [performance, setPerformance] = useState("");
-  const [currentYear, setCurrentYear] = useState(new Date().getFullYear());
+  const currentDate = new Date();
+  const currentYear = currentDate.getFullYear();
+  const currentMonth = currentDate.getMonth();
+  
   const theme = useTheme();
   const colors = useMemo(() => tokens(theme.palette.mode), [theme.palette.mode]);
-  const students = useSelector((state) => state.adminData.usersData.students);
   const assignmentData = useSelector((state) => state.student.assignments);
   const timeTableData = useSelector((state) => state.student.timetable);
   const userId = useSelector((state) => state.users.user.userId);
   const studentId = useSelector((state) => state.users.user.studentId);
 
-  // Helper function to generate color for lines dynamically
   const generateColor = (index) => {
     const hue = (index * 360) / 10 % 360;
     return `hsl(${hue}, 70%, 60%)`;
   };
 
-  // Helper function to calculate monthly data for assignment submissions and attendance
-  const processMonthlyData = (data, studentId, type) => {
+  const processMonthlyData = useMemo(() => (data, studentId, type, earliestDate, latestDate) => {
     const months = [
       "January", "February", "March", "April", "May", "June",
       "July", "August", "September", "October", "November", "December"
     ];
+    
+    const aggregatedData = months.reduce((acc, month) => ({
+      ...acc,
+      [month]: { total: 0, attended: 0 }
+    }), {});
 
-    const aggregatedData = {};
-
+    // Track if current month has timetable data (for attendance only)
+    let hasCurrentMonthTimetable = false;
+    
     data.forEach(item => {
-      const date = new Date(item.date);
-      const month = date.getMonth();
-      const monthName = months[month];
-
-      if (!aggregatedData[monthName]) {
-        aggregatedData[monthName] = { total: 0, attended: 0 };
+      const date = new Date(type === 'assignment' ? item.dueDate : item.date);
+      const monthIndex = date.getMonth();
+      
+      if (date < earliestDate || 
+          date > latestDate || 
+          date.getFullYear() !== currentYear || 
+          monthIndex > currentMonth) {
+        return;
       }
 
+      const monthName = months[monthIndex];
+      
       if (type === 'attendance' && item.done) {
-        if (item.attendance && item.attendance.includes(studentId)) {
+        aggregatedData[monthName].total += 1;
+        if (item.attendance?.includes(userId)) {
           aggregatedData[monthName].attended += 1;
         }
+        if (monthIndex === currentMonth) {
+          hasCurrentMonthTimetable = true;
+        }
+      } else if (type === 'assignment') {
         aggregatedData[monthName].total += 1;
-      }
-
-      if (type === 'assignment') {
-        if (item.submissions && item.submissions.some(submission => submission.studentId === studentId)) {
+        if (item.submissions?.some(sub => sub.studentId === studentId)) {
           aggregatedData[monthName].attended += 1;
         }
-        aggregatedData[monthName].total += 1;
       }
     });
 
-    const processedData = months.map(month => {
-      const monthData = aggregatedData[month] || { total: 0, attended: 0 };
-      const rate = monthData.total > 0 ? (monthData.attended / monthData.total) * 100 : 0;
-      return { x: month, y: rate };
+    return months.map((month, index) => {
+      const { total, attended } = aggregatedData[month];
+      const rate = total > 0 ? (attended / total) * 100 : 0;
+      // For attendance, exclude current month if no timetable exists
+      if (type === 'attendance' && index === currentMonth && !hasCurrentMonthTimetable) {
+        return { x: month, y: 0 };
+      }
+      return { 
+        x: month, 
+        y: index <= currentMonth && total > 0 ? rate : 0 
+      };
     });
+  }, [currentYear, currentMonth, userId, studentId]);
 
-    return processedData;
-  };
-
-  // Helper function to calculate student performance grade based on combined rate
   const calculatePerformance = (attendanceRate, assignmentRate) => {
-    if (attendanceRate === 0 && assignmentRate === 0) {
-      return "Yet to start classes";
-    }
-
+    if (attendanceRate === 0 && assignmentRate === 0) return "Yet to start classes";
     const combinedRate = (attendanceRate + assignmentRate) / 2;
-
-    if (combinedRate >= 90) {
-      return "A";
-    } else if (combinedRate >= 80) {
-      return "B";
-    } else if (combinedRate >= 70) {
-      return "C";
-    } else if (combinedRate >= 60) {
-      return "D";
-    } else {
-      return "E";
-    }
+    return combinedRate >= 90 ? "A" :
+           combinedRate >= 80 ? "B" :
+           combinedRate >= 70 ? "C" :
+           combinedRate >= 60 ? "D" : "E";
   };
 
   useEffect(() => {
     const fetchData = () => {
+      if (!assignmentData?.length || !timeTableData?.length) {
+        setLineData([]);
+        return;
+      }
+
       try {
-        if (students && students.length > 0) {
-          const years = Array.from(new Set(students.map(user => new Date(user.createdAt).getFullYear())));
-          const selectedYear = years.includes(currentYear) ? currentYear : Math.max(...years);
-          setCurrentYear(selectedYear);
+        const firstTimeTableDate = new Date(Math.min(...timeTableData.map(item => new Date(item.date))));
+        const firstAssignmentDate = new Date(Math.min(...assignmentData.map(item => new Date(item.dueDate))));
+        const earliestDate = new Date(Math.min(firstTimeTableDate, firstAssignmentDate));
 
-          const assignmentMonthlyData = processMonthlyData(assignmentData, studentId, 'assignment');
-          const attendanceMonthlyData = processMonthlyData(timeTableData, studentId, 'attendance');
+        const lastTimeTableDate = new Date(Math.max(...timeTableData.map(item => new Date(item.date))));
+        const lastAssignmentDate = new Date(Math.max(...assignmentData.map(item => new Date(item.dueDate))));
+        const latestDate = new Date(Math.max(lastTimeTableDate, lastAssignmentDate));
 
-          const assignmentRate = assignmentMonthlyData.reduce((acc, curr) => acc + curr.y, 0) / assignmentMonthlyData.length;
-          const attendanceRate = attendanceMonthlyData.reduce((acc, curr) => acc + curr.y, 0) / attendanceMonthlyData.length;
+        const assignmentMonthlyData = processMonthlyData(
+          assignmentData, 
+          studentId, 
+          'assignment', 
+          earliestDate, 
+          latestDate
+        );
+        const attendanceMonthlyData = processMonthlyData(
+          timeTableData, 
+          studentId, 
+          'attendance', 
+          earliestDate, 
+          latestDate
+        );
+        
+        // Filter valid months excluding current month if no timetable exists for attendance
+        const validAssignmentMonths = assignmentMonthlyData.filter(d => d.y > 0).length;
+        const validAttendanceMonths = attendanceMonthlyData.filter((d, i) => 
+          d.y > 0 && (i !== currentMonth || timeTableData.some(t => 
+            new Date(t.date).getMonth() === currentMonth))
+        ).length;
 
-          const grade = calculatePerformance(attendanceRate, assignmentRate);
-          setPerformance(grade);
+        const assignmentRate = validAssignmentMonths > 0 
+          ? assignmentMonthlyData.reduce((acc, curr) => acc + curr.y, 0) / validAssignmentMonths 
+          : 0;
+        const attendanceRate = validAttendanceMonths > 0 
+          ? attendanceMonthlyData.reduce((acc, curr, i) => 
+              acc + (i === currentMonth && !timeTableData.some(t => 
+                new Date(t.date).getMonth() === currentMonth) ? 0 : curr.y), 
+              0) / validAttendanceMonths 
+          : 0;
 
-          const formattedData = [
-            {
-              id: "Assignments Submitted",
-              color: isCustomLineColors ? generateColor(0) : colors.primary[500],
-              data: assignmentMonthlyData
-            },
-            {
-              id: "Classes Attended",
-              color: isCustomLineColors ? generateColor(1) : colors.primary[600],
-              data: attendanceMonthlyData
-            }
-          ];
-
-          setLineData(formattedData);
-        } else {
-          console.warn("No data available or data array is empty.");
-        }
+        setPerformance(calculatePerformance(attendanceRate, assignmentRate));
+        setLineData([
+          {
+            id: "Assignments Submitted",
+            color: isCustomLineColors ? generateColor(0) : colors.primary[500],
+            data: assignmentMonthlyData
+          },
+          {
+            id: "Classes Attended",
+            color: isCustomLineColors ? generateColor(1) : colors.primary[600],
+            data: attendanceMonthlyData
+          }
+        ]);
       } catch (error) {
-        console.error("Error fetching data: ", error);
+        console.error("Error processing data:", error);
       }
     };
 
     fetchData();
-  }, [assignmentData, timeTableData, students, studentId, isCustomLineColors, colors.primary, currentYear]);
+  }, [assignmentData, timeTableData, studentId, isCustomLineColors, colors.primary, processMonthlyData]);
 
   if (lineData.length === 0) {
-    return <Box sx={{display: 'grid', placeContent:'center'}}><p>Your cohort is yet to get a time-table</p></Box>;
+    return <Box sx={{ display: 'grid', placeContent: 'center' }}><p>Your cohort is yet to get a time-table</p></Box>;
   }
 
   return (
     <Box width="98%" height="100%">
-
-      
       {performance !== "Yet to start classes" && (
         <Box>
           <h2>Student Performance: {performance}</h2>
@@ -255,4 +284,4 @@ const PerfromanceLineChart = ({ isCustomLineColors = false, isDashboard = false 
   );
 };
 
-export default PerfromanceLineChart;
+export default PerformanceLineChart;

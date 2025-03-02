@@ -365,7 +365,7 @@ console.log(doneData)
           <p>Location: {editingSchedule?.location}</p>
         </Box>
         <ActionButton 
-                onClick={() => openAttendance(row)}
+                onClick={() => openAttendance(editingSchedule)}
                 content=  'Mark Attendance'
               sx={{width: '120px'}}
             />

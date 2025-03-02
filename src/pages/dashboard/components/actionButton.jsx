@@ -21,11 +21,9 @@ const ActionButton = ({ icon, content, onClick, submit, ...props }) => {
   return (
     <ButtonBase
       onClick={onClick}
-      sx={{ 
-        width: 'auto',
-        justifyContent:"center"
-        }} // Ensures the button expands to full width
+      
       type={submit && 'submit'}
+      width= '100%'
     >
       <Box
         width={{
@@ -50,7 +48,8 @@ const ActionButton = ({ icon, content, onClick, submit, ...props }) => {
         }}
         {...props}
       >
-        <Typography
+        {
+          icon && <Typography
           color={textColor}
           sx={{
             mb: '5px',
@@ -65,6 +64,8 @@ const ActionButton = ({ icon, content, onClick, submit, ...props }) => {
         >
           {icon}
         </Typography>
+        }
+        
         <Typography
           color={textColor}
           fontWeight="900"
@@ -72,8 +73,6 @@ const ActionButton = ({ icon, content, onClick, submit, ...props }) => {
             fontSize: {
               xs: '10px',  // Font size for extra-small screens
               sm: '12px',  // Font size for small screens
-              md: '14px',  // Font size for medium screens
-              lg: '14px',  // Font size for large screens
             },
           }}
         >

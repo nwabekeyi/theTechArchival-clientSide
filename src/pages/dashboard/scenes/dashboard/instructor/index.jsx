@@ -46,7 +46,8 @@ const Instructor = () => {
     nextClass,
     assignmentSubmissionRate,
     topStudents,
-    leastStudents
+    leastStudents,
+    announcements
   } = useInstructorData();
 
 
@@ -66,7 +67,7 @@ const Instructor = () => {
               </Typography>
                 <Box display="flex" flexDirection="column" alignItems="center" mt="25px" 
               >
-                <ProgressCircle size="125" progress={courseProgress} />
+                <ProgressCircle size="125" progress={courseProgress / 100} />
                 <Typography variant="h5" color={colors.blueAccent[500]} sx={{ mt: "15px" }}>
                   {`${courseProgress}% completed`}
                 </Typography>
@@ -83,7 +84,7 @@ const Instructor = () => {
                 Attendance
               </Typography>
               <Box display="flex" flexDirection="column" alignItems="center" mt="25px">
-                <ProgressCircle size="125" progress={attendanceRate} />
+                <ProgressCircle size="125" progress= {attendanceRate / 100} />
                 <Typography variant="h5" color={colors.blueAccent[500]} sx={{ mt: "15px" }}>
                   {`${attendanceRate}% attendance rate`}
                 </Typography>
@@ -100,9 +101,9 @@ const Instructor = () => {
                 Assignment submissions
               </Typography>
               <Box display="flex" flexDirection="column" alignItems="center" mt="25px">
-                <ProgressCircle size="125" progress={assignmentSubmissionRate} />
+                <ProgressCircle size="125" progress={assignmentSubmissionRate.totalAssignmentRate/100} />
                 <Typography variant="h5" color={colors.blueAccent[500]} sx={{ mt: "15px" }}>
-                  {`${assignmentSubmissionRate}% submission rate`}
+                  {`${assignmentSubmissionRate.totalAssignmentRate}% submission rate`}
                 </Typography>
                 <Typography>Total assignment submission rate</Typography>
               </Box>
@@ -155,17 +156,25 @@ const Instructor = () => {
             overflowY: 'auto'
             
           }}>                
-              <Typography variant="h5" fontWeight="600" mb="15px">Announcements</Typography>
-              {mockAnnouncements.map((announcement) => (
-                <Card key={announcement.id} sx={{ mb: 2 }}>
-                  <CardContent sx={{ backgroundColor: conBg }}>
-                    <Typography variant="h6">{announcement.title}</Typography>
-                    <Typography variant="body2">{announcement.message}</Typography>
-                    <Typography variant="caption" color="gray">{announcement.date}</Typography>
-                  </CardContent>
-                </Card>
-              ))}
-          </DashboardDataBox>
+          <Typography variant="h5" fontWeight="600" mb="15px">
+                        Announcements
+                      </Typography>
+                      {announcements && announcements.length > 0 ? (
+                        announcements.map((announcement) => (
+                          <Card key={announcement.id} sx={{ mb: 2 }}>
+                            <CardContent sx={{ backgroundColor: conBg, textAlign: 'left' }}>
+                              <Typography variant="h6">{announcement.title}</Typography>
+                              <Typography variant="body2">{announcement.message}</Typography>
+                              <Typography variant="caption" color="gray">
+                                {announcement.date}
+                              </Typography>
+                            </CardContent>
+                          </Card>
+                        ))
+                      ) : (
+                        <Typography>No announcements available</Typography>
+                      )}          
+              </DashboardDataBox>
         </ResponsiveContainer>
        
 
