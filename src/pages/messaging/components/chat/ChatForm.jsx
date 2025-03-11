@@ -10,54 +10,42 @@ import {
   ListItemText,
   Avatar,
   InputAdornment,
+  CircularProgress,
 } from "@mui/material";
 import SendIcon from "@mui/icons-material/Send";
 import EmojiEmotionsIcon from "@mui/icons-material/EmojiEmotions";
 import Picker from "emoji-picker-react";
-import { tokens } from "../../../dashboard/theme"; // Assuming your token function for colors
+import { tokens } from "../../../dashboard/theme";
 import useWebSocket from "../../../../hooks/useWebSocket";
 import {
   checkDBFullnessAndSave,
   addChatroomMessage,
   setReplyToMessage,
-  setMessage,
-  setMessages
-} from '../../../../reduxStore/slices/messageSlice';
-import { SEND_MESSAGE } from '../../../../utils/graphql/mutations';
-import { useMutation} from '@apollo/client';
-import { useSelector} from 'react-redux';
+  setMessages,
+} from "../../../../reduxStore/slices/messageSlice";
+import { useSelector, useDispatch } from "react-redux";
 
-
-
-const ChatForm = ({ 
-  currentChat,
-  mention,
-  setMention
-}) => {
-  const message = useSelector((state) => state.message.message);
+const ChatForm = ({ currentChat, mention, setMention, currentUser, replyToMessage }) => {
+  const messages = useSelector((state) => state.message.messages); // Assumes messages is an array
+  const dispatch = useDispatch();
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
-  const [chosenEmoji, setChosenEmoji] = useState(null);
   const [mentionPosition, setMentionPosition] = useState({});
   const [filteredParticipants, setFilteredParticipants] = useState([]);
-  const [mentionQuery, setMentionQuery] = useState('');
-  const [messageState, setMessageState] = useState(message);
-  const [sendMessageMutation] = useMutation(SEND_MESSAGE);
-
-// Use the single handler for the 'chatroom message' event
-const { emit, isConnected} = useWebSocket();
+  const [mentionQuery, setMentionQuery] = useState("");
+  const [messageState, setMessageState] = useState("");
+  const [isSending, setIsSending] = useState(false); // Track sending state for UI feedback
+  const { emit, isConnected, listen } = useWebSocket();
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
+  const emojiPickerRef = useRef(null);
 
-  const emojiPickerRef = useRef(null); // Reference for the emoji picker
-
-  // Handle mention selection
   const onChange = useCallback(
     (e) => {
       const value = e.target.value;
       setMessageState(value);
 
-      if (value.includes('@')) {
-        const query = value.split('@').pop().trim();
+      if (value.includes("@")) {
+        const query = value.split("@").pop().trim();
         setMentionQuery(query);
         setFilteredParticipants(
           currentChat.participants.filter((participant) =>
@@ -71,40 +59,34 @@ const { emit, isConnected} = useWebSocket();
         const cursorPos = inputElement.selectionStart;
         const rect = inputElement.getBoundingClientRect();
         const charWidth = 8;
-        const left = rect.left + charWidth * (cursorPos - value.lastIndexOf('@') - 1);
+        const left = rect.left + charWidth * (cursorPos - value.lastIndexOf("@") - 1);
         const top = rect.top - 250;
 
         setMentionPosition({ left, top });
       } else {
-        setMentionQuery('');
+        setMentionQuery("");
         setFilteredParticipants([]);
       }
     },
-    [currentChat && currentChat.participants]
+    [currentChat?.participants]
   );
 
-  useEffect(() => {
-    return () => {
-      setShowEmojiPicker(false);
-      setChosenEmoji(null);
-    };
-  }, []);
-
-  const handleEmojiClick = (event, emojiObject) => {
+  const handleEmojiClick = (event) => {
     const emoji = event.emoji;
-
     if (emoji) {
       setMessageState((prevState) => prevState + emoji);
     }
     setShowEmojiPicker(false);
   };
 
-  const handleFormSubmit = async () => {
+  const handleFormSubmit = (e) => {
     e.preventDefault();
-    if (!isConnected) {
-      console.log('Cannot send message, WebSocket is not connected.');
+    if (!isConnected || !messageState.trim() || isSending) {
+      console.log("Cannot send message: WebSocket not connected, message empty, or already sending.");
       return;
     }
+
+    setIsSending(true); // Indicate message is being sent
 
     const messageBody = {
       chatroomName: currentChat.name,
@@ -115,42 +97,84 @@ const { emit, isConnected} = useWebSocket();
         role: currentUser.role,
       },
       message: messageState,
-      messageType: 'text',
+      messageType: "text",
       deliveredTo: [],
       readBy: [],
-      status: 'sent',
       replyTo: replyToMessage ? { id: replyToMessage._id, message: replyToMessage.message } : null,
       mention: mention || null,
+      timestamp: new Date().toISOString(),
     };
 
-    try {
-      const { data } = await sendMessageMutation({
-        variables: messageBody,
-      });
+    // Emit message to server without adding to Redux yet
+    emit("chatroom message", messageBody);
 
-      if (data) {
-        dispatch(setMessages((prevMessages) => [...prevMessages, data.sendMessage]));
-        dispatch(setReplyToMessage(null));
-        setMention('');
-        dispatch(setMessage(''));
-        emit('chatroom message', {
-          ...messageBody,
-          _id: data.sendMessage._id
-        });
-        dispatch(addChatroomMessage({ chatroomName: currentChat.name, message: data.sendMessage }));
-        dispatch(checkDBFullnessAndSave({
-          storeName: 'ChatroomMessages',
-          chatroomName: currentChat.name,
-          message: data.sendMessage,
-        }));
-        setMessageState('');
-      }
-    } catch (err) {
-      console.error('Error sending message:', err);
-    }
+    // Reset form but keep sending state until confirmation
+    setMessageState("");
+    dispatch(setReplyToMessage(null));
+    setMention("");
   };
 
-  // Close the emoji picker when clicking outside of it
+  useEffect(() => {
+    if (!isConnected) return;
+
+    const handleMessageConfirmation = (data) => {
+      const {
+        messageId,
+        status,
+        chatroomName,
+        message,
+        timestamp,
+        error,
+        sender,
+        deliveredTo,
+        readBy,
+        messageType,
+        replyTo,
+        mention,
+      } = data;
+
+      setIsSending(false); // Reset sending state regardless of outcome
+
+      if (status === "sent") {
+        const confirmedMessage = {
+          _id: messageId,
+          chatroomName,
+          sender,
+          message,
+          messageType,
+          deliveredTo,
+          readBy,
+          status: "sent",
+          replyTo,
+          mention,
+          timestamp,
+        };
+
+        // Add confirmed message to Redux state
+        dispatch(setMessages((prevMessages) => [...prevMessages, confirmedMessage]));
+        dispatch(addChatroomMessage({ chatroomName, message: confirmedMessage }));
+
+        // Save to IndexedDB
+        dispatch(
+          checkDBFullnessAndSave({
+            storeName: "ChatroomMessages",
+            chatroomName,
+            message: confirmedMessage,
+          })
+        );
+      } else if (status === "failure") {
+        console.error(`Message failed to send: ${error}`);
+        // Optionally notify user of failure (e.g., via a toast)
+      }
+    };
+
+    listen("chatroom message received", handleMessageConfirmation);
+
+    return () => {
+      // Cleanup listener (adjust based on useWebSocket implementation)
+    };
+  }, [isConnected, listen, dispatch, currentChat.name]);
+
   const handleClickOutside = useCallback((event) => {
     if (emojiPickerRef.current && !emojiPickerRef.current.contains(event.target)) {
       setShowEmojiPicker(false);
@@ -163,7 +187,6 @@ const { emit, isConnected} = useWebSocket();
     } else {
       document.removeEventListener("mousedown", handleClickOutside);
     }
-
     return () => {
       document.removeEventListener("mousedown", handleClickOutside);
     };
@@ -180,13 +203,9 @@ const { emit, isConnected} = useWebSocket();
             width: "100%",
             py: 1,
             position: "relative",
-            "& .css-kcpv2-MuiInputBase-root-MuiOutlinedInput-root": {
-              padding: 0,
-            },
-      
+            "& .css-kcpv2-MuiInputBase-root-MuiOutlinedInput-root": { padding: 0 },
           }}
         >
-          {/* Message Input with Emoji Picker at the Start */}
           <TextField
             variant="outlined"
             placeholder="Write a message"
@@ -195,6 +214,7 @@ const { emit, isConnected} = useWebSocket();
             onChange={onChange}
             multiline
             minRows={2}
+            disabled={isSending} // Disable input while sending
             InputProps={{
               startAdornment: (
                 <InputAdornment position="start">
@@ -204,6 +224,7 @@ const { emit, isConnected} = useWebSocket();
                       setShowEmojiPicker((prevState) => !prevState);
                     }}
                     sx={{ color: colors.primary[100] }}
+                    disabled={isSending}
                   >
                     <EmojiEmotionsIcon sx={{ fontSize: 28 }} />
                   </IconButton>
@@ -212,10 +233,15 @@ const { emit, isConnected} = useWebSocket();
               endAdornment: (
                 <InputAdornment position="end">
                   <IconButton
-                    type="submit"
+                    onClick={handleFormSubmit}
                     sx={{ color: colors.primary[100], transform: "rotate(0deg)" }}
+                    disabled={isSending}
                   >
-                    <SendIcon sx={{ fontSize: 28 }} />
+                    {isSending ? (
+                      <CircularProgress size={28} sx={{ color: colors.primary[100] }} />
+                    ) : (
+                      <SendIcon sx={{ fontSize: 28 }} />
+                    )}
                   </IconButton>
                 </InputAdornment>
               ),
@@ -223,32 +249,25 @@ const { emit, isConnected} = useWebSocket();
             sx={{
               backgroundColor: colors.primary[400],
               borderRadius: "25px",
-              "& .MuiOutlinedInput-notchedOutline": {
-                border: "none",
-              },
+              "& .MuiOutlinedInput-notchedOutline": { border: "none" },
               height: "auto",
-              overflowY: "auto", // Allow overflow for long messages
+              overflowY: "auto",
               "& .MuiInputBase-input": {
-                marginTop: '20px',
-                textJustify: 'auto',
-                height: "100%", // Ensure it takes full height
-                textAlign: "start", // Center text in the input area
+                marginTop: "20px",
+                textJustify: "auto",
+                height: "100%",
+                textAlign: "start",
               },
             }}
           />
 
-          {/* Emoji Picker */}
           {showEmojiPicker && (
-            <Paper
-              ref={emojiPickerRef} // Reference for closing when clicking outside
-              sx={{ position: "absolute", bottom: "50px", zIndex: 1000 }}
-            >
+            <Paper ref={emojiPickerRef} sx={{ position: "absolute", bottom: "50px", zIndex: 1000 }}>
               <Picker pickerStyle={{ width: "100%" }} onEmojiClick={handleEmojiClick} />
             </Paper>
           )}
         </Box>
 
-        {/* Mention Suggestions */}
         {filteredParticipants.length > 0 && (
           <Box
             sx={{
@@ -267,17 +286,14 @@ const { emit, isConnected} = useWebSocket();
                   key={participant.userId}
                   onClick={() => {
                     setMessageState(
-                      `${messageState.substring(0, messageState.lastIndexOf('@'))}@${participant.firstName} ${participant.lastName} `
+                      `${messageState.substring(0, messageState.lastIndexOf("@"))}@${participant.firstName} ${participant.lastName} `
                     );
-                    setMentionQuery('');
+                    setMentionQuery("");
                     setFilteredParticipants([]);
                   }}
                   sx={{
                     cursor: "pointer",
-                    "&:hover": {
-                      backgroundColor: colors.grey[900],
-                      transition: "background-color 0.3s",
-                    },
+                    "&:hover": { backgroundColor: colors.grey[900], transition: "background-color 0.3s" },
                   }}
                 >
                   <Avatar src={participant.profilePictureUrl} sx={{ marginRight: 2 }} />

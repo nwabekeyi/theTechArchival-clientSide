@@ -40,7 +40,7 @@ const Receipt = ({ receipt }) => {
       }}
     >
       <Typography variant="h6" align="center" gutterBottom>
-        Babtech School of Technology
+        Beks Technology
       </Typography>
       <Typography variant="subtitle2" align="center" gutterBottom>
         Payment Receipt

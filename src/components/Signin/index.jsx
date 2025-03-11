@@ -150,7 +150,7 @@ console.log(path)
                 <IconButton size="small" color="primary">
                   <BadgeRoundedIcon sx={{ color: '#fff' }}/>
                 </IconButton>
-                <Typography variant="h6">Babtech e-learning</Typography>
+                <Typography variant="h6">Beks e-learning</Typography>
               </Box>
             </Box>
 
@@ -200,7 +200,7 @@ console.log(path)
           </Box>
 
           <Box sx={{ textAlign: 'center', mt: 3 }}>
-            <Typography variant="body2">© Babtech Computers {new Date().getFullYear()}</Typography>
+            <Typography variant="body2">© Beks technologies {new Date().getFullYear()}</Typography>
           </Box>
         </Box>
       </Box>

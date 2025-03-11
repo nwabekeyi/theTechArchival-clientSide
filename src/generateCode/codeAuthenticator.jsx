@@ -93,7 +93,7 @@ const CodeAuthenticator = () => {
               fontSize: { xs: "1.2em", md: "2em" },
             }}
           >
-            Welcome to Babtech computers
+            Welcome to Beks technologies
           </Typography>
           <Box
             sx={{

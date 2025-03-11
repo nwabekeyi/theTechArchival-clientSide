@@ -1,6 +1,5 @@
-
 import "./index.css";
-import React, { useState,lazy, Suspense, useEffect } from "react";
+import React, { useState, lazy, Suspense, useEffect } from "react";
 import { Routes, Route, useLocation } from "react-router-dom";
 import Topbar from "./scenes/global/Topbar";
 import Sidebar from "./scenes/global/Sidebar";
@@ -11,7 +10,7 @@ import FloatingMessageIcon from "./components/floatingMessageIcon";
 import { tokens } from "./theme";
 import SignIn from "../../components/Signin";
 import Loader from "../../utils/loader";
-
+import useWebSocket from "../../hooks/useWebSocket";
 
 // Lazy load the components
 const Dashboard = lazy(() => import("./scenes/dashboard"));
@@ -37,30 +36,39 @@ const StudentManagement = lazy(() => import("./scenes/studentManagement/studentM
 const OfflineStudentTable = lazy(() => import("./scenes/offlineStudent/offlineStudent"));
 const StudentInstructors = lazy(() => import("./scenes/studentInstructors"));
 const ChatApp = lazy(() => import("../messaging"));
-import useWebSocket from '../../hooks/useWebSocket'; // Import socket instance
-
 
 function DashboardHome() {
   const [theme, colorMode] = useMode();
   const [userData, setUserData] = useState(null);
   const colors = tokens(theme.palette.mode);
   const user = useSelector((state) => state.users.user);
-  const userRole = user ? user.role : 'not logged in';
-  const { emit, isConnected, listen} = useWebSocket();
+  const userRole = user ? user.role : "not logged in";
+  const { emit, isConnected, listen } = useWebSocket();
   const location = useLocation();
 
   useEffect(() => {
-    // Check if the document.referrer includes 'dashboard'
-    const referrerPath = document.referrer.split('/');
-    const isFromDashboard = referrerPath.includes("dashboard");
-    console.log(referrerPath);
+    // Check if we've already reloaded in this session to prevent infinite loops
+    const hasReloaded = sessionStorage.getItem("hasReloaded");
 
-    // Reload the page if "dashboard" is not in the referrer path
-    if (!isFromDashboard) {
-      window.location.reload();
+    if (!hasReloaded) {
+      const referrer = document.referrer;
+      const referrerPath = referrer ? referrer.split("/") : [];
+      const isFromDashboard = referrerPath.some((part) => part === "dashboard");
+
+      console.log("Referrer:", referrer);
+      console.log("Referrer Path:", referrerPath);
+      console.log("Is from dashboard:", isFromDashboard);
+
+      // Reload if the referrer does NOT contain "dashboard" and is not empty
+      if (!isFromDashboard && referrer !== "") {
+        sessionStorage.setItem("hasReloaded", "true"); // Mark as reloaded
+        window.location.reload();
+      } else {
+        // Mark as loaded even if no reload is needed to prevent re-checking
+        sessionStorage.setItem("hasReloaded", "true");
+      }
     }
-  }, []); // Empty dependency array to ensure it runs only once on mount
-
+  }, []); // Runs only once on mount
 
   const renderRoutesBasedOnRole = (role) => {
     switch (role) {
@@ -115,72 +123,76 @@ function DashboardHome() {
   };
 
   return (
-
     <>
-    {
-      userRole === 'not logged in' 
-      ?
-      <div>
+      {userRole === "not logged in" ? (
+        <div>
           <SignIn />
-      </div>
-
-      :
-      <ColorModeContext.Provider value={colorMode}>
-      <FloatingMessageIcon />
-      <ThemeProvider theme={theme}>
-        <CssBaseline />
-        <Box sx={{ display: "flex", height: "100%",backgroundColor:theme.palette.mode === "light"
-      ? colors.primary[900]
-      : colors.primary[500],
-        px: 2,
-        gap: 1
-      }}>
-          {/* Sidebar */}
-          <Sidebar />
-          {/* Content */}
-          <Box
-            id="dashboard"
-            className="content"
-            sx={{
-              marginX: "0",
-              width: '100%',
-              backgroundColor:'transparent',
-              height: "100vh", // Make the content area take full height
-              display: "flex",
-              flexDirection: "column",
-              overflowY: "auto", // Enable vertical scrolling,
-              justifyContent: 'center',
-              alignItems: 'center',
-              paddingBottom: '1%'
-            }}
-            >
+        </div>
+      ) : (
+        <ColorModeContext.Provider value={colorMode}>
+          <FloatingMessageIcon />
+          <ThemeProvider theme={theme}>
+            <CssBaseline />
             <Box
-            sx={{
-              height: "auto",
-              width:'100%',
-              display: 'flex',
-              justifyContent:'center',
-              backgroundColor:'transparent'}}>
-              <Topbar userData={userData} />
-            </Box>
+              sx={{
+                display: "flex",
+                height: "100%",
+                backgroundColor:
+                  theme.palette.mode === "light" ? colors.primary[900] : colors.primary[500],
+                px: 2,
+                gap: 1,
+              }}
+            >
+              {/* Sidebar */}
+              <Sidebar />
+              {/* Content */}
+              <Box
+                id="dashboard"
+                className="content"
+                sx={{
+                  marginX: "0",
+                  width: "100%",
+                  backgroundColor: "transparent",
+                  height: "100vh",
+                  display: "flex",
+                  flexDirection: "column",
+                  overflowY: "auto",
+                  justifyContent: "center",
+                  alignItems: "center",
+                  paddingBottom: "1%",
+                }}
+              >
+                <Box
+                  sx={{
+                    height: "auto",
+                    width: "100%",
+                    display: "flex",
+                    justifyContent: "center",
+                    backgroundColor: "transparent",
+                  }}
+                >
+                  <Topbar userData={userData} />
+                </Box>
 
-            {/* Routes */}
-            <Box sx={{ overflowY: "auto", width: '100%', height: '100%'}}>
-              <Suspense fallback={<Loader />}>
-                <Routes>
-                  <Route path={userRole === 'not logged in' ? "/signin" : "/"} element={<Dashboard userData={userData} />} />
-                  {userRole && renderRoutesBasedOnRole(userRole)}
-                </Routes>
-              </Suspense>
+                {/* Routes */}
+                <Box sx={{ overflowY: "auto", width: "100%", height: "100%" }}>
+                  <Suspense fallback={<Loader />}>
+                    <Routes>
+                      <Route
+                        path={userRole === "not logged in" ? "/signin" : "/"}
+                        element={<Dashboard userData={userData} />}
+                      />
+                      {userRole && renderRoutesBasedOnRole(userRole)}
+                    </Routes>
+                  </Suspense>
+                </Box>
+              </Box>
             </Box>
-            </Box>
-
-        </Box>
-      </ThemeProvider>
-    </ColorModeContext.Provider>
-    }
-     </>
- );
-};
+          </ThemeProvider>
+        </ColorModeContext.Provider>
+      )}
+    </>
+  );
+}
 
 export default DashboardHome;

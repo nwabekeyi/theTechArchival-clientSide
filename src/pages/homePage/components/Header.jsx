@@ -59,7 +59,7 @@ const Header = () => {
             <div className='flex items-center px-5 lg:px-7.5 xl:px-10 max-lg:py-4'>
                 {/* Conditionally render the "Babtech e-learning" link */}
                     <Link to="/" className='block w-[20rem] xl:mr-8'>
-                        <p className='font-extrabold lg:text-[1.7em]'>Babtech e-learning</p>
+                        <p className='font-extrabold lg:text-[1.7em]'>Beks e-learning</p>
                     </Link>
             {
                location.pathname === '/' && 

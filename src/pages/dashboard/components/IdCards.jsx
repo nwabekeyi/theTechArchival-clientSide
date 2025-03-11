@@ -23,7 +23,7 @@ const IDCard = ({ idCardRef }) => {
     instructorId: '',
     program: 'Data Analysis',
     profilePictureUrl: imgplaceholder,
-    address: '123 Tech Street, Babtech',
+    address: '123 Tech Street, Beks',
   };
 
   const {
@@ -38,7 +38,7 @@ const IDCard = ({ idCardRef }) => {
     profilePictureUrl,
   } = userData || fallbackData;
 
-  const companyName = "Babtech School of Technology";
+  const companyName = "Beks Technology";
 
   return (
     <div ref={idCardRef} style={{ display: 'flex', justifyContent: "center", width: 'auto' }}>
@@ -143,7 +143,7 @@ const IDCard = ({ idCardRef }) => {
         <CardContent style={{ position: 'relative', zIndex: 2, padding: '30px' }}>
           {/* Top Section */}
           <Typography variant="body2" color="#1F3A93" fontWeight="bold" mb={2}>
-            This is to certify that the bearer whose name, email, and phone is affixed is a student/staff of Babtech.
+            This is to certify that the bearer whose name, email, and phone is affixed is a student/staff of Beks.
           </Typography>
           <Typography variant="body2" color="#1F3A93" fontWeight="bold" mb={4}>
             If found, kindly return to the nearest police station or 53, Governor Road, Ikotun, Lagos.
@@ -193,10 +193,10 @@ const IDCard = ({ idCardRef }) => {
             </Grid>
             <Grid item>
               <Typography variant="h6" fontWeight="bold" color="white">
-                Babtech School of Technology
+                Beks Technology
               </Typography>
               <Typography variant="body2" fontWeight="bold" color="white" mt={1}>
-                info@babtechcomputers.com
+                info@beksTech.com
               </Typography>
             </Grid>
           </Grid>

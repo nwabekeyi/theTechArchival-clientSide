@@ -6,7 +6,7 @@ import  Logo from '../../images/logo.svg';
 import ContactForm from './widget/contactForm';
 
 const config = {
-  botName: 'Babtech Support Bot',
+  botName: 'Beks Support Bot',
   initialMessages: [
     createChatBotMessage('`Hello, My name is Babs. How can I assist you today?`', {
       widget: 'welcomeOptions', // Render the WelcomeOptions widget as the initial message

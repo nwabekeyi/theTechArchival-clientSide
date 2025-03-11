@@ -26,7 +26,7 @@ const ChatbotComponent = () => {
         <img src={chatBot} style={{ height: "100vh", width: '90vw' }} />
       <StyledChatbot>
         <Chatbot
-          headerText='Babtech support Bot'
+          headerText='Beks support Bot'
           config={config}
           actionProvider={ActionProvider} // Passing ActionProvider instance as a prop
           messageParser={MessageParser} // Passing MessageParser instance as a prop

@@ -32,6 +32,7 @@ export default function ChatLayout() {
   const user = useSelector((state) => state.users.user);
   const dispatch = useDispatch();
   const selectedView = useSelector((state) => state.message.selectedView);
+  const replyToMessage = useSelector((state) => state.message.replyToMessage);
 
   useEffect(() =>{
     if(isMobile){
@@ -232,6 +233,8 @@ export default function ChatLayout() {
         currentChat={currentChat}
         mention={mention}
         setMention={setMention}
+        currentUser={user}
+        replyToMessage={replyToMessage}
       />
     </Grid>
     :
@@ -239,7 +242,6 @@ export default function ChatLayout() {
       <Welcome />
     </Grid>
     }
-   
   </Grid>
 </Box>
 

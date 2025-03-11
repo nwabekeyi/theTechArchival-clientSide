@@ -119,7 +119,7 @@ const initialState = {
   replyToMessage: null, // Initial state for replyToMessage
   selectedView: null, // Initial state for selectedView
   message: null, // Initial state for single message
-  messages: '' // Initial state for multiple messages
+  messages: [] // Initial state for multiple messages
 };
 
 const messageSlice = createSlice({
@@ -226,8 +226,15 @@ const messageSlice = createSlice({
 
     // New reducer for setting multiple messages
     setMessages: (state, action) => {
-      state.messages = action.payload;
+      if (typeof action.payload === 'function') {
+        // If payload is a function, apply it to the current state.messages
+        state.messages = action.payload(state.messages);
+      } else {
+        // If payload is a value (e.g., an array), set it directly
+        state.messages = action.payload;
+      }
     },
+
     
     // Rest of the reducers...
   },
