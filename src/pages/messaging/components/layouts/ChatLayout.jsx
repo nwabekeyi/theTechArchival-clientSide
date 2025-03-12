@@ -229,13 +229,13 @@ export default function ChatLayout() {
           <Welcome />
         )}
       </Box>
-      <ChatForm 
+      {/* <ChatForm 
         currentChat={currentChat}
         mention={mention}
         setMention={setMention}
         currentUser={user}
         replyToMessage={replyToMessage}
-      />
+      /> */}
     </Grid>
     :
     <Grid sx={{diplay: 'flex', justifyContent: 'center', height:'100%'}}>
